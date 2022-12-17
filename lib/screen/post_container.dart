@@ -1,5 +1,6 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
+import 'package:like_button/like_button.dart';
 import 'package:rootnode/constant/layout_constraints.dart';
 import 'package:rootnode/model/post_model.dart';
 
@@ -182,16 +183,40 @@ class _PostFooterState extends State<_PostFooter> {
     return Padding(
       padding: LayoutConstants.postActionPadding,
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Wrap(spacing: 20, children: const [
-          Icon(
-            Boxicons.bxs_like,
-            color: Colors.white70,
-            size: 20,
+        Wrap(spacing: 20, children: [
+          LikeButton(
+            size: LayoutConstants.postIcon,
+            likeCount: widget.post.likes,
+            likeBuilder: (isLiked) {
+              return isLiked
+                  ? const Icon(
+                      Boxicons.bxs_like,
+                      color: Colors.white70,
+                      size: 20,
+                    )
+                  : const Icon(
+                      Boxicons.bx_like,
+                      color: Colors.white70,
+                      size: 20,
+                    );
+            },
           ),
-          Icon(
-            Boxicons.bxs_message_square_detail,
-            color: Colors.white70,
-            size: 20,
+          LikeButton(
+            size: LayoutConstants.postIcon,
+            likeCount: widget.post.comment,
+            likeBuilder: (isLiked) {
+              return isLiked
+                  ? const Icon(
+                      Boxicons.bxs_message_square_detail,
+                      color: Colors.white70,
+                      size: 20,
+                    )
+                  : const Icon(
+                      Boxicons.bx_message_square_detail,
+                      color: Colors.white70,
+                      size: 20,
+                    );
+            },
           ),
         ]),
         const Icon(

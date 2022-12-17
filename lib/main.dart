@@ -1,20 +1,24 @@
 import 'package:boxicons/boxicons.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:rootnode/constant/layout_constraints.dart';
+import 'package:rootnode/model/post_model.dart';
+import 'package:rootnode/screen/post_container.dart';
+import 'package:rootnode/services/post_api_service.dart';
 
 void main(List<String> args) {
   runApp(MaterialApp(
-    theme: ThemeData(
-      colorScheme: ColorScheme.fromSwatch(
-        // For OverScroll Glow Effect
-        accentColor: const Color(0xFFF1F1F1),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch(
+          // For OverScroll Glow Effect
+          accentColor: const Color(0xFFF1F1F1),
+        ),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        scaffoldBackgroundColor: const Color(0xFF111111),
       ),
-      visualDensity: VisualDensity.adaptivePlatformDensity,
-      scaffoldBackgroundColor: const Color(0xFF111111),
-    ),
-    debugShowCheckedModeBanner: false,
-    home: const HomeScreen(),
-  ));
+      debugShowCheckedModeBanner: false,
+      home: const HomeScreen()));
 }
 
 class HomeScreen extends StatefulWidget {
@@ -26,14 +30,39 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
+  late PostModel? _postModel;
+  final List<Post> _posts = [];
+  int page = 1;
+  late int total;
+
+  void _clearInitials() {
+    setState(() {
+      _posts.clear();
+      page = 1;
+    });
+  }
+
+  void _getInitialData() async {
+    _postModel = await PostApiService.getPost(page: page);
+    Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {
+          _posts.addAll(_postModel!.posts);
+          total = _postModel!.totalPages;
+        }));
+  }
 
   void _fetchMoreData() async {
-    print("Test");
+    if (page == total) return;
+    page = page == total ? total : page + 1;
+    _postModel = await PostApiService.getPost(page: page);
+    Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {
+          _posts.addAll(_postModel!.posts);
+        }));
   }
 
   @override
   void initState() {
     super.initState();
+    _getInitialData();
     _scrollController.addListener(() {
       if (_scrollController.position.maxScrollExtent ==
           _scrollController.offset) {
@@ -44,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _clearInitials();
     super.dispose();
     _scrollController.dispose();
   }
@@ -54,28 +84,41 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         // extendBody: true,
         // extendBodyBehindAppBar: true,
-        bottomNavigationBar: const GNav(
-          tabMargin: EdgeInsets.all(10),
+        bottomNavigationBar: GNav(
+          tabMargin: const EdgeInsets.all(10),
           tabBorderRadius: 50,
-          tabBackgroundColor: Colors.white12,
+          tabBackgroundColor:
+              mqSmallW(context) ? Colors.white12 : Colors.transparent,
           curve: Curves.easeInQuad,
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           color: Colors.white54,
           activeColor: Colors.cyan,
-          iconSize: 20,
-          backgroundColor: Color(0xFF111111),
-          padding: EdgeInsets.all(10),
-          gap: 10,
+          iconSize: mqSmallW(context)
+              ? LayoutConstants.postIconBig
+              : LayoutConstants.postIcon,
+          backgroundColor: const Color(0xFF111111),
+          padding: mqSmallW(context)
+              ? const EdgeInsets.all(10)
+              : const EdgeInsets.all(5),
+          gap: mqSmallW(context) ? 10 : 0,
           tabs: [
-            GButton(icon: Boxicons.bxs_home, text: 'Home' /***/),
-            GButton(icon: Boxicons.bx_stats, text: 'Node' /***/),
-            GButton(icon: Boxicons.bxs_message_square_dots, text: 'Chat'),
-            GButton(icon: Boxicons.bxs_calendar_event, text: 'Event'),
+            GButton(
+                icon: Boxicons.bxs_home,
+                text: mqSmallW(context) ? 'Home' : "" /***/),
+            GButton(
+                icon: Boxicons.bx_stats,
+                text: mqSmallW(context) ? 'Node' : "" /***/),
+            GButton(
+                icon: Boxicons.bxs_message_square_dots,
+                text: mqSmallW(context) ? 'Chat' : ""),
+            GButton(
+                icon: Boxicons.bxs_calendar_event,
+                text: mqSmallW(context) ? 'Event' : ""),
           ],
         ),
         appBar: AppBar(
           elevation: 0,
-          toolbarHeight: 80,
+          toolbarHeight: mqSmallH(context) ? 80 : 60,
           backgroundColor: const Color(0xFF111111),
           title: const RootNodeBar(),
           actions: [
@@ -88,12 +131,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () {},
                   icon: const Icon(Icons.add, color: Colors.white70, size: 24),
                 ),
-                IconButton(
-                  splashRadius: 20,
-                  onPressed: () {},
-                  icon: const Icon(Icons.notifications,
-                      color: Colors.white70, size: 22),
-                )
+                mqSmallW(context)
+                    ? IconButton(
+                        splashRadius: 20,
+                        onPressed: () {},
+                        icon: const Icon(Icons.notifications,
+                            color: Colors.white70, size: 22),
+                      )
+                    : const SizedBox()
               ]),
             ),
           ],
@@ -104,11 +149,41 @@ class _HomeScreenState extends State<HomeScreen> {
           height: double.maxFinite,
           child:
               // POST
-              const Text(""),
+              _posts.isEmpty
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(LayoutConstants.postPadding),
+                        child: CircularProgressIndicator(
+                          color: Colors.white10,
+                        ),
+                      ),
+                    )
+                  : RefreshIndicator(
+                      color: Colors.white10,
+                      backgroundColor: Colors.black12,
+                      onRefresh: () async {
+                        _clearInitials();
+                        _getInitialData();
+                      },
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: _posts.length + 1,
+                        itemBuilder: (context, index) {
+                          return index < _posts.length
+                              ? PostContainer(post: _posts[index])
+                              : PostLoader(page: page, total: total);
+                        },
+                      ),
+                    ),
         ),
       ),
     );
   }
+
+  bool mqSmallW(BuildContext context) =>
+      MediaQuery.of(context).size.width > 320;
+  bool mqSmallH(BuildContext context) =>
+      MediaQuery.of(context).size.height > 320;
 }
 
 class RootNodeBar extends StatelessWidget {
