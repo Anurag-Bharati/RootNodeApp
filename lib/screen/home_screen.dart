@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:rootnode/constant/layout_constraints.dart';
 import 'package:rootnode/model/post_model.dart';
-import 'package:rootnode/screen/post_container.dart';
+import 'package:rootnode/widgets/post_container.dart';
 import 'package:rootnode/services/post_api_service.dart';
 
 class HomeScreen extends StatefulWidget {
