@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:rootnode/screen/home_screen.dart';
 import 'package:rootnode/screen/register_screen.dart';
+import 'package:rootnode/widgets/rootnode_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -64,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: SizedBox(
                         height: double.infinity,
                         child: Image.asset(
-                          "assets/images/nodebg.png",
+                          "assets/images/nodebg1.png",
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -85,65 +87,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ]),
-                  TextFormField(
+                  RootNodeTextField(
                     controller: _emailFieldController,
-                    scrollPadding: EdgeInsets.only(
-                        bottom:
-                            MediaQuery.of(context).viewInsets.bottom + 20 * 8),
-                    style: const TextStyle(
-                      color: Colors.white70,
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    obscureText: false,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'This field is required';
-                      }
-                      return null;
-                    },
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                      hintText: "Email",
-                      hintStyle: const TextStyle(
-                        color: Colors.white54,
-                      ),
-                      labelStyle: const TextStyle(
-                        color: Colors.white54,
-                      ),
-                      errorStyle: TextStyle(color: Colors.red[400]!),
-                    ),
+                    hintText: "Email",
+                    type: TextFieldTypes.email,
+                    onPressed: () {},
                   ),
-                  TextFormField(
+                  RootNodeTextField(
                     controller: _passwordFieldController,
-                    scrollPadding: EdgeInsets.only(
-                        bottom:
-                            MediaQuery.of(context).viewInsets.bottom + 20 * 8),
-                    style: const TextStyle(
-                      color: Colors.white70,
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'This field is required';
-                      }
-                      return null;
-                    },
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                      hintText: "Password",
-                      hintStyle: const TextStyle(
-                        color: Colors.white54,
-                      ),
-                      labelStyle: const TextStyle(
-                        color: Colors.white54,
-                      ),
-                      errorStyle: TextStyle(color: Colors.red[400]!),
-                    ),
+                    hintText: "Password",
+                    type: TextFieldTypes.password,
+                    onPressed: () {},
                   ),
                   Container(
                     decoration: BoxDecoration(
@@ -159,7 +113,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (_globalkey.currentState!.validate()) {
                           _showSnackBar(
                               "Logging in..", Colors.green[400]!, false);
-                          // TODO Route Here
+                          Future.delayed(
+                            const Duration(seconds: 2),
+                            () => Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      const HomeScreen()),
+                            ),
+                          );
                         } else {
                           _showSnackBar(
                               "Invalid fields", Colors.red[400]!, true);
