@@ -64,7 +64,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: SizedBox(
                         height: double.infinity,
                         child: Image.asset(
-                          "assets/images/nodebg1.png",
+                          "assets/images/nodebg.png",
                           fit: BoxFit.cover,
                         ),
                       ),

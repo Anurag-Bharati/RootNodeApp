@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rootnode/screen/home_screen.dart';
+import 'package:rootnode/screen/splash_screen.dart';
 
 void main(List<String> args) {
   runApp(MaterialApp(
@@ -12,5 +12,5 @@ void main(List<String> args) {
         scaffoldBackgroundColor: const Color(0xFF111111),
       ),
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen()));
+      home: const SplashScreen()));
 }
