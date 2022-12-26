@@ -23,6 +23,19 @@ class ObjectBoxInstance {
   // Queries Starts Here
   // User
 
+  int registerUser(User user) {
+    return _userBox.put(user);
+  }
+
+  User? loginUser(String username, String password) {
+    Query<User> query = _userBox
+        .query(User_.username
+            .equals(username)
+            .and(User_.password.equals(password)))
+        .build();
+    return query.findUnique();
+  }
+
   List<User> getAllUser() {
     return _userBox.getAll();
   }

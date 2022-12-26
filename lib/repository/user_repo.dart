@@ -9,19 +9,19 @@ abstract class UserRepo {
 
 class UserRepoImpl extends UserRepo {
   @override
+  Future<int> registerUser(User user) async {
+    // TODO
+    // FIX_THIS => NOT VALIDATED
+    return UserDataSource().registerUser(user);
+  }
+
+  @override
   Future<List<User>> getUsers() {
     return UserDataSource().getAllUsers();
   }
 
   @override
   Future<User?> loginUser(String username, String password) {
-    // TODO: implement loginUser
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<int> registerUser(User user) {
-    // TODO: implement registerUser
-    throw UnimplementedError();
+    return UserDataSource().loginUser(username, password);
   }
 }
