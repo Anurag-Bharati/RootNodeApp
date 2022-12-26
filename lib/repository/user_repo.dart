@@ -1,3 +1,4 @@
+import 'package:rootnode/data_source/local_data_store/student_data_source.dart';
 import 'package:rootnode/model/user.dart';
 
 abstract class UserRepo {
@@ -9,8 +10,7 @@ abstract class UserRepo {
 class UserRepoImpl extends UserRepo {
   @override
   Future<List<User>> getUsers() {
-    // TODO: implement getUsers
-    throw UnimplementedError();
+    return UserDataSource().getAllUsers();
   }
 
   @override
