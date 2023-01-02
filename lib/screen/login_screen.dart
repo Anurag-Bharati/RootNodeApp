@@ -28,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: x,
         content: Text(message),
         duration: const Duration(milliseconds: 1500),
+        margin: const EdgeInsets.all(20),
         action: dismissable
             ? SnackBarAction(
                 label: "OK",
@@ -63,123 +64,126 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: SizedBox(
           height: double.infinity,
-          child: Center(
-            child: SingleChildScrollView(
+          width: double.infinity,
+          child: CustomScrollView(
               controller: _scrollController,
-              physics: null,
-              child: Form(
-                key: _globalkey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // SizedBox(
-                    //   height: 300,
-                    //   child: Opacity(
-                    //       opacity: 0.1,
-                    //       child: Image.asset("assets/images/rootnode_w.png")),
-                    // ),
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: const RootNodeTextLogo(),
-                    ),
-                    RootNodeTextField(
-                      controller: _emailFieldController,
-                      hintText: "Email",
-                      type: TextFieldTypes.email,
-                      onPressed: () {},
-                    ),
-                    RootNodeTextField(
-                      controller: _passwordFieldController,
-                      hintText: "Password",
-                      type: TextFieldTypes.password,
-                      onPressed: () {},
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.cyan,
-                      ),
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 10),
-                      child: TextButton(
-                        style: const ButtonStyle(alignment: Alignment.center),
-                        onPressed: () async {
-                          FocusScope.of(context).unfocus();
-                          if (_globalkey.currentState!.validate()) {
-                            _showSnackBar(
-                                "Logging in..", Colors.green[400]!, false);
-                            User? res = await userRepo.loginUser(
-                              _emailFieldController.text,
-                              _passwordFieldController.text,
-                            );
-                            if (res == null) {
-                              _showSnackBar(
-                                  "Invalid email or password! Please try Again.",
-                                  Colors.red[400]!,
-                                  true);
-                              return;
-                            }
-                            Future.delayed(
-                              const Duration(seconds: 2),
-                              () => Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        HomeScreen(user: res)),
-                              ),
-                            );
-                          } else {
-                            _showSnackBar(
-                                "Invalid fields", Colors.red[400]!, true);
-                          }
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            'Login',
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+              scrollDirection: Axis.vertical,
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Form(
+                    key: _globalkey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // SizedBox(
+                        //   height: 300,
+                        //   child: Opacity(
+                        //       opacity: 0.1,
+                        //       child: Image.asset("assets/images/rootnode_w.png")),
+                        // ),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          margin: const EdgeInsets.only(bottom: 40),
+                          child: const RootNodeTextLogo(),
                         ),
-                      ),
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 20, right: 20, top: 10),
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Text(
-                            "Don't have account?",
-                            style:
-                                TextStyle(color: Colors.white70, fontSize: 16),
+                        RootNodeTextField(
+                          controller: _emailFieldController,
+                          hintText: "Email",
+                          type: TextFieldTypes.email,
+                          onPressed: () {},
+                        ),
+                        RootNodeTextField(
+                          controller: _passwordFieldController,
+                          hintText: "Password",
+                          type: TextFieldTypes.password,
+                          onPressed: () {},
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.cyan,
                           ),
-                          TextButton(
-                              onPressed: (() {
-                                Navigator.pushReplacement(
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 10),
+                          child: TextButton(
+                            style:
+                                const ButtonStyle(alignment: Alignment.center),
+                            onPressed: () async {
+                              FocusScope.of(context).unfocus();
+                              if (_globalkey.currentState!.validate()) {
+                                _showSnackBar(
+                                    "Logging in..", Colors.green[400]!, false);
+                                User? res = await userRepo.loginUser(
+                                  _emailFieldController.text,
+                                  _passwordFieldController.text,
+                                );
+                                if (res == null) {
+                                  _showSnackBar("Invalid email or password",
+                                      Colors.red[400]!, true);
+                                  return;
+                                }
+                                Future.delayed(
+                                  const Duration(seconds: 2),
+                                  () => Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                         builder: (BuildContext context) =>
-                                            const RegisterScreen()));
-                              }),
-                              child: const Text(
-                                "Register",
-                                style:
-                                    TextStyle(color: Colors.cyan, fontSize: 16),
-                              )),
-                        ],
-                      ),
-                    )
-                  ],
+                                            HomeScreen(user: res)),
+                                  ),
+                                );
+                              } else {
+                                _showSnackBar(
+                                    "Invalid fields", Colors.red[400]!, true);
+                              }
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                'Login',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 20, right: 20, top: 10),
+                          child: Wrap(
+                            alignment: WrapAlignment.center,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              const Text(
+                                "Don't have account?",
+                                style: TextStyle(
+                                    color: Colors.white70, fontSize: 16),
+                              ),
+                              TextButton(
+                                  onPressed: (() {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                const RegisterScreen()));
+                                  }),
+                                  child: const Text(
+                                    "Register",
+                                    style: TextStyle(
+                                        color: Colors.cyan, fontSize: 16),
+                                  )),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
+              ]),
         ),
       ),
     );
