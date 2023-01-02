@@ -13,9 +13,9 @@ class UserDataSource {
     }
   }
 
-  Future<User?> loginUser(String username, String password) async {
+  Future<User?> loginUser(String email, String password) async {
     try {
-      return objectBoxInstance.loginUser(username, password);
+      return objectBoxInstance.loginUser(email, password);
     } catch (e) {
       return null; // => Future.value(0) inside async
     }

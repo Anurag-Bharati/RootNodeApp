@@ -27,11 +27,9 @@ class ObjectBoxInstance {
     return _userBox.put(user);
   }
 
-  User? loginUser(String username, String password) {
+  User? loginUser(String email, String password) {
     Query<User> query = _userBox
-        .query(User_.username
-            .equals(username)
-            .and(User_.password.equals(password)))
+        .query(User_.email.equals(email).and(User_.password.equals(password)))
         .build();
     return query.findUnique();
   }

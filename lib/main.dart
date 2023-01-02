@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:rootnode/helper/objectbox.dart';
 import 'package:rootnode/screen/splash_screen.dart';
+import 'package:rootnode/state/objectbox_state.dart';
 
-void main(List<String> args) {
+void main(List<String> args) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Create an Object for ObjectBoxInstance
+  ObjectBoxState.objectBoxInstance = await ObjectBoxInstance.init();
   runApp(MaterialApp(
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch(

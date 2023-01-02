@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:rootnode/model/user.dart';
+import 'package:rootnode/repository/user_repo.dart';
+import 'package:rootnode/screen/home_screen.dart';
 import 'package:rootnode/widgets/rootnode_widget.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -9,9 +12,13 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final userRepo = UserRepoImpl();
+  final _fnameFieldController = TextEditingController();
+  final _lnameFieldController = TextEditingController();
+  final _unameFieldController = TextEditingController();
   final _emailFieldController = TextEditingController();
-  final _scrollController = ScrollController();
   final _passwordFieldController = TextEditingController();
+  final _scrollController = ScrollController();
   final _globalkey = GlobalKey<FormState>();
 
   _showSnackBar(String message, Color x, bool dismissable) {
@@ -33,9 +40,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  _showRegSnackBar(int status) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: status > 0 ? Colors.green : Colors.red,
+        content: status > 0
+            ? const Text("Registered Successfully!")
+            : const Text("Something went wrong!"),
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: "OK",
+          onPressed: () {},
+          textColor: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  _registerUser() async {
+    _showSnackBar("Signing Up..", Colors.green[400]!, false);
+
+    User user = User(
+      _fnameFieldController.text,
+      _lnameFieldController.text,
+      _unameFieldController.text,
+      _emailFieldController.text,
+      _passwordFieldController.text,
+    );
+
+    int status = await userRepo.registerUser(user);
+    _showRegSnackBar(status);
+    if (status > 0) {
+      Future.delayed(const Duration(seconds: 2),
+          () => _backToLogin(context, _emailFieldController.text));
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
+    _fnameFieldController.dispose();
+    _lnameFieldController.dispose();
     _emailFieldController.dispose();
     _passwordFieldController.dispose();
     _scrollController.dispose();
@@ -48,108 +95,88 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: SizedBox(
           height: double.infinity,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            physics: null,
-            child: Form(
-              key: _globalkey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Stack(children: [
+          child: Form(
+            key: _globalkey,
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                     Container(
-                      margin: const EdgeInsets.only(bottom: 30),
-                      height: 300,
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                        height: double.infinity,
-                        child: Image.asset(
-                          "assets/images/nodebg.png",
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 30),
-                      height: 300,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [
-                              Colors.transparent,
-                              Colors.transparent,
-                              Color(0xFF111111)
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter),
-                      ),
-                    ),
-                    Positioned(
-                      left: 20,
-                      top: 20,
+                      padding: const EdgeInsets.all(20),
+                      alignment: Alignment.topLeft,
                       child: IconButton(
                           highlightColor: Colors.transparent,
                           splashColor: Colors.transparent,
-                          onPressed: () => _backToLogin(context),
+                          onPressed: () => _backToLogin(context, null),
                           icon: const Icon(
                             Icons.arrow_back_ios,
                             color: Colors.white70,
                           )),
                     ),
-                  ]),
-                  RootNodeTextField(
-                    controller: _emailFieldController,
-                    hintText: "Name",
-                    type: TextFieldTypes.email,
-                    onPressed: () {},
-                  ),
-                  RootNodeTextField(
-                    controller: _emailFieldController,
-                    hintText: "Email",
-                    type: TextFieldTypes.email,
-                    onPressed: () {},
-                  ),
-                  RootNodeTextField(
-                    controller: _passwordFieldController,
-                    hintText: "Password",
-                    type: TextFieldTypes.password,
-                    onPressed: () {},
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.cyan,
+                    RootNodeTextField(
+                      controller: _fnameFieldController,
+                      hintText: "First name",
+                      type: TextFieldTypes.email,
+                      onPressed: () {},
                     ),
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 10),
-                    child: TextButton(
-                      style: const ButtonStyle(alignment: Alignment.center),
-                      onPressed: () {
-                        FocusScope.of(context).unfocus();
-                        if (_globalkey.currentState!.validate()) {
-                          _showSnackBar(
-                              "Signing Up..", Colors.green[400]!, false);
-                          Future.delayed(const Duration(seconds: 2),
-                              () => _backToLogin(context));
-                        } else {
-                          _showSnackBar(
-                              "Invalid fields", Colors.red[400]!, true);
-                        }
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Text(
-                          'SignUp',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
+                    RootNodeTextField(
+                      controller: _lnameFieldController,
+                      hintText: "Last name",
+                      type: TextFieldTypes.email,
+                      onPressed: () {},
+                    ),
+                    RootNodeTextField(
+                      controller: _unameFieldController,
+                      hintText: "Username",
+                      type: TextFieldTypes.email,
+                      onPressed: () {},
+                    ),
+                    RootNodeTextField(
+                      controller: _emailFieldController,
+                      hintText: "Email",
+                      type: TextFieldTypes.email,
+                      onPressed: () {},
+                    ),
+                    RootNodeTextField(
+                      controller: _passwordFieldController,
+                      hintText: "Password",
+                      type: TextFieldTypes.password,
+                      onPressed: () {},
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.cyan,
+                      ),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 10),
+                      child: TextButton(
+                        style: const ButtonStyle(alignment: Alignment.center),
+                        onPressed: () {
+                          FocusScope.of(context).unfocus();
+                          if (_globalkey.currentState!.validate()) {
+                            _registerUser();
+                          } else {
+                            _showSnackBar(
+                                "Invalid fields", Colors.red[400]!, true);
+                          }
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            'SignUp',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -158,7 +185,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void _backToLogin(BuildContext context) {
-    Navigator.pop(context);
+  void _backToLogin(BuildContext context, String? email) {
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => HomeScreen(email)));
   }
 }

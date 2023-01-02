@@ -119,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (BuildContext context) =>
-                                      const HomeScreen()),
+                                      HomeScreen(null)),
                             ),
                           );
                         } else {

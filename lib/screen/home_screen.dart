@@ -7,7 +7,8 @@ import 'package:rootnode/widgets/post_container.dart';
 import 'package:rootnode/services/post_api_service.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  String? email;
+  HomeScreen(email, {super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
