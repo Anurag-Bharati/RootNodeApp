@@ -6,9 +6,11 @@ import 'package:rootnode/model/post_model.dart';
 import 'package:rootnode/widgets/post_container.dart';
 import 'package:rootnode/services/post_api_service.dart';
 
+import '../model/user.dart';
+
 class HomeScreen extends StatefulWidget {
-  String? email;
-  HomeScreen(email, {super.key});
+  final User? user;
+  const HomeScreen({super.key, this.user});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -106,7 +108,9 @@ class _HomeScreenState extends State<HomeScreen> {
           elevation: 0,
           toolbarHeight: mqSmallH(context) ? 80 : 60,
           backgroundColor: const Color(0xFF111111),
-          title: const RootNodeBar(),
+          title: RootNodeBar(
+            username: widget.user == null ? null : widget.user!.username,
+          ),
           actions: [
             Container(
               alignment: Alignment.center,
@@ -173,8 +177,10 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class RootNodeBar extends StatelessWidget {
+  final String? username;
   const RootNodeBar({
     Key? key,
+    this.username,
   }) : super(key: key);
 
   @override
@@ -206,8 +212,8 @@ class RootNodeBar extends StatelessWidget {
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 "Good Morning,",
                 style: TextStyle(
                     overflow: TextOverflow.fade,
@@ -216,8 +222,8 @@ class RootNodeBar extends StatelessWidget {
                     fontSize: 14),
               ),
               Text(
-                "ANURAG",
-                style: TextStyle(
+                username ?? "ANURAG",
+                style: const TextStyle(
                   overflow: TextOverflow.fade,
                   color: Colors.white70,
                   fontWeight: FontWeight.w600,

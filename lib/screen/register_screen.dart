@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
-import 'package:rootnode/screen/home_screen.dart';
+import 'package:rootnode/screen/login_screen.dart';
 import 'package:rootnode/widgets/rootnode_widget.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -189,6 +189,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => HomeScreen(email)));
+            builder: (BuildContext context) => LoginScreen(email: email)));
   }
 }
