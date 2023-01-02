@@ -141,11 +141,8 @@ class _HomeScreenState extends State<HomeScreen> {
               // POST
               _posts.isEmpty
                   ? const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(LayoutConstants.postPadding),
-                        child: CircularProgressIndicator(
-                          color: Colors.white10,
-                        ),
+                      child: CircularProgressIndicator(
+                        color: Colors.white10,
                       ),
                     )
                   : RefreshIndicator(

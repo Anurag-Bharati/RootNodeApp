@@ -252,8 +252,13 @@ class PostLoader extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     color: Colors.white70),
               )
-            : const CircularProgressIndicator(
-                color: Colors.white10,
+            : const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                  color: Colors.white10,
+                ),
               ),
       ),
     ]);
