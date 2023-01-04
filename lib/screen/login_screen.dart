@@ -92,13 +92,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: _emailFieldController,
                           hintText: "Email",
                           type: TextFieldTypes.email,
-                          onPressed: () {},
                         ),
                         RootNodeTextField(
                           controller: _passwordFieldController,
                           hintText: "Password",
                           type: TextFieldTypes.password,
-                          onPressed: () {},
                         ),
                         Container(
                           decoration: BoxDecoration(

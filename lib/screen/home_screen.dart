@@ -134,34 +134,39 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         body: Container(
-          color: const Color(0xFF111111),
+          alignment: Alignment.center,
           width: double.infinity,
-          height: double.maxFinite,
-          child:
-              // POST
-              _posts.isEmpty
-                  ? const Center(
-                      child: CircularProgressIndicator(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 650),
+            color: const Color(0xFF111111),
+            width: double.infinity,
+            height: double.maxFinite,
+            child:
+                // POST
+                _posts.isEmpty
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white10,
+                        ),
+                      )
+                    : RefreshIndicator(
                         color: Colors.white10,
-                      ),
-                    )
-                  : RefreshIndicator(
-                      color: Colors.white10,
-                      backgroundColor: Colors.black12,
-                      onRefresh: () async {
-                        _clearInitials();
-                        _getInitialData();
-                      },
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        itemCount: _posts.length + 1,
-                        itemBuilder: (context, index) {
-                          return index < _posts.length
-                              ? PostContainer(post: _posts[index])
-                              : PostLoader(page: page, total: total);
+                        backgroundColor: Colors.black12,
+                        onRefresh: () async {
+                          _clearInitials();
+                          _getInitialData();
                         },
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: _posts.length + 1,
+                          itemBuilder: (context, index) {
+                            return index < _posts.length
+                                ? PostContainer(post: _posts[index])
+                                : PostLoader(page: page, total: total);
+                          },
+                        ),
                       ),
-                    ),
+          ),
         ),
       ),
     );

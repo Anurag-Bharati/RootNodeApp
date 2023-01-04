@@ -140,31 +140,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         controller: _fnameFieldController,
                         hintText: "First name",
                         type: TextFieldTypes.email,
-                        onPressed: () {},
                       ),
                       RootNodeTextField(
                         controller: _lnameFieldController,
                         hintText: "Last name",
                         type: TextFieldTypes.email,
-                        onPressed: () {},
                       ),
                       RootNodeTextField(
                         controller: _unameFieldController,
                         hintText: "Username",
                         type: TextFieldTypes.email,
-                        onPressed: () {},
                       ),
                       RootNodeTextField(
                         controller: _emailFieldController,
                         hintText: "Email",
                         type: TextFieldTypes.email,
-                        onPressed: () {},
                       ),
                       RootNodeTextField(
                         controller: _passwordFieldController,
                         hintText: "Password",
                         type: TextFieldTypes.password,
-                        onPressed: () {},
                       ),
                       Container(
                         decoration: BoxDecoration(

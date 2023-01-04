@@ -8,13 +8,11 @@ class RootNodeTextField extends StatefulWidget {
     required this.controller,
     required this.type,
     required this.hintText,
-    required this.onPressed,
   }) : super(key: key);
 
   final TextEditingController controller;
   final TextFieldTypes type;
   final String hintText;
-  final Null Function() onPressed;
 
   @override
   State<RootNodeTextField> createState() => _RootNodeTextFieldState();
@@ -36,7 +34,6 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
           child: TextFormField(
             scrollPadding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom + 20 * 8),
-            onTap: widget.onPressed(),
             controller: widget.controller,
             style: const TextStyle(
               color: Colors.white70,

@@ -4,12 +4,11 @@ import 'package:rootnode/state/objectbox_state.dart';
 
 class UserDataSource {
   ObjectBoxInstance get objectBoxInstance => ObjectBoxState.objectBoxInstance!;
-  // ObjectBoxInstance  objectBoxInstance = ObjectBoxState.objectBoxInstance!;
   Future<int> registerUser(User user) async {
     try {
       return objectBoxInstance.registerUser(user);
     } catch (e) {
-      return 0; // => Future.value(0) inside async
+      return 0;
     }
   }
 
@@ -17,7 +16,7 @@ class UserDataSource {
     try {
       return objectBoxInstance.loginUser(email, password);
     } catch (e) {
-      return null; // => Future.value(0) inside async
+      return null;
     }
   }
 
