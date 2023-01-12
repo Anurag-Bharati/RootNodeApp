@@ -1,7 +1,7 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
-import 'package:rootnode/constant/layout_constraints.dart';
+import 'package:rootnode/app/constant/layout_constraints.dart';
 import 'package:rootnode/model/post_model.dart';
 
 class PostContainer extends StatelessWidget {

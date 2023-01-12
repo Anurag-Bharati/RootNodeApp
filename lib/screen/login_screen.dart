@@ -3,9 +3,11 @@ import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/home_screen.dart';
 import 'package:rootnode/screen/register_screen.dart';
-import 'package:rootnode/widgets/rootnode_widget.dart';
+import 'package:rootnode/widgets/text_field.dart';
+import 'package:rootnode/app/utils/snackbar.dart';
 
 class LoginScreen extends StatefulWidget {
+  static const route = "/login";
   final String? email;
   const LoginScreen({super.key, this.email});
 
@@ -19,26 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _scrollController = ScrollController();
   final _passwordFieldController = TextEditingController();
   final _globalkey = GlobalKey<FormState>();
-
-  _showSnackBar(String message, Color x, bool dismissable) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: x,
-        content: Text(message),
-        duration: const Duration(milliseconds: 1500),
-        margin: const EdgeInsets.all(20),
-        action: dismissable
-            ? SnackBarAction(
-                label: "OK",
-                onPressed: () {},
-                textColor: Colors.white,
-              )
-            : null,
-      ),
-    );
-  }
 
   @override
   void initState() {
@@ -111,15 +93,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: () async {
                               FocusScope.of(context).unfocus();
                               if (_globalkey.currentState!.validate()) {
-                                _showSnackBar(
-                                    "Logging in..", Colors.green[400]!, false);
+                                showSnackbar(
+                                    context, "Logging in..", Colors.green[400]!,
+                                    dismissable: false);
                                 User? res = await userRepo.loginUser(
                                   _emailFieldController.text,
                                   _passwordFieldController.text,
                                 );
                                 if (res == null) {
-                                  _showSnackBar("Invalid email or password",
-                                      Colors.red[400]!, true);
+                                  // ignore: use_build_context_synchronously
+                                  showSnackbar(
+                                      context,
+                                      "Invalid email or password",
+                                      Colors.red[400]!);
                                   return;
                                 }
                                 Future.delayed(
@@ -132,8 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 );
                               } else {
-                                _showSnackBar(
-                                    "Invalid fields", Colors.red[400]!, true);
+                                showSnackbar(context, "Invalid fields",
+                                    Colors.red[400]!);
                               }
                             },
                             child: const Padding(

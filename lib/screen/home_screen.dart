@@ -1,7 +1,7 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:rootnode/constant/layout_constraints.dart';
+import 'package:rootnode/app/constant/layout_constraints.dart';
 import 'package:rootnode/model/post_model.dart';
 import 'package:rootnode/widgets/post_container.dart';
 import 'package:rootnode/services/post_api_service.dart';
@@ -9,6 +9,7 @@ import 'package:rootnode/services/post_api_service.dart';
 import '../model/user.dart';
 
 class HomeScreen extends StatefulWidget {
+  static const String route = "/home";
   final User? user;
   const HomeScreen({super.key, this.user});
 

@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:http/http.dart' as http;
-import 'package:rootnode/constant/api_constant.dart';
+import 'package:rootnode/app/constant/api_constant.dart';
 import 'package:rootnode/model/post_model.dart';
 
 class PostApiService {

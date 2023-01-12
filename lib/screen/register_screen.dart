@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:rootnode/app/utils/snackbar.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/login_screen.dart';
-import 'package:rootnode/widgets/rootnode_widget.dart';
+import 'package:rootnode/widgets/text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
+  static const route = "/register";
   const RegisterScreen({super.key});
 
   @override
@@ -20,26 +22,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordFieldController = TextEditingController();
   final _scrollController = ScrollController();
   final _globalkey = GlobalKey<FormState>();
-
-  _showSnackBar(String message, Color x, bool dismissable) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: x,
-        content: Text(message),
-        duration: const Duration(milliseconds: 1500),
-        margin: const EdgeInsets.all(20),
-        action: dismissable
-            ? SnackBarAction(
-                label: "OK",
-                onPressed: () {},
-                textColor: Colors.white,
-              )
-            : null,
-      ),
-    );
-  }
 
   _showRegSnackBar(int status) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -62,7 +44,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   _registerUser() async {
-    _showSnackBar("Signing Up..", Colors.green[400]!, false);
+    showSnackbar(context, "Signing Up..", Colors.green[400]!,
+        dismissable: false);
 
     User user = User(
       _fnameFieldController.text,
@@ -175,8 +158,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             if (_globalkey.currentState!.validate()) {
                               _registerUser();
                             } else {
-                              _showSnackBar(
-                                  "Invalid fields", Colors.red[400]!, true);
+                              showSnackbar(
+                                  context, "Invalid fields", Colors.red[400]!);
                             }
                           },
                           child: const Padding(
