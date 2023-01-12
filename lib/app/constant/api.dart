@@ -1,19 +1,20 @@
 class ApiConstants {
-  static String baseURL = 'http://10.0.2.2:3000';
-  static String apiURL = '/api/v0';
+  static const String baseUrl = 'http://10.0.2.2:3000';
   /* AUTH  */
-  static String register = '/auth/register';
-  static String login = '/auth/login';
-  static String refresh = '/auth/refresh';
-  static String logout = '/auth/logout';
+  static const String register = '/auth/register';
+  static const String login = '/auth/login';
+  static const String refresh = '/auth/refresh';
+  static const String logout = '/auth/logout';
 
   /* USER */
-  static String whoAmI = '/user/whoami';
-  static String isUsernameUnique = '/user/unique';
+  static const String whoAmI = '/api/v0/user/whoami';
+  static const String isUsernameUnique = '/api/v0/user/unique';
 
   /* ALL */
-  static String post = "/post";
-  static String conn = "/conn";
-  static String story = "/story";
-  static String event = "/event";
+  static const String auth = "/api/v0/auth";
+  static const String user = "/api/v0/user";
+  static const String post = "/api/v0/post";
+  static const String conn = "/api/v0/conn";
+  static const String story = "/api/v0/story";
+  static const String event = "/api/v0/event";
 }
