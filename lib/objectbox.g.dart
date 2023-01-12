@@ -105,7 +105,9 @@ ModelDefinition getObjectBoxModel() {
           final fnameOffset = fbb.writeString(object.fname);
           final lnameOffset = fbb.writeString(object.lname);
           final emailOffset = fbb.writeString(object.email);
-          final usernameOffset = fbb.writeString(object.username);
+          final usernameOffset = object.username == null
+              ? null
+              : fbb.writeString(object.username!);
           final passwordOffset = fbb.writeString(object.password);
           fbb.startTable(7);
           fbb.addInt64(0, object.uid);
@@ -127,12 +129,12 @@ ModelDefinition getObjectBoxModel() {
               const fb.StringReader(asciiOptimization: true)
                   .vTableGet(buffer, rootOffset, 8, ''),
               const fb.StringReader(asciiOptimization: true)
-                  .vTableGet(buffer, rootOffset, 12, ''),
-              const fb.StringReader(asciiOptimization: true)
                   .vTableGet(buffer, rootOffset, 10, ''),
               const fb.StringReader(asciiOptimization: true)
                   .vTableGet(buffer, rootOffset, 14, ''),
-              uid: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
+              uid: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0))
+            ..username = const fb.StringReader(asciiOptimization: true)
+                .vTableGetNullable(buffer, rootOffset, 12);
 
           return object;
         })

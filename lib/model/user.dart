@@ -7,9 +7,8 @@ class User {
   String fname;
   String lname;
   String email;
-  String username;
+  String? username;
   String password;
 
-  User(this.fname, this.lname, this.username, this.email, this.password,
-      {this.uid = 0});
+  User(this.fname, this.lname, this.email, this.password, {this.uid = 0});
 }

@@ -17,7 +17,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final userRepo = UserRepoImpl();
   final _fnameFieldController = TextEditingController();
   final _lnameFieldController = TextEditingController();
-  final _unameFieldController = TextEditingController();
+  final _confirmFieldController = TextEditingController();
   final _emailFieldController = TextEditingController();
   final _passwordFieldController = TextEditingController();
   final _scrollController = ScrollController();
@@ -50,7 +50,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     User user = User(
       _fnameFieldController.text,
       _lnameFieldController.text,
-      _unameFieldController.text,
       _emailFieldController.text,
       _passwordFieldController.text,
     );
@@ -130,11 +129,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         type: TextFieldTypes.email,
                       ),
                       RootNodeTextField(
-                        controller: _unameFieldController,
-                        hintText: "Username",
-                        type: TextFieldTypes.email,
-                      ),
-                      RootNodeTextField(
                         controller: _emailFieldController,
                         hintText: "Email",
                         type: TextFieldTypes.email,
@@ -142,6 +136,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       RootNodeTextField(
                         controller: _passwordFieldController,
                         hintText: "Password",
+                        type: TextFieldTypes.password,
+                      ),
+                      RootNodeTextField(
+                        controller: _confirmFieldController,
+                        hintText: "Confirm password",
                         type: TextFieldTypes.password,
                       ),
                       Container(
