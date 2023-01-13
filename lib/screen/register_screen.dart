@@ -54,7 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _passwordFieldController.text,
     );
 
-    int status = await userRepo.registerUser(user);
+    int status = await userRepo.saveUser(user);
     _showRegSnackBar(status);
     if (status > 0) {
       Future.delayed(const Duration(seconds: 2),

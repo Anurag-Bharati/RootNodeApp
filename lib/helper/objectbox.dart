@@ -10,7 +10,7 @@ class ObjectBoxInstance {
     _userBox = Box<User>(_store);
   }
 
-  // Init of ObjectBox
+  // Init ObjectBox
   static Future<ObjectBoxInstance> init() async {
     var dir = await getApplicationDocumentsDirectory();
     final store = Store(
@@ -20,13 +20,7 @@ class ObjectBoxInstance {
     return ObjectBoxInstance(store);
   }
 
-  // Queries Starts Here
-  // User
-
-  int registerUser(User user) {
-    return _userBox.put(user);
-  }
-
+  int saveUser(User user) => _userBox.put(user);
   User? loginUser(String email, String password) {
     Query<User> query = _userBox
         .query(User_.email.equals(email).and(User_.password.equals(password)))
@@ -34,7 +28,5 @@ class ObjectBoxInstance {
     return query.findUnique();
   }
 
-  List<User> getAllUser() {
-    return _userBox.getAll();
-  }
+  List<User> getAllUser() => _userBox.getAll();
 }

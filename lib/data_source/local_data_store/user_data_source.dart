@@ -4,9 +4,9 @@ import 'package:rootnode/state/objectbox_state.dart';
 
 class UserDataSource {
   ObjectBoxInstance get objectBoxInstance => ObjectBoxState.objectBoxInstance!;
-  Future<int> registerUser(User user) async {
+  Future<int> saveUser(User user) async {
     try {
-      return objectBoxInstance.registerUser(user);
+      return objectBoxInstance.saveUser(user);
     } catch (e) {
       return 0;
     }
