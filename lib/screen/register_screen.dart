@@ -23,45 +23,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _scrollController = ScrollController();
   final _globalkey = GlobalKey<FormState>();
 
-  _showRegSnackBar(int status) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: status > 0 ? Colors.green : Colors.red,
-        margin: const EdgeInsets.all(20),
-        content: status > 0
-            ? const Text("Registered Successfully!")
-            : const Text("Something went wrong!"),
-        duration: const Duration(seconds: 3),
-        action: SnackBarAction(
-          label: "OK",
-          onPressed: () {},
-          textColor: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  _registerUser() async {
-    showSnackbar(context, "Signing Up..", Colors.green[400]!,
-        dismissable: false);
-
-    User user = User(
-      _fnameFieldController.text,
-      _lnameFieldController.text,
-      _emailFieldController.text,
-      _passwordFieldController.text,
-    );
-
-    int status = await userRepo.saveUser(user);
-    _showRegSnackBar(status);
-    if (status > 0) {
-      Future.delayed(const Duration(seconds: 2),
-          () => _backToLogin(context, _emailFieldController.text));
-    }
-  }
-
   @override
   void dispose() {
     super.dispose();
@@ -155,7 +116,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           onPressed: () {
                             FocusScope.of(context).unfocus();
                             if (_globalkey.currentState!.validate()) {
-                              _registerUser();
+                              _saveUser();
                             } else {
                               showSnackbar(
                                   context, "Invalid fields", Colors.red[400]!);
@@ -183,6 +144,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  _saveUser() async {
+    showSnackbar(context, "Signing Up..", Colors.green[400]!,
+        dismissable: false);
+
+    User user = User(
+      _fnameFieldController.text,
+      _lnameFieldController.text,
+      _emailFieldController.text,
+      _passwordFieldController.text,
+    );
+
+    int status = await userRepo.saveUser(user);
+    _switch(status);
+  }
+
+  _switch(status) {
+    String msg;
+    msg = status > 0 ? "Registered Successfully!" : "Something went wrong!";
+    Color color = status > 0 ? Colors.green : Colors.red;
+    showSnackbar(context, msg, color);
+    if (status > 0) {
+      Future.delayed(const Duration(seconds: 2),
+          () => _backToLogin(context, _emailFieldController.text));
+    }
   }
 
   void _backToLogin(BuildContext context, String? email) {

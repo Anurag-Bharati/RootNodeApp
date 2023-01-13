@@ -27,7 +27,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (widget.email != null) {
       _emailFieldController.text = widget.email!;
     }
-
     super.initState();
   }
 
@@ -59,12 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // SizedBox(
-                        //   height: 300,
-                        //   child: Opacity(
-                        //       opacity: 0.1,
-                        //       child: Image.asset("assets/images/rootnode_w.png")),
-                        // ),
                         Container(
                           padding: const EdgeInsets.all(20),
                           margin: const EdgeInsets.only(bottom: 40),
