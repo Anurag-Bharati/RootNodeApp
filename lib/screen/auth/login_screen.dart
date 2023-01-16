@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
-import 'package:rootnode/screen/home_screen.dart';
-import 'package:rootnode/screen/register_screen.dart';
+import 'package:rootnode/screen/auth/register_screen.dart';
+import 'package:rootnode/screen/dashboard/home_screen.dart';
 import 'package:rootnode/widgets/text_field.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
 
 class LoginScreen extends StatefulWidget {
-  static const route = "/login";
+  static const route = "login";
   final String? email;
   const LoginScreen({super.key, this.email});
 

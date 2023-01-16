@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
-import 'package:rootnode/screen/login_screen.dart';
+import 'package:rootnode/screen/auth/login_screen.dart';
 import 'package:rootnode/widgets/text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
-  static const route = "/register";
+  static const route = "register";
   const RegisterScreen({super.key});
 
   @override
@@ -25,12 +25,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     _fnameFieldController.dispose();
     _lnameFieldController.dispose();
     _emailFieldController.dispose();
     _passwordFieldController.dispose();
     _scrollController.dispose();
+    super.dispose();
   }
 
   @override

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/routes.dart';
 import 'package:rootnode/app/theme.dart';
-import 'package:rootnode/screen/splash_screen.dart';
+import 'package:rootnode/screen/dashboard/dashboard.dart';
+import 'package:rootnode/screen/dashboard/home_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
       title: 'RootNode',
       debugShowCheckedModeBanner: false,
       theme: getApplicationThemeData(),
-      initialRoute: SplashScreen.route,
+      initialRoute: DashboardScreen.route,
       routes: getAppRoutes,
     );
   }
