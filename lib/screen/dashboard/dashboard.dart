@@ -1,6 +1,7 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/screen/dashboard/event_screen.dart';
@@ -25,19 +26,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
   }
 
-  void showNavbar() => setState(() {
-        navVisible = true;
-      });
-  void hideNavbar() => setState(() {
-        navVisible = false;
-      });
+  void showNavbar() => null;
+  void hideNavbar() => null;
+
+  // setState(() {navVisible = false;});
 
   int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
+      // extendBody: true,
       appBar: AppBar(
         elevation: 0,
         toolbarHeight: mqSmallH(context) ? 80 : 60,
@@ -171,26 +170,12 @@ class RootNodeBar extends StatelessWidget {
         ),
         const SizedBox(width: 10 - 3),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Wrap(
+            direction: Axis.vertical,
+            spacing: -5,
             children: [
-              const Text(
-                "Good Morning,",
-                style: TextStyle(
-                    overflow: TextOverflow.fade,
-                    color: Colors.white54,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 14),
-              ),
-              Text(
-                username ?? "ANURAG",
-                style: const TextStyle(
-                  overflow: TextOverflow.fade,
-                  color: Colors.white70,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                ),
-              ),
+              Text("Good Morning,", style: RootNodeFontStyle.label),
+              Text(username ?? "ANURAG", style: RootNodeFontStyle.title),
             ],
           ),
         ),

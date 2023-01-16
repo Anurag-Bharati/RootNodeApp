@@ -1,6 +1,7 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
+import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
 import 'package:rootnode/model/post_model.dart';
 
@@ -60,39 +61,21 @@ class _PostHeader extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Expanded(
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(
-              post.user,
-              style: const TextStyle(
-                  overflow: TextOverflow.ellipsis,
-                  color: Colors.white70,
-                  fontSize: LayoutConstants.postTitle,
-                  fontWeight: FontWeight.w600),
-            ),
-            Text(
-              post.usertag,
-              style: const TextStyle(
-                  overflow: TextOverflow.ellipsis,
-                  color: Colors.white70,
-                  fontSize: LayoutConstants.postMetaData,
-                  fontWeight: FontWeight.w400),
-            ),
+          child: Wrap(direction: Axis.vertical, spacing: -5, children: [
+            Text(post.user, style: RootNodeFontStyle.title),
+            Text(post.usertag, style: RootNodeFontStyle.subtitle),
           ]),
         ),
         Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             spacing: 10,
-            children: const [
+            children: [
               Text(
                 "14h",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: LayoutConstants.postMetaData,
-                    fontWeight: FontWeight.w400),
+                style: RootNodeFontStyle.label,
               ),
-              Icon(
+              const Icon(
                 Boxicons.bx_dots_vertical_rounded,
                 color: Colors.white70,
                 size: LayoutConstants.postIcon,
@@ -121,10 +104,7 @@ class _PostBody extends StatelessWidget {
           child: Text(
             post.content,
             softWrap: true,
-            style: const TextStyle(
-                color: Colors.white70,
-                fontSize: LayoutConstants.postSubtitle,
-                fontWeight: FontWeight.w400),
+            style: RootNodeFontStyle.caption,
           ),
         ),
         post.media != null

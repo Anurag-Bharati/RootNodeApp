@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/model/post_model.dart';
 import 'package:rootnode/services/post_api_service.dart';
+import 'package:rootnode/widgets/posts.dart';
 import 'package:rootnode/widgets/stories.dart';
 
 import '../../model/user.dart';
@@ -31,7 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int page = 1;
   late int total;
   bool navHidden = false;
-  void _clearInitials() {
+
+  void _clearInitials() async {
     setState(() {
       _posts.clear();
       page = 1;
@@ -40,10 +42,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _getInitialData() async {
     _postModel = await PostApiService.getPost(page: page);
-    setState(() {
-      _posts.addAll(_postModel!.posts);
-      total = _postModel!.totalPages;
-    });
+    Future.delayed(
+        const Duration(seconds: 1),
+        () => setState(() {
+              _posts.addAll(_postModel!.posts);
+              total = _postModel!.totalPages;
+            }));
   }
 
   void _fetchMoreData() async {
@@ -57,17 +61,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    super.initState();
     _getInitialData();
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection ==
           ScrollDirection.forward) {
         if (navHidden) {
+          debugPrint("Show");
           widget.showNavbar();
           navHidden = false;
         }
       } else {
         if (!navHidden) {
+          debugPrint("Hide");
           widget.hideNavbar();
           navHidden = true;
         }
@@ -88,16 +93,45 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        const SliverToBoxAdapter(child: DummySearchField()),
-        SliverToBoxAdapter(
+    return RefreshIndicator(
+      color: Colors.cyan,
+      backgroundColor: Colors.transparent,
+      onRefresh: () async {
+        _clearInitials();
+        _getInitialData();
+      },
+      child: CustomScrollView(
+        controller: _scrollController,
+        slivers: [
+          const SliverToBoxAdapter(child: DummySearchField()),
+          SliverToBoxAdapter(
             child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Stories(currentUser: User("", "", "", ""), stories: _posts),
-        )),
-      ],
-      // POST
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child:
+                  Stories(currentUser: User("", "", "", ""), stories: _posts),
+            ),
+          ),
+          _posts.isEmpty
+              ? SliverToBoxAdapter(
+                  child: Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height / 2,
+                    alignment: Alignment.center,
+                    child: const CircularProgressIndicator(
+                      color: Colors.white10,
+                    ),
+                  ),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    return index < _posts.length
+                        ? PostContainer(post: _posts[index])
+                        : PostLoader(page: page, total: total);
+                  }, childCount: _posts.length + 1),
+                )
+        ],
+        // POST
+      ),
     );
   }
 }

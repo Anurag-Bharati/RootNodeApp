@@ -7,7 +7,7 @@ class Stories extends StatelessWidget {
   final User currentUser;
   final List<Post> stories;
 
-  const Stories({Key? key, required this.currentUser, required this.stories});
+  const Stories({super.key, required this.currentUser, required this.stories});
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +43,9 @@ class Stories extends StatelessWidget {
 class _StoryCard extends StatelessWidget {
   final bool isAddStory;
   final User currentUser;
-  Post? story;
+  final Post? story = null;
 
-  _StoryCard({
+  const _StoryCard({
     Key? key,
     this.isAddStory = false,
     required this.currentUser,
