@@ -77,10 +77,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       body: IndexedStack(index: _selectedIndex, children: [
-        HomeScreen(
-          showNavbar: showNavbar,
-          hideNavbar: hideNavbar,
-        ),
+        HomeScreen(showNavbar: showNavbar, hideNavbar: hideNavbar),
         const NodeScreen(),
         const MessengerScreen(),
         const EventScreen(),

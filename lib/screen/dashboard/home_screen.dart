@@ -24,8 +24,9 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  final ScrollController _scrollController = ScrollController();
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  late final ScrollController _scrollController;
+  late final TabController? _tabController;
 
   late PostModel? _postModel;
   final List<Post> _posts = [];
@@ -61,6 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    _scrollController = ScrollController();
+    _tabController = TabController(length: 2, vsync: this);
     _getInitialData();
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection ==
@@ -103,6 +106,24 @@ class _HomeScreenState extends State<HomeScreen> {
       child: CustomScrollView(
         controller: _scrollController,
         slivers: [
+          SliverToBoxAdapter(
+            child: TabBar(
+              overlayColor: MaterialStateProperty.resolveWith(
+                  (states) => Colors.transparent),
+              onTap: (value) => debugPrint("Tab is Tabbed"),
+              labelColor: Colors.white70,
+              indicatorColor: Colors.cyan,
+              indicatorPadding: const EdgeInsets.all(10),
+              indicatorSize: TabBarIndicatorSize.label,
+              labelStyle: RootNodeFontStyle.body,
+              unselectedLabelColor: Colors.white30,
+              splashFactory: NoSplash.splashFactory,
+              isScrollable: false,
+              padding: EdgeInsets.zero,
+              controller: _tabController,
+              tabs: const [Tab(text: "Public"), Tab(text: "Mutual")],
+            ),
+          ),
           const SliverToBoxAdapter(child: DummySearchField()),
           SliverToBoxAdapter(
             child: Padding(
