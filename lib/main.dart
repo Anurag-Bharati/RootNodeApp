@@ -17,5 +17,4 @@ void main(List<String> args) async {
       const MyApp(),
     ),
   );
-  runApp(const MaterialApp());
 }

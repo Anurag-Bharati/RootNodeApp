@@ -1,8 +1,10 @@
+import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/model/post_model.dart';
-import 'package:rootnode/widgets/post_container.dart';
 import 'package:rootnode/services/post_api_service.dart';
+import 'package:rootnode/widgets/stories.dart';
 
 import '../../model/user.dart';
 
@@ -23,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
+
   late PostModel? _postModel;
   final List<Post> _posts = [];
   int page = 1;
@@ -85,39 +88,43 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return CustomScrollView(
+      slivers: [
+        const SliverToBoxAdapter(child: DummySearchField()),
+        SliverToBoxAdapter(
+            child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Stories(currentUser: User("", "", "", ""), stories: _posts),
+        )),
+      ],
+      // POST
+    );
+  }
+}
+
+class DummySearchField extends StatelessWidget {
+  const DummySearchField({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      alignment: Alignment.center,
       width: double.infinity,
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 650),
-        color: const Color(0xFF111111),
-        width: double.infinity,
-        height: double.maxFinite,
-        child:
-            // POST
-            _posts.isEmpty
-                ? const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white10,
-                    ),
-                  )
-                : RefreshIndicator(
-                    color: Colors.white10,
-                    backgroundColor: Colors.black12,
-                    onRefresh: () async {
-                      _clearInitials();
-                      _getInitialData();
-                    },
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: _posts.length + 1,
-                      itemBuilder: (context, index) {
-                        return index < _posts.length
-                            ? PostContainer(post: _posts[index])
-                            : PostLoader(page: page, total: total);
-                      },
-                    ),
-                  ),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+          color: const Color(0xFF333333),
+          borderRadius: BorderRadius.circular(10)),
+      child: Wrap(
+        spacing: 10,
+        children: [
+          const Icon(Boxicons.bx_search, color: Colors.white54),
+          Text(
+            "Find people, events...",
+            style: RootNodeFontStyle.label,
+          )
+        ],
       ),
     );
   }

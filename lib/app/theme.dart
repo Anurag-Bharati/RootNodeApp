@@ -6,6 +6,7 @@ ThemeData getApplicationThemeData() {
       // For OverScroll Glow Effect
       accentColor: const Color(0xFFF1F1F1),
     ),
+    fontFamily: "Poppins",
     visualDensity: VisualDensity.adaptivePlatformDensity,
     scaffoldBackgroundColor: const Color(0xFF111111),
     primaryColor: Colors.cyan,
@@ -22,6 +23,7 @@ ThemeData getApplicationThemeData() {
       elevation: 0,
       shadowColor: Colors.transparent,
       titleTextStyle: TextStyle(
+        fontFamily: "Poppins",
         fontSize: 16,
         color: Colors.white,
         fontWeight: FontWeight.w400,
