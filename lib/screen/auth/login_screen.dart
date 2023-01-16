@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/auth/register_screen.dart';
-import 'package:rootnode/screen/dashboard/home_screen.dart';
+import 'package:rootnode/screen/dashboard/dashboard.dart';
 import 'package:rootnode/widgets/text_field.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
 
@@ -107,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (BuildContext context) =>
-                                            HomeScreen(user: res)),
+                                            DashboardScreen(user: res)),
                                   ),
                                 );
                               } else {

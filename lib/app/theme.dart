@@ -16,11 +16,12 @@ ThemeData getApplicationThemeData() {
     progressIndicatorTheme: const ProgressIndicatorThemeData(
       color: Colors.white54,
     ),
-    appBarTheme: AppBarTheme(
-      color: HexColor.fromHex("#111111"),
+    appBarTheme: const AppBarTheme(
+      surfaceTintColor: Colors.transparent,
+      color: Color(0xFF111111),
       elevation: 0,
       shadowColor: Colors.transparent,
-      titleTextStyle: const TextStyle(
+      titleTextStyle: TextStyle(
         fontSize: 16,
         color: Colors.white,
         fontWeight: FontWeight.w400,
@@ -29,7 +30,7 @@ ThemeData getApplicationThemeData() {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
-        backgroundColor: HexColor.fromHex("#ED9728"),
+        backgroundColor: Colors.cyan,
         textStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,

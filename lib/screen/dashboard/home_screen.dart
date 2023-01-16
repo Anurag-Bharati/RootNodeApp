@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:rootnode/model/post_model.dart';
 import 'package:rootnode/widgets/post_container.dart';
 import 'package:rootnode/services/post_api_service.dart';
@@ -8,7 +9,13 @@ import '../../model/user.dart';
 class HomeScreen extends StatefulWidget {
   static const String route = "home";
   final User? user;
-  const HomeScreen({super.key, this.user});
+  final VoidCallback showNavbar;
+  final VoidCallback hideNavbar;
+  const HomeScreen(
+      {super.key,
+      this.user,
+      required this.showNavbar,
+      required this.hideNavbar});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -20,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Post> _posts = [];
   int page = 1;
   late int total;
-
+  bool navHidden = false;
   void _clearInitials() {
     setState(() {
       _posts.clear();
@@ -30,10 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _getInitialData() async {
     _postModel = await PostApiService.getPost(page: page);
-    Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {
-          _posts.addAll(_postModel!.posts);
-          total = _postModel!.totalPages;
-        }));
+    setState(() {
+      _posts.addAll(_postModel!.posts);
+      total = _postModel!.totalPages;
+    });
   }
 
   void _fetchMoreData() async {
@@ -50,11 +57,24 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _getInitialData();
     _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        if (navHidden) {
+          widget.showNavbar();
+          navHidden = false;
+        }
+      } else {
+        if (!navHidden) {
+          widget.hideNavbar();
+          navHidden = true;
+        }
+      }
       if (_scrollController.position.maxScrollExtent ==
           _scrollController.offset) {
         _fetchMoreData();
       }
     });
+    super.initState();
   }
 
   @override

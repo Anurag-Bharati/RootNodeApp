@@ -19,58 +19,25 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  bool navVisible = true;
   @override
   void initState() {
     super.initState();
   }
 
+  void showNavbar() => setState(() {
+        navVisible = true;
+      });
+  void hideNavbar() => setState(() {
+        navVisible = false;
+      });
+
   int _selectedIndex = 0;
-  final List<Widget> _lstScreen = [
-    const HomeScreen(),
-    const NodeScreen(),
-    const MessengerScreen(),
-    const EventScreen(),
-  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: GNav(
-        tabMargin: const EdgeInsets.all(10),
-        tabBorderRadius: 50,
-        tabBackgroundColor:
-            mqSmallW(context) ? Colors.white12 : Colors.transparent,
-        curve: Curves.easeInQuad,
-        duration: const Duration(milliseconds: 300),
-        color: Colors.white54,
-        activeColor: Colors.cyan,
-        iconSize: mqSmallW(context)
-            ? LayoutConstants.postIconBig
-            : LayoutConstants.postIcon,
-        backgroundColor: const Color(0xFF111111),
-        padding: mqSmallW(context)
-            ? const EdgeInsets.all(10)
-            : const EdgeInsets.all(5),
-        gap: mqSmallW(context) ? 10 : 0,
-        tabs: [
-          GButton(
-              icon: Boxicons.bxs_home,
-              text: mqSmallW(context) ? 'Home' : "" /***/),
-          GButton(
-              icon: Boxicons.bx_stats,
-              text: mqSmallW(context) ? 'Node' : "" /***/),
-          GButton(
-              icon: Boxicons.bxs_message_square_dots,
-              text: mqSmallW(context) ? 'Chat' : ""),
-          GButton(
-              icon: Boxicons.bxs_calendar_event,
-              text: mqSmallW(context) ? 'Event' : ""),
-        ],
-        selectedIndex: _selectedIndex,
-        onTabChange: (value) => setState(() {
-          _selectedIndex = value;
-        }),
-      ),
+      extendBody: true,
       appBar: AppBar(
         elevation: 0,
         toolbarHeight: mqSmallH(context) ? 80 : 60,
@@ -80,7 +47,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         actions: [
           Container(
-            alignment: Alignment.center,
             padding: const EdgeInsets.only(right: 10),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               _selectedIndex == 2
@@ -111,7 +77,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body: _lstScreen[_selectedIndex],
+      body: IndexedStack(index: _selectedIndex, children: [
+        HomeScreen(
+          showNavbar: showNavbar,
+          hideNavbar: hideNavbar,
+        ),
+        const NodeScreen(),
+        const MessengerScreen(),
+        const EventScreen(),
+      ]),
+      bottomNavigationBar: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        // transform: Matrix4.translationValues(0, navVisible ? 0 : 100, 0),
+        height: navVisible ? kBottomNavigationBarHeight + 8 : 0,
+        child: GNav(
+          tabMargin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          tabBorderRadius: 50,
+          tabBackgroundColor:
+              mqSmallW(context) ? Colors.white12 : Colors.transparent,
+          curve: Curves.easeInQuad,
+          duration: const Duration(milliseconds: 300),
+          color: Colors.white54,
+          activeColor: Colors.cyan,
+          iconSize: mqSmallW(context)
+              ? LayoutConstants.postIconBig
+              : LayoutConstants.postIcon,
+          backgroundColor: const Color(0xFF111111),
+          padding: mqSmallW(context)
+              ? const EdgeInsets.symmetric(horizontal: 10, vertical: 8)
+              : const EdgeInsets.all(5),
+          gap: mqSmallW(context) ? 10 : 0,
+          tabs: [
+            GButton(
+                icon: Boxicons.bxs_home,
+                text: mqSmallW(context) ? 'Home' : "" /***/),
+            GButton(
+                icon: Boxicons.bx_stats,
+                text: mqSmallW(context) ? 'Node' : "" /***/),
+            GButton(
+                icon: Boxicons.bxs_message_square_dots,
+                text: mqSmallW(context) ? 'Chat' : ""),
+            GButton(
+                icon: Boxicons.bxs_calendar_event,
+                text: mqSmallW(context) ? 'Event' : ""),
+          ],
+          selectedIndex: _selectedIndex,
+          onTabChange: (value) => setState(() {
+            showNavbar();
+            _selectedIndex = value;
+          }),
+        ),
+      ),
     );
   }
 
