@@ -65,8 +65,9 @@ class _PostHeader extends StatelessWidget {
           ),
           child: FadeInImage.assetNetwork(
             fit: BoxFit.cover,
-            image: post.owner!.avatar ??
-                "https://icon-library.com/images/anonymous-user-icon/anonymous-user-icon-2.jpg",
+            image: post.owner!.avatar != null
+                ? "${ApiConstants.baseUrl}\\${post.owner!.avatar}"
+                : "https://icon-library.com/images/anonymous-user-icon/anonymous-user-icon-2.jpg",
             placeholder: 'assets/images/image_grey.png',
           ),
         ),

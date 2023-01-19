@@ -1,13 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:random_color/random_color.dart';
 import 'package:rootnode/app/constant/font.dart';
-import 'package:rootnode/model/post.dart';
+import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
+import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user.dart';
+import 'package:rootnode/repository/story_repo.dart';
+import 'package:string_extensions/string_extensions.dart';
 
-class Stories extends StatelessWidget {
+class StoriesWidget extends StatefulWidget {
   final User currentUser;
-  final List<Post> stories;
 
-  const Stories({super.key, required this.currentUser, required this.stories});
+  const StoriesWidget({super.key, required this.currentUser});
+
+  @override
+  State<StoriesWidget> createState() => _StoriesWidgetState();
+}
+
+class _StoriesWidgetState extends State<StoriesWidget> {
+  late final ScrollController _scrollController;
+  late final RandomColor _randomColor;
+  final _storyRepo = StoryRepoImpl();
+  late StoryResponse? _storyResponse;
+  final List<Story> _stories = [];
+  late int storyTotal;
+  int storyPage = 1;
+
+  void _getInitialStoryData() async {
+    _storyResponse = await _storyRepo.getStoryFeed(
+        page: storyPage, refresh: 1, private: false);
+
+    setState(() {
+      _stories.addAll(_storyResponse!.stories!);
+      storyTotal = _storyResponse!.totalPages!;
+    });
+  }
+
+  void _fetchMoreStoryData() async {
+    if (storyPage == storyTotal) return;
+    storyPage = storyPage == storyTotal ? storyTotal : storyPage + 1;
+    _storyResponse = await _storyRepo.getStoryFeed(
+        page: storyPage, refresh: 0, private: false);
+    setState(() {
+      _stories.addAll(_storyResponse!.stories!);
+    });
+  }
+
+  @override
+  void initState() {
+    _randomColor = RandomColor();
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      if (_scrollController.position.maxScrollExtent ==
+          _scrollController.offset) {
+        print("Story Ref");
+        _fetchMoreStoryData();
+      }
+    });
+    _getInitialStoryData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,24 +66,28 @@ class Stories extends StatelessWidget {
       width: double.infinity,
       height: 124.0,
       child: ListView.builder(
+        controller: _scrollController,
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10.0),
-        itemCount: 1 + stories.length,
+        itemCount: 1 + _stories.length,
         itemBuilder: (context, index) {
           if (index == 0) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: _StoryCard(
+                color: _randomColor.randomColor(),
                 isAddStory: true,
-                currentUser: currentUser,
+                currentUser: widget.currentUser,
+                story: null,
               ),
             );
           }
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: _StoryCard(
-              currentUser: currentUser,
-            ),
+                color: _randomColor.randomColor(),
+                currentUser: widget.currentUser,
+                story: _stories[index - 1]),
           );
         },
       ),
@@ -43,12 +98,15 @@ class Stories extends StatelessWidget {
 class _StoryCard extends StatelessWidget {
   final bool isAddStory;
   final User currentUser;
-  final Post? story = null;
+  final Story? story;
+  final Color color;
 
   const _StoryCard({
     Key? key,
     this.isAddStory = false,
     required this.currentUser,
+    required this.story,
+    required this.color,
   }) : super(key: key);
 
   @override
@@ -63,12 +121,18 @@ class _StoryCard extends StatelessWidget {
                   width: 110.0,
                   color: Colors.cyan,
                 )
-              : Image.network(
-                  "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/640px-Image_created_with_a_mobile_phone.png",
-                  height: double.infinity,
-                  width: 110.0,
-                  fit: BoxFit.cover,
-                ),
+              : story!.media == null
+                  ? Container(
+                      height: double.infinity,
+                      width: 110.0,
+                      color: color,
+                    )
+                  : Image.network(
+                      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/640px-Image_created_with_a_mobile_phone.png",
+                      height: double.infinity,
+                      width: 110.0,
+                      fit: BoxFit.cover,
+                    ),
         ),
         GestureDetector(
           onTap: () => debugPrint("Hi Story"),
@@ -80,7 +144,7 @@ class _StoryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12.0),
               gradient: const LinearGradient(
                 colors: [
-                  Color(0x55111111),
+                  Color(0xFF111111),
                   Colors.transparent,
                 ],
                 begin: Alignment.bottomCenter,
@@ -93,7 +157,12 @@ class _StoryCard extends StatelessWidget {
                     width: 40.0,
                     child: Icon(Icons.add, size: 40),
                   )
-                : const SizedBox(),
+                : SizedBox(
+                    child: Text(
+                      story!.heading!,
+                      style: RootNodeFontStyle.label,
+                    ),
+                  ),
           ),
         ),
         Positioned(
@@ -101,7 +170,9 @@ class _StoryCard extends StatelessWidget {
           left: 8.0,
           right: 8.0,
           child: Text(
-            isAddStory ? 'Add story' : "This is a test aaa sss",
+            isAddStory
+                ? 'Add story'
+                : "${story!.owner!.fname!.toTitleCase!} ${story!.owner!.lname![0].capitalize!}.",
             style: RootNodeFontStyle.subtitle,
             overflow: TextOverflow.fade,
             textAlign: TextAlign.center,

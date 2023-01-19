@@ -7,7 +7,6 @@ class PostResponse {
     this.currentPage,
   });
 
-  bool? success;
   Posts? data;
   int? totalPages;
   int? currentPage;

@@ -1,6 +1,7 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
 import 'package:rootnode/model/user.dart';
@@ -42,6 +43,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         toolbarHeight: mqSmallH(context) ? 80 : 60,
         backgroundColor: const Color(0xFF111111),
         title: RootNodeBar(
+          avatar: widget.user!.avatar != null
+              ? "${ApiConstants.baseUrl}\\${widget.user!.avatar}"
+              : "https://cdn.shopify.com/s/files/1/0344/6469/files/angry.jpg?v=1560891349",
           fname: widget.user == null ? null : widget.user!.fname,
           lname: widget.user == null ? null : widget.user!.lname,
         ),
@@ -78,7 +82,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       body: IndexedStack(index: _selectedIndex, children: [
-        HomeScreen(showNavbar: showNavbar, hideNavbar: hideNavbar),
+        HomeScreen(
+            user: widget.user!, showNavbar: showNavbar, hideNavbar: hideNavbar),
         const NodeScreen(),
         const MessengerScreen(),
         const EventScreen(),
@@ -138,10 +143,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 class RootNodeBar extends StatelessWidget {
   final String? fname;
   final String? lname;
+  final String avatar;
   const RootNodeBar({
     Key? key,
     this.fname,
     this.lname,
+    required this.avatar,
   }) : super(key: key);
 
   @override
@@ -162,8 +169,7 @@ class RootNodeBar extends StatelessWidget {
             ),
             child: FadeInImage.assetNetwork(
               fit: BoxFit.cover,
-              image:
-                  "https://cdn.shopify.com/s/files/1/0344/6469/files/angry.jpg?v=1560891349",
+              image: avatar,
               placeholder: 'assets/images/image_grey.png',
             ),
           ),

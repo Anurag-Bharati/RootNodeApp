@@ -47,6 +47,7 @@ dependencies:
     connectivity_plus: ^3.0.2
     timeago: ^3.3.0
     string_extensions: ^0.6.6
+    random_color: ^1.0.6-nullsafety
 
 dev_dependencies:
     flutter_test:

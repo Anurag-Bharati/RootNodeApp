@@ -12,12 +12,12 @@ import '../../model/user.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String route = "home";
-  final User? user;
+  final User user;
   final VoidCallback showNavbar;
   final VoidCallback hideNavbar;
   const HomeScreen(
       {super.key,
-      this.user,
+      required this.user,
       required this.showNavbar,
       required this.hideNavbar});
 
@@ -33,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool privateFeed = false;
 
   late PostResponse? _postResponse;
+
   List<Post> _posts = [];
   final List<Post> _publicFeed = [];
   final List<Post> _privateFeed = [];
@@ -59,10 +60,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         const Duration(seconds: 1),
         () => setState(() {
               privateFeed
-                  ? _privateFeed
-                      .addAll(_postResponse!.data!.posts as Iterable<Post>)
-                  : _publicFeed
-                      .addAll(_postResponse!.data!.posts as Iterable<Post>);
+                  ? _privateFeed.addAll(_postResponse!.data!.posts!)
+                  : _publicFeed.addAll(_postResponse!.data!.posts!);
               privateFeed
                   ? privateTotal = _postResponse!.totalPages!
                   : publicTotal = _postResponse!.totalPages!;
@@ -88,10 +87,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
     Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {
           privateFeed
-              ? _privateFeed
-                  .addAll(_postResponse!.data!.posts as Iterable<Post>)
-              : _publicFeed
-                  .addAll(_postResponse!.data!.posts as Iterable<Post>);
+              ? _privateFeed.addAll(_postResponse!.data!.posts!)
+              : _publicFeed.addAll(_postResponse!.data!.posts!);
           _posts = privateFeed ? _privateFeed : _publicFeed;
         }));
   }
@@ -146,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Stories(currentUser: User(), stories: _posts),
+              child: StoriesWidget(currentUser: widget.user),
             ),
           ),
           SliverToBoxAdapter(
