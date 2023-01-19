@@ -28,13 +28,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final _postRepo = PostRepoImpl();
   late final ScrollController _scrollController;
-  late final TabController? _tabController;
+  late final TabController _tabController;
   bool navHidden = false;
   bool privateFeed = false;
+  bool postScopeDisabled = false;
 
   late PostResponse? _postResponse;
 
   List<Post> _posts = [];
+  List<bool> _postsLiked = [];
+
   final List<Post> _publicFeed = [];
   final List<Post> _privateFeed = [];
   late int privateTotal;
@@ -56,20 +59,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       refresh: refresh,
       private: privateFeed,
     );
-    Future.delayed(
-        const Duration(seconds: 1),
-        () => setState(() {
-              privateFeed
-                  ? _privateFeed.addAll(_postResponse!.data!.posts!)
-                  : _publicFeed.addAll(_postResponse!.data!.posts!);
-              privateFeed
-                  ? privateTotal = _postResponse!.totalPages!
-                  : publicTotal = _postResponse!.totalPages!;
-              _posts = privateFeed ? _privateFeed : _publicFeed;
-            }));
+    Future.delayed(const Duration(seconds: 1), () {
+      privateFeed
+          ? _privateFeed.addAll(_postResponse!.data!.posts!)
+          : _publicFeed.addAll(_postResponse!.data!.posts!);
+      privateFeed
+          ? privateTotal = _postResponse!.totalPages!
+          : publicTotal = _postResponse!.totalPages!;
+      _posts = privateFeed ? _privateFeed : _publicFeed;
+      _postsLiked = _postResponse!.data!.meta!.isLiked!;
+      setState(() {
+        postScopeDisabled = false;
+      });
+    });
   }
 
   void _fetchMoreData() async {
+    if (postScopeDisabled) return;
     bool condn =
         privateFeed ? privatePage == privateTotal : publicPage == publicTotal;
     if (condn) return;
@@ -85,12 +91,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       refresh: 0,
       private: privateFeed,
     );
-    Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {
-          privateFeed
-              ? _privateFeed.addAll(_postResponse!.data!.posts!)
-              : _publicFeed.addAll(_postResponse!.data!.posts!);
-          _posts = privateFeed ? _privateFeed : _publicFeed;
-        }));
+    Future.delayed(const Duration(seconds: 1)).then((value) {
+      privateFeed
+          ? _privateFeed.addAll(_postResponse!.data!.posts!)
+          : _publicFeed.addAll(_postResponse!.data!.posts!);
+      _posts = privateFeed ? _privateFeed : _publicFeed;
+      _postsLiked.addAll(_postResponse!.data!.meta!.isLiked!);
+      setState(() {});
+    });
   }
 
   @override
@@ -119,6 +127,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       }
     });
     super.initState();
+  }
+
+  void _switchPostScope(value) {
+    if (postScopeDisabled) {
+      return setState(() {
+        _tabController.index = privateFeed ? 1 : 0;
+      });
+    }
+
+    postScopeDisabled = true;
+    _clearInitials();
+    privateFeed = value == 0 ? false : true;
+    _getInitialData();
+    setState(() {});
   }
 
   @override
@@ -156,13 +178,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 enableFeedback: true,
                 overlayColor: MaterialStateProperty.resolveWith(
                     (states) => Colors.transparent),
-                onTap: (value) => setState(() {
-                  privateFeed = value == 0 ? false : true;
-                  _clearInitials();
-                  _getInitialData();
-                }),
+                onTap: (value) => _switchPostScope(value),
                 labelColor: Colors.white70,
-                indicatorColor: Colors.cyan,
+                indicatorColor:
+                    postScopeDisabled ? Colors.white30 : Colors.cyan,
                 indicatorPadding: const EdgeInsets.all(10),
                 indicatorSize: TabBarIndicatorSize.label,
                 labelStyle: RootNodeFontStyle.body,
@@ -188,14 +207,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 )
               : SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    return index < _posts.length
-                        ? PostContainer(post: _posts[index])
-                        : PostLoader(
-                            page: privateFeed ? privatePage : publicPage,
-                            total: privateFeed ? privateTotal : publicTotal,
-                          );
-                  }, childCount: _posts.length + 1),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return index < _posts.length
+                          ? PostContainer(
+                              post: _posts[index],
+                              likedMeta: _postsLiked[index])
+                          : PostLoader(
+                              page: privateFeed ? privatePage : publicPage,
+                              total: privateFeed ? privateTotal : publicTotal,
+                            );
+                    },
+                    childCount: _posts.length + 1,
+                  ),
                 )
         ],
         // POST

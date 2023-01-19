@@ -38,6 +38,6 @@ class RootNodeFontStyle {
         fontFamily: 'Poppins',
         height: 1.8,
         color: Colors.white54,
-        overflow: TextOverflow.fade,
+        overflow: TextOverflow.ellipsis,
       );
 }

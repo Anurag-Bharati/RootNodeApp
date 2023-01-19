@@ -5,6 +5,7 @@ import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
 import 'package:rootnode/model/post.dart';
+import 'package:rootnode/repository/post_repo.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:string_extensions/string_extensions.dart';
 
@@ -12,9 +13,11 @@ class PostContainer extends StatelessWidget {
   const PostContainer({
     Key? key,
     required this.post,
+    required this.likedMeta,
   }) : super(key: key);
 
   final Post post;
+  final bool likedMeta;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,10 @@ class PostContainer extends StatelessWidget {
         const SizedBox(height: 16),
         _PostBody(post: post),
         const Divider(thickness: 3, color: Color(0xFF111111)),
-        _PostFooter(post: post)
+        _PostFooter(
+          post: post,
+          likedMeta: likedMeta,
+        )
       ]),
     );
   }
@@ -87,7 +93,7 @@ class _PostHeader extends StatelessWidget {
             spacing: 10,
             children: [
               Text(
-                _getPostedAgo(post.updatedAt!),
+                _getPostedAgo(post.createdAt!),
                 textAlign: TextAlign.center,
                 style: RootNodeFontStyle.label,
               ),
@@ -166,16 +172,26 @@ class _PostFooter extends StatefulWidget {
   const _PostFooter({
     Key? key,
     required this.post,
+    required this.likedMeta,
   }) : super(key: key);
 
   final Post post;
+  final bool likedMeta;
 
   @override
   State<_PostFooter> createState() => _PostFooterState();
 }
 
 class _PostFooterState extends State<_PostFooter> {
-  bool liked = false;
+  final _postRepo = PostRepoImpl();
+  bool liking = false;
+  Future<bool> togglePostLike() async {
+    if (liking) return !widget.likedMeta;
+    liking = true;
+    bool res = await _postRepo.togglePostLike(id: widget.post.id!);
+    liking = false;
+    return res;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -184,6 +200,8 @@ class _PostFooterState extends State<_PostFooter> {
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Wrap(spacing: 20, children: [
           LikeButton(
+            onTap: (isLiked) => togglePostLike(),
+            isLiked: widget.likedMeta,
             size: LayoutConstants.postIcon,
             likeCount: widget.post.likesCount,
             likeBuilder: (isLiked) {
@@ -191,14 +209,15 @@ class _PostFooterState extends State<_PostFooter> {
                   ? const Icon(
                       Boxicons.bxs_like,
                       color: Colors.white70,
-                      size: 20,
+                      size: 22,
                     )
                   : const Icon(
                       Boxicons.bx_like,
                       color: Colors.white70,
-                      size: 20,
+                      size: 22,
                     );
             },
+            likeCountPadding: const EdgeInsets.only(top: 2, left: 8.0),
           ),
           LikeButton(
             size: LayoutConstants.postIcon,
@@ -208,14 +227,15 @@ class _PostFooterState extends State<_PostFooter> {
                   ? const Icon(
                       Boxicons.bxs_message_square_detail,
                       color: Colors.white70,
-                      size: 20,
+                      size: 22,
                     )
                   : const Icon(
                       Boxicons.bx_message_square_detail,
                       color: Colors.white70,
-                      size: 20,
+                      size: 22,
                     );
             },
+            likeCountPadding: const EdgeInsets.only(top: 2, left: 8.0),
           ),
         ]),
         const Icon(

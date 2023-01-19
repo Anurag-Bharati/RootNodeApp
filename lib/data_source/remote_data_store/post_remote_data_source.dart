@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_post.dart';
 import 'package:rootnode/helper/http_service.dart';
+import 'package:rootnode/helper/simple_storage.dart';
 
 class PostRemoteDataSource {
   final Dio _httpServices = HttpServices().getDioInstance();
@@ -13,8 +15,23 @@ class PostRemoteDataSource {
         "${ApiConstants.baseUrl}${ApiConstants.post}${private ? '/feed' : ''}?page=$page&refresh=$refresh",
       );
       return res.statusCode == 200 ? PostResponse.fromJson(res.data) : null;
-    } catch (e) {
+    } catch (_) {
+      debugPrint(_.toString());
       return null;
+    }
+  }
+
+  Future<bool> togglePostLike({required String id}) async {
+    try {
+      String? token = await SimpleStorage.getStringData("token");
+      _httpServices.options.headers["authorization"] = "Bearer $token";
+      Response res = await _httpServices.post(
+        "${ApiConstants.baseUrl}${ApiConstants.post}/$id/like-unlike",
+      );
+      return res.data['data']['liked'];
+    } catch (_) {
+      debugPrint(_.toString());
+      return false;
     }
   }
 }

@@ -12,6 +12,7 @@ class Story {
     this.likesCount,
     this.watchCount,
     this.media,
+    this.color,
     this.status,
     this.visibility,
     this.likeable,
@@ -30,6 +31,7 @@ class Story {
   String? heading;
   int? likesCount;
   int? watchCount;
+  int? color;
   String? status;
   StoryFile? media;
   String? visibility;
@@ -52,6 +54,7 @@ class Story {
         likesCount: json["likesCount"],
         watchCount: json["watchCount"],
         status: json["status"],
+        color: json["color"],
         media: json["media"] == null ? null : StoryFile.fromJson(json),
         visibility: json["visibility"],
         likeable: json["likeable"],

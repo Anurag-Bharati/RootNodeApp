@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:random_color/random_color.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
 import 'package:rootnode/model/story.dart';
@@ -18,7 +17,7 @@ class StoriesWidget extends StatefulWidget {
 
 class _StoriesWidgetState extends State<StoriesWidget> {
   late final ScrollController _scrollController;
-  late final RandomColor _randomColor;
+  // late final RandomColor _randomColor;
   final _storyRepo = StoryRepoImpl();
   late StoryResponse? _storyResponse;
   final List<Story> _stories = [];
@@ -47,7 +46,6 @@ class _StoriesWidgetState extends State<StoriesWidget> {
 
   @override
   void initState() {
-    _randomColor = RandomColor();
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       if (_scrollController.position.maxScrollExtent ==
@@ -75,7 +73,7 @@ class _StoriesWidgetState extends State<StoriesWidget> {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: _StoryCard(
-                color: _randomColor.randomColor(),
+                color: Colors.cyan,
                 isAddStory: true,
                 currentUser: widget.currentUser,
                 story: null,
@@ -85,7 +83,7 @@ class _StoriesWidgetState extends State<StoriesWidget> {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: _StoryCard(
-                color: _randomColor.randomColor(),
+                color: Color(_stories[index - 1].color!),
                 currentUser: widget.currentUser,
                 story: _stories[index - 1]),
           );
@@ -135,13 +133,17 @@ class _StoryCard extends StatelessWidget {
                     ),
         ),
         GestureDetector(
-          onTap: () => debugPrint("Hi Story"),
+          onTap: () => debugPrint(isAddStory.toString()),
           child: Container(
             alignment: Alignment.center,
             height: double.infinity,
             width: 110.0,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(
+                  color: const Color(0xFF111111),
+                  width: 1.0,
+                  strokeAlign: BorderSide.strokeAlignOutside),
               gradient: const LinearGradient(
                 colors: [
                   Color(0xFF111111),
@@ -158,9 +160,14 @@ class _StoryCard extends StatelessWidget {
                     child: Icon(Icons.add, size: 40),
                   )
                 : SizedBox(
-                    child: Text(
-                      story!.heading!,
-                      style: RootNodeFontStyle.label,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        story!.heading!,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: RootNodeFontStyle.label,
+                      ),
                     ),
                   ),
           ),
