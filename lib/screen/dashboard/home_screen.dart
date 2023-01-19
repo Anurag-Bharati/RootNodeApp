@@ -128,8 +128,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child:
-                  Stories(currentUser: User("", "", "", ""), stories: _posts),
+              child: Stories(currentUser: User(), stories: _posts),
             ),
           ),
           _posts.isEmpty

@@ -6,7 +6,8 @@ import 'package:rootnode/model/post_model.dart';
 class PostApiService {
   static Future<PostModel?> getPost({int page = 1}) async {
     try {
-      var url = Uri.parse("${ApiConstants.baseUrl}/post?page=$page");
+      var url =
+          Uri.parse("${ApiConstants.baseUrl}${ApiConstants.post}?page=$page");
       var response = await http.get(url);
       // log(response.body);
       if (response.statusCode == 200) {

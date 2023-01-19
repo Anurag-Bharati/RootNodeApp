@@ -151,10 +151,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         dismissable: false);
 
     User user = User(
-      _fnameFieldController.text,
-      _lnameFieldController.text,
-      _emailFieldController.text,
-      _passwordFieldController.text,
+      fname: _fnameFieldController.text,
+      lname: _lnameFieldController.text,
+      email: _emailFieldController.text,
+      password: _passwordFieldController.text,
     );
 
     int status = await userRepo.saveUser(user);
