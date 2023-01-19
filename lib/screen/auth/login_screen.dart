@@ -89,16 +89,27 @@ class _LoginScreenState extends State<LoginScreen> {
                                 showSnackbar(
                                     context, "Logging in..", Colors.green[400]!,
                                     dismissable: false);
-                                User? res = await userRepo.loginUser(
-                                  _emailFieldController.text,
-                                  _passwordFieldController.text,
+                                bool res = await userRepo.loginUser(
+                                  identifier: _emailFieldController.text,
+                                  password: _passwordFieldController.text,
+                                  isEmail: false,
                                 );
-                                if (res == null) {
+                                if (!res) {
                                   // ignore: use_build_context_synchronously
                                   showSnackbar(
                                       context,
                                       "Invalid email or password",
                                       Colors.red[400]!);
+                                  return;
+                                }
+                                User? user = await userRepo.getUserFromToken();
+                                if (user == null) {
+                                  // ignore: use_build_context_synchronously
+                                  showSnackbar(
+                                    context,
+                                    "Sorry! Something went wrong.",
+                                    Colors.red[400]!,
+                                  );
                                   return;
                                 }
                                 Future.delayed(
@@ -107,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (BuildContext context) =>
-                                            DashboardScreen(user: res)),
+                                            DashboardScreen(user: user)),
                                   ),
                                 );
                               } else {

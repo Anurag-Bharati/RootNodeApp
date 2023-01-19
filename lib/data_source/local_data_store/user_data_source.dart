@@ -12,11 +12,11 @@ class UserDataSource {
     }
   }
 
-  Future<User?> loginUser(String email, String password) async {
+  Future<bool> loginUser(String email, String password) async {
     try {
       return objectBoxInstance.loginUser(email, password);
     } catch (e) {
-      return null;
+      return false;
     }
   }
 
@@ -25,6 +25,14 @@ class UserDataSource {
       return objectBoxInstance.getAllUser();
     } catch (e) {
       throw Exception("Error in getting all users");
+    }
+  }
+
+  Future<User?> getUserById(String id) async {
+    try {
+      return objectBoxInstance.getUserById(id);
+    } catch (err) {
+      return null;
     }
   }
 }
