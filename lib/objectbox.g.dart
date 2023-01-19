@@ -15,6 +15,7 @@ import 'package:objectbox/objectbox.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'model/post.dart';
+import 'model/story.dart';
 import 'model/user.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -257,6 +258,76 @@ final _entities = <ModelEntity>[
             indexId: const IdUid(5, 6360670171826796046))
       ],
       relations: <ModelRelation>[],
+      backlinks: <ModelBacklink>[]),
+  ModelEntity(
+      id: const IdUid(5, 3915084085433421223),
+      name: 'Story',
+      lastPropertyId: const IdUid(12, 2871486317808580817),
+      flags: 0,
+      properties: <ModelProperty>[
+        ModelProperty(
+            id: const IdUid(1, 5281342022726176054),
+            name: 'storyId',
+            type: 6,
+            flags: 129),
+        ModelProperty(
+            id: const IdUid(2, 1861875227471639409),
+            name: 'id',
+            type: 9,
+            flags: 2080,
+            indexId: const IdUid(6, 2994870038586928502)),
+        ModelProperty(
+            id: const IdUid(3, 3782621823877601322),
+            name: 'type',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(4, 2603067226680828925),
+            name: 'heading',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(5, 2087805284040158575),
+            name: 'likesCount',
+            type: 6,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(6, 2554701045589056990),
+            name: 'watchCount',
+            type: 6,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(7, 3143836766694416383),
+            name: 'status',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(8, 7131381447180983958),
+            name: 'visibility',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(9, 3695933232609251406),
+            name: 'likeable',
+            type: 1,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(10, 1601054104833571222),
+            name: 'seenBy',
+            type: 30,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(11, 3904754751371635212),
+            name: 'createdAt',
+            type: 10,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(12, 2871486317808580817),
+            name: 'updatedAt',
+            type: 10,
+            flags: 0)
+      ],
+      relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[])
 ];
 
@@ -280,8 +351,8 @@ Future<Store> openStore(
 ModelDefinition getObjectBoxModel() {
   final model = ModelInfo(
       entities: _entities,
-      lastEntityId: const IdUid(4, 3200740966856453186),
-      lastIndexId: const IdUid(5, 6360670171826796046),
+      lastEntityId: const IdUid(5, 3915084085433421223),
+      lastIndexId: const IdUid(6, 2994870038586928502),
       lastRelationId: const IdUid(1, 403350268397340821),
       lastSequenceId: const IdUid(0, 0),
       retiredEntityUids: const [2699268489578170829],
@@ -530,6 +601,77 @@ ModelDefinition getObjectBoxModel() {
                   const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
 
           return object;
+        }),
+    Story: EntityDefinition<Story>(
+        model: _entities[3],
+        toOneRelations: (Story object) => [],
+        toManyRelations: (Story object) => {},
+        getId: (Story object) => object.storyId,
+        setId: (Story object, int id) {
+          object.storyId = id;
+        },
+        objectToFB: (Story object, fb.Builder fbb) {
+          final idOffset =
+              object.id == null ? null : fbb.writeString(object.id!);
+          final typeOffset =
+              object.type == null ? null : fbb.writeString(object.type!);
+          final headingOffset =
+              object.heading == null ? null : fbb.writeString(object.heading!);
+          final statusOffset =
+              object.status == null ? null : fbb.writeString(object.status!);
+          final visibilityOffset = object.visibility == null
+              ? null
+              : fbb.writeString(object.visibility!);
+          final seenByOffset = object.seenBy == null
+              ? null
+              : fbb.writeList(
+                  object.seenBy!.map(fbb.writeString).toList(growable: false));
+          fbb.startTable(13);
+          fbb.addInt64(0, object.storyId);
+          fbb.addOffset(1, idOffset);
+          fbb.addOffset(2, typeOffset);
+          fbb.addOffset(3, headingOffset);
+          fbb.addInt64(4, object.likesCount);
+          fbb.addInt64(5, object.watchCount);
+          fbb.addOffset(6, statusOffset);
+          fbb.addOffset(7, visibilityOffset);
+          fbb.addBool(8, object.likeable);
+          fbb.addOffset(9, seenByOffset);
+          fbb.addInt64(10, object.createdAt?.millisecondsSinceEpoch);
+          fbb.addInt64(11, object.updatedAt?.millisecondsSinceEpoch);
+          fbb.finish(fbb.endTable());
+          return object.storyId;
+        },
+        objectFromFB: (Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final createdAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 24);
+          final updatedAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 26);
+          final object = Story(
+              id: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 6),
+              type: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 8),
+              heading: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 10),
+              likesCount: const fb.Int64Reader()
+                  .vTableGetNullable(buffer, rootOffset, 12),
+              watchCount: const fb.Int64Reader()
+                  .vTableGetNullable(buffer, rootOffset, 14),
+              status: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 16),
+              visibility: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 18),
+              likeable: const fb.BoolReader()
+                  .vTableGetNullable(buffer, rootOffset, 20),
+              seenBy: const fb.ListReader<String>(fb.StringReader(asciiOptimization: true), lazy: false).vTableGetNullable(buffer, rootOffset, 22),
+              createdAt: createdAtValue == null ? null : DateTime.fromMillisecondsSinceEpoch(createdAtValue),
+              updatedAt: updatedAtValue == null ? null : DateTime.fromMillisecondsSinceEpoch(updatedAtValue),
+              storyId: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
+
+          return object;
         })
   };
 
@@ -690,4 +832,51 @@ class MediaFile_ {
 
   /// see [MediaFile.id]
   static final id = QueryStringProperty<MediaFile>(_entities[2].properties[3]);
+}
+
+/// [Story] entity fields to define ObjectBox queries.
+class Story_ {
+  /// see [Story.storyId]
+  static final storyId =
+      QueryIntegerProperty<Story>(_entities[3].properties[0]);
+
+  /// see [Story.id]
+  static final id = QueryStringProperty<Story>(_entities[3].properties[1]);
+
+  /// see [Story.type]
+  static final type = QueryStringProperty<Story>(_entities[3].properties[2]);
+
+  /// see [Story.heading]
+  static final heading = QueryStringProperty<Story>(_entities[3].properties[3]);
+
+  /// see [Story.likesCount]
+  static final likesCount =
+      QueryIntegerProperty<Story>(_entities[3].properties[4]);
+
+  /// see [Story.watchCount]
+  static final watchCount =
+      QueryIntegerProperty<Story>(_entities[3].properties[5]);
+
+  /// see [Story.status]
+  static final status = QueryStringProperty<Story>(_entities[3].properties[6]);
+
+  /// see [Story.visibility]
+  static final visibility =
+      QueryStringProperty<Story>(_entities[3].properties[7]);
+
+  /// see [Story.likeable]
+  static final likeable =
+      QueryBooleanProperty<Story>(_entities[3].properties[8]);
+
+  /// see [Story.seenBy]
+  static final seenBy =
+      QueryStringVectorProperty<Story>(_entities[3].properties[9]);
+
+  /// see [Story.createdAt]
+  static final createdAt =
+      QueryIntegerProperty<Story>(_entities[3].properties[10]);
+
+  /// see [Story.updatedAt]
+  static final updatedAt =
+      QueryIntegerProperty<Story>(_entities[3].properties[11]);
 }
