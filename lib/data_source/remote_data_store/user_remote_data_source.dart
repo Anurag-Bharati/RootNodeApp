@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rootnode/app/constant/api.dart';
@@ -28,11 +27,11 @@ class UserRemoteDataSource {
       data[isEmail ? "email" : "username"] = identifier;
 
       Response res = await _httpServices.post(
-        ApiConstants.baseUrl + ApiConstants.baseUrl,
+        ApiConstants.baseUrl + ApiConstants.login,
         data: data,
       );
       if (res.statusCode == 200) {
-        SimpleStorage.saveStringData("token", res.data.accessToken);
+        SimpleStorage.saveStringData("token", res.data["data"]["accessToken"]);
         return true;
       } else {
         return false;
@@ -46,10 +45,10 @@ class UserRemoteDataSource {
   Future<User?> getUserFromToken() async {
     try {
       String? token = await SimpleStorage.getStringData("token");
-      _httpServices.options.headers["authorization"] = token;
+      _httpServices.options.headers["authorization"] = "Bearer $token";
       Response res =
           await _httpServices.get(ApiConstants.baseUrl + ApiConstants.whoAmI);
-      return res.data.isAnonymous ? null : User.fromJson(res.data.user);
+      return res.data["isAnonymous"] ? null : User.fromJson(res.data["user"]);
     } catch (_) {
       debugPrint(_.toString());
       return null;

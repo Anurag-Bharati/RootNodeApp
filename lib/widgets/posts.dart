@@ -1,9 +1,12 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
+import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
-import 'package:rootnode/model/post_model.dart';
+import 'package:rootnode/model/post.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:string_extensions/string_extensions.dart';
 
 class PostContainer extends StatelessWidget {
   const PostContainer({
@@ -40,6 +43,13 @@ class _PostHeader extends StatelessWidget {
 
   final Post post;
 
+  String _getPostedAgo(DateTime dt) {
+    Duration diff = DateTime.now().difference(dt);
+    int min = diff.inMinutes;
+    return timeago.format(DateTime.now().subtract(Duration(minutes: min)),
+        locale: 'en_short');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -55,15 +65,20 @@ class _PostHeader extends StatelessWidget {
           ),
           child: FadeInImage.assetNetwork(
             fit: BoxFit.cover,
-            image: post.profile,
+            image: post.owner!.avatar ??
+                "https://icon-library.com/images/anonymous-user-icon/anonymous-user-icon-2.jpg",
             placeholder: 'assets/images/image_grey.png',
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: Wrap(direction: Axis.vertical, spacing: -5, children: [
-            Text(post.user, style: RootNodeFontStyle.title),
-            Text(post.usertag, style: RootNodeFontStyle.subtitle),
+            Text("${post.owner!.fname!} ${post.owner!.lname!}".toTitleCase!,
+                style: RootNodeFontStyle.title),
+            Text(
+              "@${post.owner!.username!}",
+              style: RootNodeFontStyle.subtitle,
+            ),
           ]),
         ),
         Wrap(
@@ -71,7 +86,7 @@ class _PostHeader extends StatelessWidget {
             spacing: 10,
             children: [
               Text(
-                "14h",
+                _getPostedAgo(post.updatedAt!),
                 textAlign: TextAlign.center,
                 style: RootNodeFontStyle.label,
               ),
@@ -97,17 +112,18 @@ class _PostBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(
               horizontal: LayoutConstants.postPadding),
           child: Text(
-            post.content,
+            post.caption!,
             softWrap: true,
             style: RootNodeFontStyle.caption,
           ),
         ),
-        post.media != null
+        post.mediaFiles.isNotEmpty
             ? Center(
                 child: Container(
                   clipBehavior: Clip.antiAlias,
@@ -117,9 +133,11 @@ class _PostBody extends StatelessWidget {
                   child: AnimatedSize(
                     curve: Curves.easeInQuad,
                     duration: const Duration(milliseconds: 500),
-                    child: Image.network(post.media!, fit: BoxFit.cover,
-                        loadingBuilder: (BuildContext context, Widget child,
-                            ImageChunkEvent? loadingProgress) {
+                    child: Image.network(
+                        "${ApiConstants.baseUrl} \\${post.mediaFiles[0].url!}",
+                        fit: BoxFit.cover, loadingBuilder:
+                            (BuildContext context, Widget child,
+                                ImageChunkEvent? loadingProgress) {
                       if (loadingProgress == null) {
                         return child;
                       }
@@ -166,7 +184,7 @@ class _PostFooterState extends State<_PostFooter> {
         Wrap(spacing: 20, children: [
           LikeButton(
             size: LayoutConstants.postIcon,
-            likeCount: widget.post.likes,
+            likeCount: widget.post.likesCount,
             likeBuilder: (isLiked) {
               return isLiked
                   ? const Icon(
@@ -183,7 +201,7 @@ class _PostFooterState extends State<_PostFooter> {
           ),
           LikeButton(
             size: LayoutConstants.postIcon,
-            likeCount: widget.post.comment,
+            likeCount: widget.post.commentsCount,
             likeBuilder: (isLiked) {
               return isLiked
                   ? const Icon(

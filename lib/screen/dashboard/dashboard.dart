@@ -42,7 +42,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         toolbarHeight: mqSmallH(context) ? 80 : 60,
         backgroundColor: const Color(0xFF111111),
         title: RootNodeBar(
-          username: widget.user == null ? null : widget.user!.username,
+          fname: widget.user == null ? null : widget.user!.fname,
+          lname: widget.user == null ? null : widget.user!.lname,
         ),
         actions: [
           Container(
@@ -135,10 +136,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 class RootNodeBar extends StatelessWidget {
-  final String? username;
+  final String? fname;
+  final String? lname;
   const RootNodeBar({
     Key? key,
-    this.username,
+    this.fname,
+    this.lname,
   }) : super(key: key);
 
   @override
@@ -172,7 +175,11 @@ class RootNodeBar extends StatelessWidget {
             spacing: -5,
             children: [
               Text("Good Morning,", style: RootNodeFontStyle.label),
-              Text(username ?? "ANURAG", style: RootNodeFontStyle.title),
+              Text(
+                  fname != null
+                      ? "$fname ${lname!.substring(0, 1).toUpperCase()}."
+                      : "ANURAG",
+                  style: RootNodeFontStyle.title),
             ],
           ),
         ),

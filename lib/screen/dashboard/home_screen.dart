@@ -2,8 +2,9 @@ import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:rootnode/app/constant/font.dart';
-import 'package:rootnode/model/post_model.dart';
-import 'package:rootnode/services/post_api_service.dart';
+import 'package:rootnode/data_source/remote_data_store/response/res_post.dart';
+import 'package:rootnode/model/post.dart';
+import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/widgets/posts.dart';
 import 'package:rootnode/widgets/stories.dart';
 
@@ -25,38 +26,73 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  final _postRepo = PostRepoImpl();
   late final ScrollController _scrollController;
   late final TabController? _tabController;
-
-  late PostModel? _postModel;
-  final List<Post> _posts = [];
-  int page = 1;
-  late int total;
   bool navHidden = false;
+  bool privateFeed = false;
+
+  late PostResponse? _postResponse;
+  List<Post> _posts = [];
+  final List<Post> _publicFeed = [];
+  final List<Post> _privateFeed = [];
+  late int privateTotal;
+  late int publicTotal;
+  int privatePage = 1;
+  int publicPage = 1;
 
   void _clearInitials() async {
     setState(() {
       _posts.clear();
-      page = 1;
+      privateFeed ? _privateFeed.clear() : _publicFeed.clear();
+      privateFeed ? privatePage = 1 : publicPage = 1;
     });
   }
 
-  void _getInitialData() async {
-    _postModel = await PostApiService.getPost(page: page);
+  void _getInitialData({int refresh = 0}) async {
+    _postResponse = await _postRepo.getPostFeed(
+      page: privateFeed ? privatePage : publicPage,
+      refresh: refresh,
+      private: privateFeed,
+    );
     Future.delayed(
         const Duration(seconds: 1),
         () => setState(() {
-              _posts.addAll(_postModel!.posts);
-              total = _postModel!.totalPages;
+              privateFeed
+                  ? _privateFeed
+                      .addAll(_postResponse!.data!.posts as Iterable<Post>)
+                  : _publicFeed
+                      .addAll(_postResponse!.data!.posts as Iterable<Post>);
+              privateFeed
+                  ? privateTotal = _postResponse!.totalPages!
+                  : publicTotal = _postResponse!.totalPages!;
+              _posts = privateFeed ? _privateFeed : _publicFeed;
             }));
   }
 
   void _fetchMoreData() async {
-    if (page == total) return;
-    page = page == total ? total : page + 1;
-    _postModel = await PostApiService.getPost(page: page);
+    bool condn =
+        privateFeed ? privatePage == privateTotal : publicPage == publicTotal;
+    if (condn) return;
+    privateFeed
+        ? privatePage == privateTotal
+            ? privatePage = privateTotal
+            : privatePage++
+        : publicPage == publicTotal
+            ? publicTotal
+            : publicPage++;
+    _postResponse = await _postRepo.getPostFeed(
+      page: privateFeed ? privatePage : publicPage,
+      refresh: 0,
+      private: privateFeed,
+    );
     Future.delayed(const Duration(seconds: 1)).then((value) => setState(() {
-          _posts.addAll(_postModel!.posts);
+          privateFeed
+              ? _privateFeed
+                  .addAll(_postResponse!.data!.posts as Iterable<Post>)
+              : _publicFeed
+                  .addAll(_postResponse!.data!.posts as Iterable<Post>);
+          _posts = privateFeed ? _privateFeed : _publicFeed;
         }));
   }
 
@@ -101,34 +137,46 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       backgroundColor: Colors.transparent,
       onRefresh: () async {
         _clearInitials();
-        _getInitialData();
+        _getInitialData(refresh: 1);
       },
       child: CustomScrollView(
         controller: _scrollController,
         slivers: [
-          SliverToBoxAdapter(
-            child: TabBar(
-              overlayColor: MaterialStateProperty.resolveWith(
-                  (states) => Colors.transparent),
-              onTap: (value) => debugPrint("Tab is Tabbed"),
-              labelColor: Colors.white70,
-              indicatorColor: Colors.cyan,
-              indicatorPadding: const EdgeInsets.all(10),
-              indicatorSize: TabBarIndicatorSize.label,
-              labelStyle: RootNodeFontStyle.body,
-              unselectedLabelColor: Colors.white30,
-              splashFactory: NoSplash.splashFactory,
-              isScrollable: false,
-              padding: EdgeInsets.zero,
-              controller: _tabController,
-              tabs: const [Tab(text: "Public"), Tab(text: "Mutual")],
-            ),
-          ),
           const SliverToBoxAdapter(child: DummySearchField()),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Stories(currentUser: User(), stories: _posts),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              decoration: BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.circular(20)),
+              child: TabBar(
+                enableFeedback: true,
+                overlayColor: MaterialStateProperty.resolveWith(
+                    (states) => Colors.transparent),
+                onTap: (value) => setState(() {
+                  privateFeed = value == 0 ? false : true;
+                  _clearInitials();
+                  _getInitialData();
+                }),
+                labelColor: Colors.white70,
+                indicatorColor: Colors.cyan,
+                indicatorPadding: const EdgeInsets.all(10),
+                indicatorSize: TabBarIndicatorSize.label,
+                labelStyle: RootNodeFontStyle.body,
+                unselectedLabelColor: Colors.white30,
+                splashFactory: NoSplash.splashFactory,
+                isScrollable: false,
+                dividerColor: Colors.transparent,
+                padding: EdgeInsets.zero,
+                controller: _tabController,
+                tabs: const [Tab(text: "Public"), Tab(text: "Mutual")],
+              ),
             ),
           ),
           _posts.isEmpty
@@ -146,7 +194,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return index < _posts.length
                         ? PostContainer(post: _posts[index])
-                        : PostLoader(page: page, total: total);
+                        : PostLoader(
+                            page: privateFeed ? privatePage : publicPage,
+                            total: privateFeed ? privateTotal : publicTotal,
+                          );
                   }, childCount: _posts.length + 1),
                 )
         ],

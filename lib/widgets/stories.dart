@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
-import 'package:rootnode/model/post_model.dart';
+import 'package:rootnode/model/post.dart';
 import 'package:rootnode/model/user.dart';
 
 class Stories extends StatelessWidget {
