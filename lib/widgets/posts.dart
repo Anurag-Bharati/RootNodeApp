@@ -1,4 +1,5 @@
 import 'package:boxicons/boxicons.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
 import 'package:rootnode/app/constant/api.dart';
@@ -30,7 +31,9 @@ class PostContainer extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _PostHeader(post: post),
         const SizedBox(height: 16),
-        _PostBody(post: post),
+        _PostBody(
+          post: post,
+        ),
         const Divider(thickness: 3, color: Color(0xFF111111)),
         _PostFooter(
           post: post,
@@ -108,13 +111,23 @@ class _PostHeader extends StatelessWidget {
   }
 }
 
-class _PostBody extends StatelessWidget {
+class _PostBody extends StatefulWidget {
   const _PostBody({
     Key? key,
     required this.post,
   }) : super(key: key);
 
   final Post post;
+
+  @override
+  State<_PostBody> createState() => _PostBodyState();
+}
+
+class _PostBodyState extends State<_PostBody> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,45 +138,105 @@ class _PostBody extends StatelessWidget {
           padding: const EdgeInsets.symmetric(
               horizontal: LayoutConstants.postPadding),
           child: Text(
-            post.caption!,
+            widget.post.caption!,
             softWrap: true,
             style: RootNodeFontStyle.caption,
           ),
         ),
-        post.mediaFiles.isNotEmpty
+        widget.post.mediaFiles.isNotEmpty
             ? Center(
                 child: Container(
+                  width: double.maxFinite,
                   clipBehavior: Clip.antiAlias,
                   decoration: const BoxDecoration(
                       borderRadius: LayoutConstants.postContentBorderRadius),
                   margin: const EdgeInsets.all(LayoutConstants.postInnerMargin),
                   child: AnimatedSize(
-                    curve: Curves.easeInQuad,
-                    duration: const Duration(milliseconds: 500),
-                    child: Image.network(
-                        "${ApiConstants.baseUrl} \\${post.mediaFiles[0].url!}",
-                        fit: BoxFit.cover, loadingBuilder:
-                            (BuildContext context, Widget child,
-                                ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child;
-                      }
-                      return Center(
-                        child: LinearProgressIndicator(
-                          backgroundColor: Colors.white10,
-                          color: Colors.white70,
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      );
-                    }),
-                  ),
+                      curve: Curves.easeInQuad,
+                      duration: const Duration(milliseconds: 500),
+                      child: widget.post.mediaFiles.length == 1 &&
+                              widget.post.mediaFiles[0].type == "image"
+                          ? PostImage(url: widget.post.mediaFiles[0].url!)
+                          : CarouselSlider(
+                              options: CarouselOptions(
+                                height: 200.0,
+                                enableInfiniteScroll: false,
+                                disableCenter: true,
+                                enlargeCenterPage: true,
+                                enlargeStrategy:
+                                    CenterPageEnlargeStrategy.scale,
+                                viewportFraction: 1,
+                              ),
+                              items: widget.post.mediaFiles.map((e) {
+                                return Builder(
+                                  key: PageStorageKey(widget.key),
+                                  builder: (BuildContext context) {
+                                    return e.type! == 'image'
+                                        ? PostImage(url: e.url!)
+                                        : Container(color: Colors.cyan);
+                                  },
+                                );
+                              }).toList(),
+                            )),
                 ),
               )
             : const SizedBox(height: 10),
       ],
+    );
+  }
+}
+
+//  Make Singleton controller for video player.
+class PostVideoPlayer extends StatefulWidget {
+  const PostVideoPlayer({
+    super.key,
+    required this.url,
+  });
+
+  final String url;
+
+  @override
+  State<PostVideoPlayer> createState() => _PostVideoPlayerState();
+}
+
+class _PostVideoPlayerState extends State<PostVideoPlayer> {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+}
+
+class PostImage extends StatelessWidget {
+  const PostImage({
+    super.key,
+    required this.url,
+  });
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+      child: Image.network("${ApiConstants.baseUrl} \\$url", fit: BoxFit.cover,
+          loadingBuilder: (BuildContext context, Widget child,
+              ImageChunkEvent? loadingProgress) {
+        if (loadingProgress == null) {
+          return child;
+        }
+        return Center(
+          child: LinearProgressIndicator(
+            backgroundColor: Colors.white10,
+            color: Colors.white70,
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded /
+                    loadingProgress.expectedTotalBytes!
+                : null,
+          ),
+        );
+      }),
     );
   }
 }
@@ -183,12 +256,12 @@ class _PostFooter extends StatefulWidget {
 }
 
 class _PostFooterState extends State<_PostFooter> {
-  final _postRepo = PostRepoImpl();
+  final postRepo = PostRepoImpl();
   bool liking = false;
   Future<bool> togglePostLike() async {
     if (liking) return !widget.likedMeta;
     liking = true;
-    bool res = await _postRepo.togglePostLike(id: widget.post.id!);
+    bool res = await postRepo.togglePostLike(id: widget.post.id!);
     liking = false;
     return res;
   }

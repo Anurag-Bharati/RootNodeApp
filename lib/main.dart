@@ -13,8 +13,6 @@ void main(List<String> args) async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then(
-    (value) => runApp(
-      const MyApp(),
-    ),
+    (value) => runApp(const MyApp()),
   );
 }

@@ -47,7 +47,11 @@ dependencies:
     connectivity_plus: ^3.0.2
     timeago: ^3.3.0
     string_extensions: ^0.6.6
-    random_color: ^1.0.6-nullsafety
+    carousel_slider: ^4.2.1
+    video_player: ^2.5.1
+    visibility_detector: ^0.3.3
+    chewie: ^1.4.0
+    better_player: ^0.0.83
 
 dev_dependencies:
     flutter_test:
