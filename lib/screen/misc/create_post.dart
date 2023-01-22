@@ -2,6 +2,8 @@ import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/model/user.dart';
+import 'package:rootnode/widgets/radio_button.dart';
+import 'package:rootnode/widgets/switch_button.dart';
 
 class CreatePostScreen extends StatefulWidget {
   const CreatePostScreen({super.key, this.user});
@@ -14,8 +16,7 @@ class CreatePostScreen extends StatefulWidget {
 class _CreatePostScreenState extends State<CreatePostScreen> {
   final _globalkey = GlobalKey<FormState>();
   final _captionFieldController = TextEditingController();
-  int maxLines = 1;
-  int selected = 0;
+  int maxLines = 2;
   List<String> visibility = ['Private', 'Mutual', 'Public'];
   @override
   Widget build(BuildContext context) {
@@ -53,7 +54,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   }),
                   onEditingComplete: () => setState(() {
                     FocusScope.of(context).unfocus();
-                    maxLines = 1;
+                    maxLines = 2;
                   }),
                   controller: _captionFieldController,
                   maxLines: maxLines,
@@ -71,7 +72,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         horizontal: 10, vertical: 10),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: Padding(
@@ -88,49 +89,38 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 10,
-                      children: [
-                        Text("Visibility", style: RootNodeFontStyle.body),
-                        Wrap(
-                          spacing: 10,
-                          children: [
-                            RootNodeRadioButton("Private", 0),
-                            RootNodeRadioButton("Mutual", 1),
-                            RootNodeRadioButton("Public", 2),
-                          ],
-                        ),
-                      ],
-                    ),
+                  child: RootNodeRadioButton(
+                    name: "Visibility",
+                    options: const ["Private", "Mutual", "Public"],
+                    onChanged: (String value) {
+                      print(value);
+                    },
                   ),
                 ),
                 const SizedBox(height: 10),
                 SizedBox(
+                    width: double.infinity,
+                    child: RootNodeRadioButton(
+                      name: "Markdown",
+                      options: const ["No", "Yes"],
+                      onChanged: (String value) {
+                        print(value);
+                      },
+                    )),
+                const SizedBox(height: 10),
+                Container(
                   width: double.infinity,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 10,
-                      children: [
-                        Text("Markdown", style: RootNodeFontStyle.body),
-                        Wrap(
-                          spacing: 10,
-                          children: [
-                            RootNodeRadioButton("No", 0),
-                            RootNodeRadioButton("Yes", 1),
-                          ],
-                        ),
-                      ],
-                    ),
+                  decoration: BoxDecoration(
+                    color: Colors.white10,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: RootNodeSwitchButton(
+                    isChecked: false,
+                    name: "Likeable",
+                    onChanged: (value) => print(value),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -140,16 +130,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     color: Colors.white10,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text("Likeable", style: RootNodeFontStyle.body),
-                        Checkbox(value: true, onChanged: (x) {})
-                      ],
-                    ),
+                  child: RootNodeSwitchButton(
+                    isChecked: false,
+                    name: "Commentable",
+                    onChanged: (value) => print(value),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -159,35 +143,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     color: Colors.white10,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text("Commentable", style: RootNodeFontStyle.body),
-                        Checkbox(value: true, onChanged: (x) {})
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white10,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text("Shareable", style: RootNodeFontStyle.body),
-                        Checkbox(value: true, onChanged: (x) {})
-                      ],
-                    ),
+                  child: RootNodeSwitchButton(
+                    isChecked: false,
+                    name: "Shareable",
+                    onChanged: (value) => print(value),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -196,7 +155,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ElevatedButton(
-                        onPressed: () {}, child: const Text("Create Now!")),
+                        onPressed: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Create Now!",
+                            style: RootNodeFontStyle.body,
+                          ),
+                        )),
                   ),
                 ),
               ],
@@ -206,58 +172,4 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       ),
     );
   }
-
-  Widget RootNodeRadioButton(String text, int index) {
-    return OutlinedButton(
-      onPressed: () => setState(() {
-        selected = index;
-      }),
-      style: ButtonStyle(
-        backgroundColor: MaterialStateColor.resolveWith((states) =>
-            selected == index
-                ? const Color.fromRGBO(2, 116, 132, 1)
-                : Colors.white10),
-        side: MaterialStateBorderSide.resolveWith((states) => BorderSide(
-            color: selected == index ? Colors.cyan : Colors.white10)),
-        shape: MaterialStateProperty.resolveWith(
-          (states) => RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-        ),
-      ),
-      child: Text(
-        text,
-        style: RootNodeFontStyle.caption,
-      ),
-    );
-  }
 }
-
-// CustomRadioButton(
-//                   elevation: 0,
-//                   height: 48,
-//                   unSelectedColor: Colors.white10,
-//                   selectedBorderColor: Colors.transparent,
-//                   unSelectedBorderColor: Colors.transparent,
-//                   autoWidth: true,
-//                   buttonLables: const [
-//                     'Private',
-//                     'Mutual',
-//                     'Public',
-//                   ],
-//                   buttonValues: const [
-//                     "private",
-//                     "mutual",
-//                     "public",
-//                   ],
-//                   buttonTextStyle: ButtonTextStyle(
-//                     selectedColor: Colors.white,
-//                     unSelectedColor: Colors.white30,
-//                     textStyle: RootNodeFontStyle.caption,
-//                   ),
-//                   defaultSelected: "public",
-//                   radioButtonValue: (value) {
-//                     print(value);
-//                   },
-//                   selectedColor: Colors.cyan,
-//                 ),
