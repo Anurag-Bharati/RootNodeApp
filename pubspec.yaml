@@ -52,6 +52,7 @@ dependencies:
     visibility_detector: ^0.3.3
     chewie: ^1.4.0
     better_player: ^0.0.83
+    file_picker: ^5.2.5
 
 dev_dependencies:
     flutter_test:

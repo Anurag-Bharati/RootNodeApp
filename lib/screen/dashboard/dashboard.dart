@@ -9,6 +9,7 @@ import 'package:rootnode/screen/dashboard/event_screen.dart';
 import 'package:rootnode/screen/dashboard/home_screen.dart';
 import 'package:rootnode/screen/dashboard/messenger_screen.dart';
 import 'package:rootnode/screen/dashboard/node_screen.dart';
+import 'package:rootnode/screen/misc/create_post.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key, this.user});
@@ -31,6 +32,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void hideNavbar() => null;
 
   // setState(() {navVisible = false;});
+
+  void _switchRoute(User user) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => CreatePostScreen(user: user),
+      ),
+    );
+  }
 
   int _selectedIndex = 0;
 
@@ -64,7 +74,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               _selectedIndex == 0
                   ? IconButton(
                       splashRadius: 20,
-                      onPressed: () {},
+                      onPressed: () {
+                        _switchRoute(widget.user!);
+                      },
                       icon: const Icon(Icons.add,
                           color: Colors.white70, size: 24),
                     )
