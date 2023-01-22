@@ -7,7 +7,9 @@ class RootNodeRadioButton extends StatefulWidget {
     required this.options,
     required this.name,
     required this.onChanged,
+    required this.selected,
   });
+  final int selected;
   final List<String> options;
   final String name;
   final ValueChanged<String> onChanged;
@@ -17,11 +19,17 @@ class RootNodeRadioButton extends StatefulWidget {
 }
 
 class _RootNodeRadioButtonState extends State<RootNodeRadioButton> {
-  int selected = 0;
+  late int selected;
+  @override
+  void initState() {
+    selected = widget.selected;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Wrap(
         spacing: 10,
         runSpacing: 10,

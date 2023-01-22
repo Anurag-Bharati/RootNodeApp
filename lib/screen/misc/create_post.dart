@@ -1,7 +1,12 @@
 import 'package:boxicons/boxicons.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
+import 'package:rootnode/app/utils/snackbar.dart';
+import 'package:rootnode/model/post.dart';
 import 'package:rootnode/model/user.dart';
+import 'package:rootnode/repository/post_repo.dart';
+import 'package:rootnode/widgets/add_media.dart';
 import 'package:rootnode/widgets/radio_button.dart';
 import 'package:rootnode/widgets/switch_button.dart';
 
@@ -14,10 +19,14 @@ class CreatePostScreen extends StatefulWidget {
 }
 
 class _CreatePostScreenState extends State<CreatePostScreen> {
+  final _postRepo = PostRepoImpl();
   final _globalkey = GlobalKey<FormState>();
   final _captionFieldController = TextEditingController();
-  int maxLines = 2;
-  List<String> visibility = ['Private', 'Mutual', 'Public'];
+  List<String> visibilityOption = ['Private', 'Mutual', 'Public'];
+
+  Post post = Post();
+  List<PlatformFile>? files;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,55 +57,39 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextFormField(
-                  onTap: () => setState(() {
-                    maxLines = 3;
-                  }),
-                  onEditingComplete: () => setState(() {
-                    FocusScope.of(context).unfocus();
-                    maxLines = 2;
-                  }),
-                  controller: _captionFieldController,
-                  maxLines: maxLines,
-                  textAlign: TextAlign.center,
-                  cursorColor: Colors.cyan[400],
-                  cursorHeight: 5,
-                  cursorWidth: 10,
-                  style: RootNodeFontStyle.captionDefault,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white10,
-                    hintText: "What's on your mind?",
-                    hintStyle: RootNodeFontStyle.caption,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 10,
-                      children: [
-                        Text("Images or Videos", style: RootNodeFontStyle.body),
-                        ElevatedButton(
-                            onPressed: () {}, child: const Text("Add Media")),
-                      ],
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: TextFormField(
+                    onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                    onEditingComplete: () => FocusScope.of(context).unfocus(),
+                    controller: _captionFieldController,
+                    maxLines: 3,
+                    textAlign: TextAlign.center,
+                    cursorColor: Colors.cyan[400],
+                    cursorHeight: 5,
+                    cursorWidth: 15,
+                    style: RootNodeFontStyle.captionDefault,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white10,
+                      hintText: "What's on your mind?",
+                      hintStyle: RootNodeFontStyle.body,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 22),
                 SizedBox(
                   width: double.infinity,
                   child: RootNodeRadioButton(
+                    selected: 2,
                     name: "Visibility",
                     options: const ["Private", "Mutual", "Public"],
                     onChanged: (String value) {
-                      print(value);
+                      debugPrint(value);
+                      post.visibility = value;
                     },
                   ),
                 ),
@@ -104,60 +97,79 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 SizedBox(
                     width: double.infinity,
                     child: RootNodeRadioButton(
+                      selected: 1,
                       name: "Markdown",
-                      options: const ["No", "Yes"],
+                      options: const ["Yes", "No"],
                       onChanged: (String value) {
-                        print(value);
+                        debugPrint(value);
+                        post.isMarkdown = value == "no" ? false : true;
                       },
                     )),
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white10,
+                    // color: Colors.white10,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: RootNodeSwitchButton(
-                    isChecked: false,
+                    isChecked: true,
                     name: "Likeable",
-                    onChanged: (value) => print(value),
+                    onChanged: (value) => post.likeable = value,
                   ),
                 ),
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white10,
+                    // color: Colors.white10,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: RootNodeSwitchButton(
-                    isChecked: false,
+                    isChecked: true,
                     name: "Commentable",
-                    onChanged: (value) => print(value),
+                    onChanged: (value) => post.commentable = value,
                   ),
                 ),
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white10,
+                    // color: Colors.white10,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: RootNodeSwitchButton(
-                    isChecked: false,
+                    isChecked: true,
                     name: "Shareable",
-                    onChanged: (value) => print(value),
+                    onChanged: (value) => post.shareable = value,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: RootNodeAddMedia(
+                      onChanged: (value) {
+                        debugPrint("==FILES AT CREATE POST==");
+                        if (value == null || value.isEmpty) return;
+                        files = value;
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.all(10),
                     child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _craftPost(context);
+                        },
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 20),
                           child: Text(
                             "Create Now!",
                             style: RootNodeFontStyle.body,
@@ -171,5 +183,27 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         ),
       ),
     );
+  }
+
+  void _craftPost(context) {
+    String caption = _captionFieldController.text;
+    if (caption == "" && (files == null || files!.isEmpty)) {
+      return showSnackbar(
+        context,
+        "Post must contain media or caption",
+        Colors.red[400]!,
+      );
+    }
+    if (caption != "") post.caption = caption;
+    _uploadPost(context);
+  }
+
+  void _uploadPost(context) async {
+    bool res = await _postRepo.createPost(post: post, files: files);
+    if (res) {
+      Navigator.pop(context, "New post created!");
+    } else {
+      showSnackbar(context, "Something went wrong!", Colors.red[400]!);
+    }
   }
 }

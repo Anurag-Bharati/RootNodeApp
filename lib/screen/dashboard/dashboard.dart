@@ -33,13 +33,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // setState(() {navVisible = false;});
 
-  void _switchRoute(User user) {
-    Navigator.push(
+  Future<void> _navigateToCreatePost(BuildContext context, User user) async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (BuildContext context) => CreatePostScreen(user: user),
       ),
     );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(
+          '$result',
+          style: RootNodeFontStyle.label.copyWith(color: Colors.cyan),
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: const Color(0xFF111111),
+      ));
   }
 
   int _selectedIndex = 0;
@@ -75,7 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ? IconButton(
                       splashRadius: 20,
                       onPressed: () {
-                        _switchRoute(widget.user!);
+                        _navigateToCreatePost(context, widget.user!);
                       },
                       icon: const Icon(Icons.add,
                           color: Colors.white70, size: 24),
