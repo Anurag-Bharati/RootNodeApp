@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
+import 'package:rootnode/helper/switchRoute.dart';
 import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/story_repo.dart';
+import 'package:rootnode/screen/misc/create_story.dart';
 import 'package:string_extensions/string_extensions.dart';
 
 class StoriesWidget extends StatefulWidget {
@@ -133,7 +135,9 @@ class _StoryCard extends StatelessWidget {
                     ),
         ),
         GestureDetector(
-          onTap: () => debugPrint(isAddStory.toString()),
+          onTap: () => isAddStory
+              ? switchRouteByPush(context, const CreateStoryScreen())
+              : debugPrint(isAddStory.toString()),
           child: Container(
             alignment: Alignment.center,
             height: double.infinity,

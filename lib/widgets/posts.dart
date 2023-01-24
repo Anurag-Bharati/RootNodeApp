@@ -138,7 +138,7 @@ class _PostBodyState extends State<_PostBody> {
           padding: const EdgeInsets.symmetric(
               horizontal: LayoutConstants.postPadding),
           child: Text(
-            widget.post.caption!,
+            widget.post.caption ?? "",
             softWrap: true,
             style: RootNodeFontStyle.caption,
           ),
@@ -157,26 +157,38 @@ class _PostBodyState extends State<_PostBody> {
                       child: widget.post.mediaFiles.length == 1 &&
                               widget.post.mediaFiles[0].type == "image"
                           ? PostImage(url: widget.post.mediaFiles[0].url!)
-                          : CarouselSlider(
-                              options: CarouselOptions(
-                                height: 200.0,
-                                enableInfiniteScroll: false,
-                                disableCenter: true,
-                                enlargeCenterPage: true,
-                                enlargeStrategy:
-                                    CenterPageEnlargeStrategy.scale,
-                                viewportFraction: 1,
-                              ),
-                              items: widget.post.mediaFiles.map((e) {
-                                return Builder(
-                                  key: PageStorageKey(widget.key),
-                                  builder: (BuildContext context) {
-                                    return e.type! == 'image'
-                                        ? PostImage(url: e.url!)
-                                        : Container(color: Colors.cyan);
-                                  },
-                                );
-                              }).toList(),
+                          : Stack(
+                              children: [
+                                CarouselSlider(
+                                  options: CarouselOptions(
+                                    height: 200.0,
+                                    enableInfiniteScroll: false,
+                                    disableCenter: true,
+                                    enlargeCenterPage: true,
+                                    enlargeStrategy:
+                                        CenterPageEnlargeStrategy.scale,
+                                    viewportFraction: 1,
+                                  ),
+                                  items: widget.post.mediaFiles.map((e) {
+                                    return Builder(
+                                      key: PageStorageKey(widget.key),
+                                      builder: (BuildContext context) {
+                                        return e.type! == 'image'
+                                            ? PostImage(url: e.url!)
+                                            : Container(color: Colors.cyan);
+                                      },
+                                    );
+                                  }).toList(),
+                                ),
+                                const Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Icon(Boxicons.bx_images,
+                                          size: 20, color: Colors.white54),
+                                    ))
+                              ],
                             )),
                 ),
               )
@@ -220,6 +232,7 @@ class PostImage extends StatelessWidget {
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+      constraints: const BoxConstraints(maxHeight: 300, minHeight: 100),
       child: Image.network("${ApiConstants.baseUrl} \\$url", fit: BoxFit.cover,
           loadingBuilder: (BuildContext context, Widget child,
               ImageChunkEvent? loadingProgress) {

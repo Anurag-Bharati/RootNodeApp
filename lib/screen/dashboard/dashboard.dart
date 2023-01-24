@@ -4,12 +4,14 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
+import 'package:rootnode/helper/switchRoute.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/screen/dashboard/event_screen.dart';
 import 'package:rootnode/screen/dashboard/home_screen.dart';
 import 'package:rootnode/screen/dashboard/messenger_screen.dart';
 import 'package:rootnode/screen/dashboard/node_screen.dart';
 import 'package:rootnode/screen/misc/create_post.dart';
+import 'package:rootnode/screen/misc/setting.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key, this.user});
@@ -41,6 +43,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
     if (!mounted) return;
+    if (result == null) return;
     ScaffoldMessenger.of(context)
       ..removeCurrentSnackBar()
       ..showSnackBar(SnackBar(
@@ -63,13 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         elevation: 0,
         toolbarHeight: mqSmallH(context) ? 80 : 60,
         backgroundColor: const Color(0xFF111111),
-        title: RootNodeBar(
-          avatar: widget.user!.avatar != null
-              ? "${ApiConstants.baseUrl}\\${widget.user!.avatar}"
-              : "https://cdn.shopify.com/s/files/1/0344/6469/files/angry.jpg?v=1560891349",
-          fname: widget.user == null ? null : widget.user!.fname,
-          lname: widget.user == null ? null : widget.user!.lname,
-        ),
+        title: RootNodeBar(user: widget.user!),
         actions: [
           Container(
             padding: const EdgeInsets.only(right: 10),
@@ -164,14 +161,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 class RootNodeBar extends StatelessWidget {
-  final String? fname;
-  final String? lname;
-  final String avatar;
+  final User user;
   const RootNodeBar({
     Key? key,
-    this.fname,
-    this.lname,
-    required this.avatar,
+    required this.user,
   }) : super(key: key);
 
   @override
@@ -180,7 +173,7 @@ class RootNodeBar extends StatelessWidget {
       children: [
         InkWell(
           borderRadius: BorderRadius.circular(50),
-          onTap: () {},
+          onTap: () => switchRouteByPush(context, SettingScreen(user: user)),
           child: Container(
             height: 40,
             width: 40,
@@ -192,7 +185,9 @@ class RootNodeBar extends StatelessWidget {
             ),
             child: FadeInImage.assetNetwork(
               fit: BoxFit.cover,
-              image: avatar,
+              image: user.avatar != null
+                  ? "${ApiConstants.baseUrl}\\${user.avatar}"
+                  : "https://cdn.shopify.com/s/files/1/0344/6469/files/angry.jpg?v=1560891349",
               placeholder: 'assets/images/image_grey.png',
             ),
           ),
@@ -205,8 +200,8 @@ class RootNodeBar extends StatelessWidget {
             children: [
               Text("Good Morning,", style: RootNodeFontStyle.label),
               Text(
-                  fname != null
-                      ? "$fname ${lname!.substring(0, 1).toUpperCase()}."
+                  user.fname != null
+                      ? "${user.fname} ${user.lname!.substring(0, 1).toUpperCase()}."
                       : "ANURAG",
                   style: RootNodeFontStyle.title),
             ],

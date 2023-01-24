@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rootnode/helper/switchRoute.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/auth/register_screen.dart';
@@ -52,17 +53,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     User? user = await userRepo.getUserFromToken();
     return user;
-  }
-
-  void _switchRoute(User user) {
-    Future.delayed(
-      const Duration(seconds: 2),
-      () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => DashboardScreen(user: user)),
-      ),
-    );
   }
 
   @override
@@ -120,7 +110,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   context, "Logging in..", Colors.green[400]!,
                                   dismissable: false);
                               User? user = await _loginUser();
-                              if (user != null) return _switchRoute(user);
+                              if (user != null) {
+                                // ignore: use_build_context_synchronously
+                                return switchRouteByPushReplace(
+                                    context, DashboardScreen(user: user));
+                              }
                               // ignore: use_build_context_synchronously
                               showSnackbar(
                                 context,
