@@ -5,9 +5,10 @@ import 'package:like_button/like_button.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
+import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/repository/post_repo.dart';
-import 'package:timeago/timeago.dart' as timeago;
+
 import 'package:string_extensions/string_extensions.dart';
 
 class PostContainer extends StatelessWidget {
@@ -52,13 +53,6 @@ class _PostHeader extends StatelessWidget {
 
   final Post post;
 
-  String _getPostedAgo(DateTime dt) {
-    Duration diff = DateTime.now().difference(dt);
-    int min = diff.inMinutes;
-    return timeago.format(DateTime.now().subtract(Duration(minutes: min)),
-        locale: 'en_short');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -96,7 +90,7 @@ class _PostHeader extends StatelessWidget {
             spacing: 10,
             children: [
               Text(
-                _getPostedAgo(post.createdAt!),
+                Utils.getTimeAgo(post.createdAt!),
                 textAlign: TextAlign.center,
                 style: RootNodeFontStyle.label,
               ),

@@ -55,7 +55,7 @@ class Story {
         watchCount: json["watchCount"],
         status: json["status"],
         color: json["color"],
-        media: json["media"] == null ? null : StoryFile.fromJson(json),
+        media: json["media"] == null ? null : StoryFile.fromJson(json["media"]),
         visibility: json["visibility"],
         likeable: json["likeable"],
         seenBy: json["seenBy"] == null

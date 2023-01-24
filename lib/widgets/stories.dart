@@ -1,4 +1,6 @@
+import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
+import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
 import 'package:rootnode/helper/switchRoute.dart';
@@ -6,6 +8,7 @@ import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/story_repo.dart';
 import 'package:rootnode/screen/misc/create_story.dart';
+import 'package:rootnode/screen/misc/view_story.dart';
 import 'package:string_extensions/string_extensions.dart';
 
 class StoriesWidget extends StatefulWidget {
@@ -75,6 +78,8 @@ class _StoriesWidgetState extends State<StoriesWidget> {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: _StoryCard(
+                stories: _stories,
+                index: index,
                 color: Colors.cyan,
                 isAddStory: true,
                 currentUser: widget.currentUser,
@@ -85,6 +90,8 @@ class _StoriesWidgetState extends State<StoriesWidget> {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: _StoryCard(
+                stories: _stories,
+                index: index,
                 color: Color(_stories[index - 1].color!),
                 currentUser: widget.currentUser,
                 story: _stories[index - 1]),
@@ -99,14 +106,17 @@ class _StoryCard extends StatelessWidget {
   final bool isAddStory;
   final User currentUser;
   final Story? story;
+  final List<Story> stories;
   final Color color;
-
+  final int index;
   const _StoryCard({
     Key? key,
     this.isAddStory = false,
     required this.currentUser,
     required this.story,
     required this.color,
+    required this.index,
+    required this.stories,
   }) : super(key: key);
 
   @override
@@ -127,17 +137,33 @@ class _StoryCard extends StatelessWidget {
                       width: 110.0,
                       color: color,
                     )
-                  : Image.network(
-                      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/640px-Image_created_with_a_mobile_phone.png",
-                      height: double.infinity,
-                      width: 110.0,
-                      fit: BoxFit.cover,
-                    ),
+                  : story!.media!.type == "image"
+                      ? Image.network(
+                          "${ApiConstants.baseUrl}/${story!.media!.url!}",
+                          height: double.infinity,
+                          width: 110.0,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          height: double.infinity,
+                          width: 110.0,
+                          color: color,
+                          child: const Icon(
+                            Boxicons.bx_video,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
         ),
         GestureDetector(
           onTap: () => isAddStory
               ? switchRouteByPush(context, const CreateStoryScreen())
-              : debugPrint(isAddStory.toString()),
+              : switchRouteByPush(
+                  context,
+                  ViewStoryScreen(
+                    stories: stories,
+                    initial: index - 1,
+                  )),
           child: Container(
             alignment: Alignment.center,
             height: double.infinity,
@@ -167,7 +193,7 @@ class _StoryCard extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text(
-                        story!.heading!,
+                        story!.type == "text" ? story!.heading! : "",
                         textAlign: TextAlign.center,
                         maxLines: 1,
                         style: RootNodeFontStyle.label,
