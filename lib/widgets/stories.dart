@@ -123,37 +123,40 @@ class _StoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20.0),
-          child: isAddStory
-              ? Container(
-                  height: double.infinity,
-                  width: 110.0,
-                  color: Colors.cyan,
-                )
-              : story!.media == null
-                  ? Container(
-                      height: double.infinity,
-                      width: 110.0,
-                      color: color,
-                    )
-                  : story!.media!.type == "image"
-                      ? Image.network(
-                          "${ApiConstants.baseUrl}/${story!.media!.url!}",
-                          height: double.infinity,
-                          width: 110.0,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          height: double.infinity,
-                          width: 110.0,
-                          color: color,
-                          child: const Icon(
-                            Boxicons.bx_video,
-                            color: Colors.white,
-                            size: 30,
+        Hero(
+          tag: "story-${index - 1}",
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20.0),
+            child: isAddStory
+                ? Container(
+                    height: double.infinity,
+                    width: 110.0,
+                    color: Colors.cyan,
+                  )
+                : story!.media == null
+                    ? Container(
+                        height: double.infinity,
+                        width: 110.0,
+                        color: color,
+                      )
+                    : story!.media!.type == "image"
+                        ? Image.network(
+                            "${ApiConstants.baseUrl}/${story!.media!.url!}",
+                            height: double.infinity,
+                            width: 110.0,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            height: double.infinity,
+                            width: 110.0,
+                            color: color,
+                            child: const Icon(
+                              Boxicons.bx_video,
+                              color: Colors.white,
+                              size: 30,
+                            ),
                           ),
-                        ),
+          ),
         ),
         GestureDetector(
           onTap: () => isAddStory
@@ -193,7 +196,7 @@ class _StoryCard extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text(
-                        story!.type == "text" ? story!.heading! : "",
+                        story!.type == "text" ? story!.quote! : "",
                         textAlign: TextAlign.center,
                         maxLines: 1,
                         style: RootNodeFontStyle.label,

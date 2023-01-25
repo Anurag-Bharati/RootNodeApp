@@ -16,7 +16,7 @@ class CreateStoryScreen extends StatefulWidget {
 class _CreateStoryScreenState extends State<CreateStoryScreen> {
   final _storyRepo = StoryRepoImpl();
   final _globalkey = GlobalKey<FormState>();
-  final _headingFieldController = TextEditingController();
+  final _quoteFieldController = TextEditingController();
   List<String> visibilityOption = ['Private', 'Mutual', 'Public'];
 
   Story story = Story();
@@ -62,22 +62,22 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   }
 
   void _craftStory(context) {
-    String heading = _headingFieldController.text;
-    if (heading == "" && (file == null)) {
+    String quote = _quoteFieldController.text;
+    if (quote == "" && (file == null)) {
       return showSnackbar(
         context,
-        "Story must contain media or caption",
+        "Story must contain media or quote",
         Colors.red[400]!,
       );
     }
-    if (heading != "") story.heading = heading;
+    if (quote != "") story.quote = quote;
     _uploadStory(context);
   }
 
   void _uploadStory(context) async {
     bool res = await _storyRepo.createStory(story: story, file: file);
     if (res) {
-      Navigator.pop(context, "New post created!");
+      Navigator.pop(context, "New story created!");
     } else {
       showSnackbar(context, "Something went wrong!", Colors.red[400]!);
     }

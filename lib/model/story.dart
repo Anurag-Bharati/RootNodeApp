@@ -8,7 +8,7 @@ class Story {
     this.id,
     this.type,
     this.owner,
-    this.heading,
+    this.quote,
     this.likesCount,
     this.watchCount,
     this.media,
@@ -28,7 +28,7 @@ class Story {
   String? id;
   String? type;
   User? owner;
-  String? heading;
+  String? quote;
   int? likesCount;
   int? watchCount;
   int? color;
@@ -50,7 +50,7 @@ class Story {
         id: json["_id"],
         type: json["type"],
         owner: json["owner"] == null ? null : User.fromJson(json["owner"]),
-        heading: json["heading"],
+        quote: json["quote"],
         likesCount: json["likesCount"],
         watchCount: json["watchCount"],
         status: json["status"],
@@ -73,7 +73,7 @@ class Story {
         "_id": id,
         "type": type,
         "owner": owner?.toJson(),
-        "heading": heading,
+        "quote": quote,
         "visibility": visibility,
         "likeable": likeable,
       };

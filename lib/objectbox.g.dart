@@ -250,7 +250,7 @@ final _entities = <ModelEntity>[
   ModelEntity(
       id: const IdUid(5, 3915084085433421223),
       name: 'Story',
-      lastPropertyId: const IdUid(12, 2871486317808580817),
+      lastPropertyId: const IdUid(14, 7776837503095183094),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
@@ -267,11 +267,6 @@ final _entities = <ModelEntity>[
         ModelProperty(
             id: const IdUid(3, 3782621823877601322),
             name: 'type',
-            type: 9,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(4, 2603067226680828925),
-            name: 'heading',
             type: 9,
             flags: 0),
         ModelProperty(
@@ -313,6 +308,16 @@ final _entities = <ModelEntity>[
             id: const IdUid(12, 2871486317808580817),
             name: 'updatedAt',
             type: 10,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(13, 2838896331150748478),
+            name: 'quote',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(14, 7776837503095183094),
+            name: 'color',
+            type: 6,
             flags: 0)
       ],
       relations: <ModelRelation>[],
@@ -361,7 +366,8 @@ ModelDefinition getObjectBoxModel() {
         2913352306531719849,
         5102395500943955716,
         7052601362960841130,
-        8506438372257683967
+        8506438372257683967,
+        2603067226680828925
       ],
       retiredRelationUids: const [403350268397340821],
       modelVersion: 5,
@@ -590,8 +596,6 @@ ModelDefinition getObjectBoxModel() {
               object.id == null ? null : fbb.writeString(object.id!);
           final typeOffset =
               object.type == null ? null : fbb.writeString(object.type!);
-          final headingOffset =
-              object.heading == null ? null : fbb.writeString(object.heading!);
           final statusOffset =
               object.status == null ? null : fbb.writeString(object.status!);
           final visibilityOffset = object.visibility == null
@@ -601,11 +605,12 @@ ModelDefinition getObjectBoxModel() {
               ? null
               : fbb.writeList(
                   object.seenBy!.map(fbb.writeString).toList(growable: false));
-          fbb.startTable(13);
+          final quoteOffset =
+              object.quote == null ? null : fbb.writeString(object.quote!);
+          fbb.startTable(15);
           fbb.addInt64(0, object.storyId);
           fbb.addOffset(1, idOffset);
           fbb.addOffset(2, typeOffset);
-          fbb.addOffset(3, headingOffset);
           fbb.addInt64(4, object.likesCount);
           fbb.addInt64(5, object.watchCount);
           fbb.addOffset(6, statusOffset);
@@ -614,6 +619,8 @@ ModelDefinition getObjectBoxModel() {
           fbb.addOffset(9, seenByOffset);
           fbb.addInt64(10, object.createdAt?.millisecondsSinceEpoch);
           fbb.addInt64(11, object.updatedAt?.millisecondsSinceEpoch);
+          fbb.addOffset(12, quoteOffset);
+          fbb.addInt64(13, object.color);
           fbb.finish(fbb.endTable());
           return object.storyId;
         },
@@ -629,18 +636,19 @@ ModelDefinition getObjectBoxModel() {
                   .vTableGetNullable(buffer, rootOffset, 6),
               type: const fb.StringReader(asciiOptimization: true)
                   .vTableGetNullable(buffer, rootOffset, 8),
-              heading: const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 10),
+              quote: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 28),
               likesCount: const fb.Int64Reader()
                   .vTableGetNullable(buffer, rootOffset, 12),
               watchCount: const fb.Int64Reader()
                   .vTableGetNullable(buffer, rootOffset, 14),
+              color: const fb.Int64Reader()
+                  .vTableGetNullable(buffer, rootOffset, 30),
               status: const fb.StringReader(asciiOptimization: true)
                   .vTableGetNullable(buffer, rootOffset, 16),
               visibility: const fb.StringReader(asciiOptimization: true)
                   .vTableGetNullable(buffer, rootOffset, 18),
-              likeable: const fb.BoolReader()
-                  .vTableGetNullable(buffer, rootOffset, 20),
+              likeable: const fb.BoolReader().vTableGetNullable(buffer, rootOffset, 20),
               seenBy: const fb.ListReader<String>(fb.StringReader(asciiOptimization: true), lazy: false).vTableGetNullable(buffer, rootOffset, 22),
               createdAt: createdAtValue == null ? null : DateTime.fromMillisecondsSinceEpoch(createdAtValue),
               updatedAt: updatedAtValue == null ? null : DateTime.fromMillisecondsSinceEpoch(updatedAtValue),
@@ -813,37 +821,40 @@ class Story_ {
   /// see [Story.type]
   static final type = QueryStringProperty<Story>(_entities[3].properties[2]);
 
-  /// see [Story.heading]
-  static final heading = QueryStringProperty<Story>(_entities[3].properties[3]);
-
   /// see [Story.likesCount]
   static final likesCount =
-      QueryIntegerProperty<Story>(_entities[3].properties[4]);
+      QueryIntegerProperty<Story>(_entities[3].properties[3]);
 
   /// see [Story.watchCount]
   static final watchCount =
-      QueryIntegerProperty<Story>(_entities[3].properties[5]);
+      QueryIntegerProperty<Story>(_entities[3].properties[4]);
 
   /// see [Story.status]
-  static final status = QueryStringProperty<Story>(_entities[3].properties[6]);
+  static final status = QueryStringProperty<Story>(_entities[3].properties[5]);
 
   /// see [Story.visibility]
   static final visibility =
-      QueryStringProperty<Story>(_entities[3].properties[7]);
+      QueryStringProperty<Story>(_entities[3].properties[6]);
 
   /// see [Story.likeable]
   static final likeable =
-      QueryBooleanProperty<Story>(_entities[3].properties[8]);
+      QueryBooleanProperty<Story>(_entities[3].properties[7]);
 
   /// see [Story.seenBy]
   static final seenBy =
-      QueryStringVectorProperty<Story>(_entities[3].properties[9]);
+      QueryStringVectorProperty<Story>(_entities[3].properties[8]);
 
   /// see [Story.createdAt]
   static final createdAt =
-      QueryIntegerProperty<Story>(_entities[3].properties[10]);
+      QueryIntegerProperty<Story>(_entities[3].properties[9]);
 
   /// see [Story.updatedAt]
   static final updatedAt =
-      QueryIntegerProperty<Story>(_entities[3].properties[11]);
+      QueryIntegerProperty<Story>(_entities[3].properties[10]);
+
+  /// see [Story.quote]
+  static final quote = QueryStringProperty<Story>(_entities[3].properties[11]);
+
+  /// see [Story.color]
+  static final color = QueryIntegerProperty<Story>(_entities[3].properties[12]);
 }

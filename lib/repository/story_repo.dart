@@ -7,6 +7,7 @@ abstract class StoryRepo {
   Future<StoryResponse?> getStoryFeed(
       {int page = 1, int refresh = 0, bool private = false});
   Future<Story?> getStoryById({required String id});
+  Future<bool> storyWatched({required String id});
   Future<bool> createStory({required Story story, PlatformFile? file});
 }
 
@@ -26,5 +27,10 @@ class StoryRepoImpl extends StoryRepo {
   @override
   Future<bool> createStory({required Story story, PlatformFile? file}) {
     return StoryRemoteDataSource().createStory(story: story, file: file);
+  }
+
+  @override
+  Future<bool> storyWatched({required String id}) {
+    return StoryRemoteDataSource().storyWatched(id: id);
   }
 }

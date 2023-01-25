@@ -37,6 +37,19 @@ class StoryRemoteDataSource {
     }
   }
 
+  Future<bool> storyWatched({required String id}) async {
+    try {
+      String? token = await SimpleStorage.getStringData("token");
+      _httpServices.options.headers["authorization"] = "Bearer $token";
+      Response res = await _httpServices
+          .post("${ApiConstants.baseUrl}${ApiConstants.story}/$id");
+      return res.statusCode == 200;
+    } catch (_) {
+      debugPrint(_.toString());
+      return false;
+    }
+  }
+
   Future<bool> createStory({required Story story, PlatformFile? file}) async {
     try {
       MultipartFile? media;

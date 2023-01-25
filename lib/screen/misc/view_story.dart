@@ -5,12 +5,16 @@ import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user.dart';
+import 'package:rootnode/repository/story_repo.dart';
 import 'package:string_extensions/string_extensions.dart';
 import 'package:video_player/video_player.dart';
 
 class ViewStoryScreen extends StatefulWidget {
-  const ViewStoryScreen(
-      {super.key, required this.stories, required this.initial});
+  const ViewStoryScreen({
+    super.key,
+    required this.stories,
+    required this.initial,
+  });
   final List<Story> stories;
   final int initial;
 
@@ -23,8 +27,12 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
   late final PageController _pageController;
   late final AnimationController _animationController;
   VideoPlayerController? _videoController;
+  final _stroyRepo = StoryRepoImpl();
   late int currentIndex;
+  bool paused = false;
+  bool loved = false;
   Duration imageStoryDuration = const Duration(seconds: 5);
+  final List<String> watchedStory = [];
 
   @override
   void initState() {
@@ -50,6 +58,12 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
     super.initState();
   }
 
+  _storyWatched({required String id}) {
+    if (watchedStory.contains(id)) return;
+    watchedStory.add(id);
+    _stroyRepo.storyWatched(id: id);
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -66,10 +80,10 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
   @override
   Widget build(BuildContext context) {
     final Story story = widget.stories[currentIndex];
-    print(story.type);
     return Scaffold(
         body: GestureDetector(
       onTapDown: (details) => _onTapDown(details, story),
+      onDoubleTap: () => _likeStory(story),
       child: Stack(
         children: [
           PageView.builder(
@@ -80,48 +94,93 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
               final Story story = widget.stories[currentIndex];
               switch (story.type) {
                 case "text":
-                  return Container(
-                    height: double.infinity,
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    color: Color(story.color!),
-                    child: Text(story.heading!),
+                  return Hero(
+                    tag: "story-$currentIndex",
+                    child: Container(
+                      height: double.infinity,
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      color: Color(story.color!),
+                      child: StoryHeading(story: story),
+                    ),
                   );
                 case "media":
                 case "mixed":
                   switch (story.media!.type) {
                     case "image":
-                      return Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Image.network(
-                              "${ApiConstants.baseUrl}/${story.media!.url}",
-                              fit: BoxFit.cover),
-                          Container(
-                            decoration: const BoxDecoration(
+                      return Hero(
+                        tag: "story-$currentIndex",
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image.network(
+                                "${ApiConstants.baseUrl}/${story.media!.url}",
+                                fit: BoxFit.cover),
+                            Container(
+                              decoration: const BoxDecoration(
                                 gradient: LinearGradient(
                                     colors: [
-                                  Color(0xFF111111),
-                                  Colors.transparent,
-                                  Colors.transparent,
-                                  Colors.transparent,
-                                  Colors.transparent,
-                                  Colors.transparent
-                                ],
+                                      Color(0xFF111111),
+                                      Colors.transparent,
+                                      Colors.transparent,
+                                      Colors.transparent,
+                                      Colors.transparent,
+                                      Colors.transparent
+                                    ],
                                     begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter)),
-                          )
-                        ],
+                                    end: Alignment.topCenter),
+                              ),
+                            ),
+                            Positioned(
+                                left: 10.0,
+                                right: 10.0,
+                                bottom: 40,
+                                child: !paused
+                                    ? Column(
+                                        children: [
+                                          const Icon(
+                                            Boxicons.bx_heading,
+                                            color: Colors.white54,
+                                            size: 20,
+                                          ),
+                                          Text(
+                                            "Heading Available!\ntap to reveal",
+                                            textAlign: TextAlign.center,
+                                            style: RootNodeFontStyle.label
+                                                .copyWith(
+                                                    fontSize: 12, height: 0),
+                                          )
+                                        ],
+                                      )
+                                    : const SizedBox.shrink()),
+                            AnimatedContainer(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: paused
+                                    ? Colors.black.withOpacity(0.5)
+                                    : Colors.transparent,
+                              ),
+                              duration: const Duration(milliseconds: 400),
+                              curve: Curves.easeInOut,
+                              child: paused && story.quote != null
+                                  ? StoryHeading(story: story)
+                                  : null,
+                            ),
+                          ],
+                        ),
                       );
                     case "video":
                       if (_videoController != null &&
                           _videoController!.value.isInitialized) {
-                        return FittedBox(
-                          fit: BoxFit.cover,
-                          child: SizedBox(
-                              width: _videoController!.value.size.width,
-                              height: _videoController!.value.size.height,
-                              child: VideoPlayer(_videoController!)),
+                        return Hero(
+                          tag: "story-$currentIndex",
+                          child: FittedBox(
+                            fit: BoxFit.cover,
+                            child: SizedBox(
+                                width: _videoController!.value.size.width,
+                                height: _videoController!.value.size.height,
+                                child: VideoPlayer(_videoController!)),
+                          ),
                         );
                       }
                   }
@@ -141,7 +200,11 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
                     padding: const EdgeInsets.symmetric(
                         horizontal: 1.5, vertical: 10.0),
                     child: UserInfo(
-                        user: story.owner!, createdAt: story.createdAt!),
+                      user: story.owner!,
+                      createdAt: story.createdAt!,
+                      heartCount: story.likesCount!,
+                      seenCount: story.seenBy!.length,
+                    ),
                   ),
                   SizedBox(
                     width: 200,
@@ -172,6 +235,7 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
     final double screenWidth = MediaQuery.of(context).size.width;
     final double dx = details.globalPosition.dx;
     if (dx < screenWidth / 3) {
+      paused = false;
       setState(() {
         if (currentIndex - 1 >= 0) {
           currentIndex--;
@@ -179,6 +243,7 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
         }
       });
     } else if (dx > 2 * screenWidth / 3) {
+      paused = false;
       setState(() {
         if (currentIndex + 1 < widget.stories.length) {
           currentIndex++;
@@ -188,7 +253,18 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
         _loadStory(story: widget.stories[currentIndex]);
       });
     } else {
-      if (story.media != null && story.media!.type == 'video') {
+      if (story.media == null) return;
+      if (story.media!.type == 'image') {
+        setState(() {
+          paused = !paused;
+          if (paused) {
+            _animationController.stop();
+          } else {
+            _animationController.forward();
+          }
+        });
+      }
+      if (story.media!.type == 'video') {
         if (_videoController == null) return;
         if (_videoController!.value.isPlaying) {
           _videoController!.pause();
@@ -202,6 +278,7 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
   }
 
   void _loadStory({required Story story, bool animateToPage = true}) {
+    _storyWatched(id: story.id!);
     _animationController.stop();
     _animationController.reset();
     switch (story.type) {
@@ -242,6 +319,81 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
         curve: Curves.easeInOut,
       );
     }
+  }
+
+  _likeStory(Story story) {
+    setState(() {
+      loved = !loved;
+    });
+  }
+}
+
+class StoryHeading extends StatelessWidget {
+  const StoryHeading({
+    super.key,
+    required this.story,
+  });
+
+  final Story story;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      direction: Axis.vertical,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(
+            right: story.quote!.length * 10 >
+                    MediaQuery.of(context).size.width * 0.8
+                ? MediaQuery.of(context).size.width * 0.8
+                : story.quote!.length * 10,
+            bottom: 5,
+          ),
+          child: const Icon(
+            Boxicons.bxs_quote_left,
+            color: Colors.white54,
+            size: 18,
+          ),
+        ),
+        Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.8,
+            maxHeight: MediaQuery.of(context).size.height * 0.6,
+          ),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.white54, width: 2),
+            borderRadius: BorderRadius.circular(10),
+            // color: Colors.white10,
+          ),
+          padding: const EdgeInsets.all(10),
+          child: SingleChildScrollView(
+            child: Text(
+              story.quote!,
+              style: RootNodeFontStyle.body.copyWith(height: 1.5),
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
+              textAlign: TextAlign.center,
+              maxLines: 500,
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(
+            left: story.quote!.length * 10 >
+                    MediaQuery.of(context).size.width * 0.8
+                ? MediaQuery.of(context).size.width * 0.8
+                : story.quote!.length * 10,
+            top: 5,
+          ),
+          child: const Icon(
+            Boxicons.bxs_quote_right,
+            color: Colors.white54,
+            size: 18,
+          ),
+        )
+      ],
+    );
   }
 }
 
@@ -304,7 +456,14 @@ class AnimatedBar extends StatelessWidget {
 class UserInfo extends StatelessWidget {
   final User user;
   final DateTime createdAt;
-  const UserInfo({super.key, required this.user, required this.createdAt});
+  final int heartCount;
+  final int seenCount;
+  const UserInfo(
+      {super.key,
+      required this.user,
+      required this.createdAt,
+      required this.heartCount,
+      required this.seenCount});
 
   @override
   Widget build(BuildContext context) {
@@ -329,13 +488,27 @@ class UserInfo extends StatelessWidget {
                 style: RootNodeFontStyle.body,
               ),
               Wrap(
-                spacing: 10,
+                spacing: 5,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  const Icon(Boxicons.bx_time, color: Colors.white70, size: 18),
+                  const Icon(Boxicons.bx_time, color: Colors.white70, size: 16),
                   Text(
                     Utils.getTimeAgo(createdAt),
-                    style: RootNodeFontStyle.body,
+                    style: RootNodeFontStyle.subtitle,
+                  ),
+                  Text("•", style: RootNodeFontStyle.subtitle),
+                  const Icon(Boxicons.bx_heart,
+                      color: Colors.white70, size: 16),
+                  Text(
+                    heartCount.toString(),
+                    style: RootNodeFontStyle.subtitle,
+                  ),
+                  Text("•", style: RootNodeFontStyle.subtitle),
+                  const Icon(Icons.visibility_outlined,
+                      color: Colors.white70, size: 18),
+                  Text(
+                    seenCount.toString(),
+                    style: RootNodeFontStyle.subtitle,
                   ),
                 ],
               ),

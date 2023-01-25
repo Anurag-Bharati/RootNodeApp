@@ -5,9 +5,11 @@ import 'package:like_button/like_button.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
+import 'package:rootnode/helper/switchRoute.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/repository/post_repo.dart';
+import 'package:rootnode/screen/misc/view_post_media.dart';
 
 import 'package:string_extensions/string_extensions.dart';
 
@@ -34,6 +36,7 @@ class PostContainer extends StatelessWidget {
         const SizedBox(height: 16),
         _PostBody(
           post: post,
+          isLiked: likedMeta,
         ),
         const Divider(thickness: 3, color: Color(0xFF111111)),
         _PostFooter(
@@ -109,9 +112,11 @@ class _PostBody extends StatefulWidget {
   const _PostBody({
     Key? key,
     required this.post,
+    required this.isLiked,
   }) : super(key: key);
 
   final Post post;
+  final bool isLiked;
 
   @override
   State<_PostBody> createState() => _PostBodyState();
@@ -125,69 +130,84 @@ class _PostBodyState extends State<_PostBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: LayoutConstants.postPadding),
-          child: Text(
-            widget.post.caption ?? "",
-            softWrap: true,
-            style: RootNodeFontStyle.caption,
+    return GestureDetector(
+      onTap: () => switchRouteByPush(
+          context,
+          ViewPost(
+            post: widget.post,
+            likedMeta: widget.isLiked,
+          )),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+                horizontal: LayoutConstants.postPadding),
+            child: Text(
+              widget.post.caption ?? "",
+              softWrap: true,
+              style: RootNodeFontStyle.caption,
+            ),
           ),
-        ),
-        widget.post.mediaFiles.isNotEmpty
-            ? Center(
-                child: Container(
-                  width: double.maxFinite,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: const BoxDecoration(
-                      borderRadius: LayoutConstants.postContentBorderRadius),
-                  margin: const EdgeInsets.all(LayoutConstants.postInnerMargin),
-                  child: AnimatedSize(
-                      curve: Curves.easeInQuad,
-                      duration: const Duration(milliseconds: 500),
-                      child: widget.post.mediaFiles.length == 1 &&
-                              widget.post.mediaFiles[0].type == "image"
-                          ? PostImage(url: widget.post.mediaFiles[0].url!)
-                          : Stack(
-                              children: [
-                                CarouselSlider(
-                                  options: CarouselOptions(
-                                    height: 200.0,
-                                    enableInfiniteScroll: false,
-                                    disableCenter: true,
-                                    enlargeCenterPage: true,
-                                    enlargeStrategy:
-                                        CenterPageEnlargeStrategy.scale,
-                                    viewportFraction: 1,
+          widget.post.mediaFiles.isNotEmpty
+              ? Center(
+                  child: Container(
+                    width: double.maxFinite,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: const BoxDecoration(
+                        borderRadius: LayoutConstants.postContentBorderRadius),
+                    margin:
+                        const EdgeInsets.all(LayoutConstants.postInnerMargin),
+                    child: AnimatedSize(
+                        curve: Curves.easeInQuad,
+                        duration: const Duration(milliseconds: 500),
+                        child: widget.post.mediaFiles.length == 1 &&
+                                widget.post.mediaFiles[0].type == "image"
+                            ? Hero(
+                                tag: widget.post.id.toString(),
+                                child: PostImage(
+                                    url: widget.post.mediaFiles[0].url!))
+                            : Stack(
+                                children: [
+                                  CarouselSlider(
+                                    options: CarouselOptions(
+                                      height: 200.0,
+                                      enableInfiniteScroll: false,
+                                      disableCenter: true,
+                                      enlargeCenterPage: true,
+                                      enlargeStrategy:
+                                          CenterPageEnlargeStrategy.scale,
+                                      viewportFraction: 1,
+                                    ),
+                                    items: widget.post.mediaFiles.map((e) {
+                                      return Builder(
+                                        key: PageStorageKey(widget.key),
+                                        builder: (BuildContext context) {
+                                          return e.type! == 'image'
+                                              ? Hero(
+                                                  tag:
+                                                      widget.post.id.toString(),
+                                                  child: PostImage(url: e.url!))
+                                              : Container(color: Colors.cyan);
+                                        },
+                                      );
+                                    }).toList(),
                                   ),
-                                  items: widget.post.mediaFiles.map((e) {
-                                    return Builder(
-                                      key: PageStorageKey(widget.key),
-                                      builder: (BuildContext context) {
-                                        return e.type! == 'image'
-                                            ? PostImage(url: e.url!)
-                                            : Container(color: Colors.cyan);
-                                      },
-                                    );
-                                  }).toList(),
-                                ),
-                                const Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Icon(Boxicons.bx_images,
-                                          size: 20, color: Colors.white54),
-                                    ))
-                              ],
-                            )),
-                ),
-              )
-            : const SizedBox(height: 10),
-      ],
+                                  const Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: Icon(Boxicons.bx_images,
+                                            size: 20, color: Colors.white54),
+                                      ))
+                                ],
+                              )),
+                  ),
+                )
+              : const SizedBox(height: 10),
+        ],
+      ),
     );
   }
 }
