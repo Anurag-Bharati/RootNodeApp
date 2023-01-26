@@ -203,7 +203,28 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
                             child: SizedBox(
                                 width: _videoController!.value.size.width,
                                 height: _videoController!.value.size.height,
-                                child: VideoPlayer(_videoController!)),
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    VideoPlayer(_videoController!),
+                                    Container(
+                                      decoration: const BoxDecoration(
+                                        gradient: LinearGradient(
+                                            colors: [
+                                              Colors.transparent,
+                                              Colors.transparent,
+                                              Colors.transparent,
+                                              Colors.transparent,
+                                              Colors.transparent,
+                                              Colors.transparent,
+                                              Color(0x55000000),
+                                            ],
+                                            begin: Alignment.bottomCenter,
+                                            end: Alignment.topCenter),
+                                      ),
+                                    )
+                                  ],
+                                )),
                           ),
                         );
                       } else {
