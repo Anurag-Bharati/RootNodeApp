@@ -1,4 +1,5 @@
 import 'package:boxicons/boxicons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
@@ -10,6 +11,7 @@ import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/screen/misc/view_post_media.dart';
+import 'package:rootnode/widgets/error_widget.dart';
 
 import 'package:string_extensions/string_extensions.dart';
 
@@ -166,7 +168,8 @@ class _PostBodyState extends State<_PostBody> {
                             ? Hero(
                                 tag: widget.post.id.toString(),
                                 child: PostImage(
-                                    url: widget.post.mediaFiles[0].url!))
+                                    url: widget.post.mediaFiles[0].url!),
+                              )
                             : Stack(
                                 children: [
                                   CarouselSlider(
@@ -246,24 +249,18 @@ class PostImage extends StatelessWidget {
     return Container(
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-      constraints: const BoxConstraints(maxHeight: 300, minHeight: 100),
-      child: Image.network("${ApiConstants.baseUrl} \\$url", fit: BoxFit.cover,
-          loadingBuilder: (BuildContext context, Widget child,
-              ImageChunkEvent? loadingProgress) {
-        if (loadingProgress == null) {
-          return child;
-        }
-        return Center(
-          child: LinearProgressIndicator(
-            backgroundColor: Colors.white10,
-            color: Colors.white70,
-            value: loadingProgress.expectedTotalBytes != null
-                ? loadingProgress.cumulativeBytesLoaded /
-                    loadingProgress.expectedTotalBytes!
-                : null,
-          ),
-        );
-      }),
+      constraints: const BoxConstraints(maxHeight: 300, minHeight: 0),
+      child: CachedNetworkImage(
+          imageUrl: "${ApiConstants.baseUrl}/$url",
+          fit: BoxFit.cover,
+          errorWidget: (context, url, error) => const MediaError(
+                icon: Icons.broken_image,
+              ),
+          progressIndicatorBuilder: (context, url, progress) => MediaLoading(
+                label: "Loading Image",
+                icon: Boxicons.bx_image,
+                progress: progress,
+              )),
     );
   }
 }

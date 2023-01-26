@@ -1,6 +1,9 @@
+import 'package:boxicons/boxicons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/model/post.dart';
+import 'package:rootnode/widgets/error_widget.dart';
 
 class ViewPost extends StatelessWidget {
   const ViewPost({
@@ -21,9 +24,15 @@ class ViewPost extends StatelessWidget {
             width: double.infinity,
             child: PageView.builder(
               itemBuilder: (context, index) => InteractiveViewer(
-                child: Image.network(
-                  "${ApiConstants.baseUrl}/${post.mediaFiles[index].url!}",
+                child: CachedNetworkImage(
+                  imageUrl:
+                      "${ApiConstants.baseUrl}/${post.mediaFiles[index].url!}",
                   fit: BoxFit.fitWidth,
+                  progressIndicatorBuilder: (context, url, progress) =>
+                      MediaLoading(
+                          label: "Loading Image",
+                          icon: Boxicons.bx_image,
+                          progress: progress),
                 ),
               ),
               itemCount: post.mediaFiles.length,

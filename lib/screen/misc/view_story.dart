@@ -1,4 +1,5 @@
 import 'package:boxicons/boxicons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
@@ -6,6 +7,7 @@ import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/story_repo.dart';
+import 'package:rootnode/widgets/error_widget.dart';
 import 'package:string_extensions/string_extensions.dart';
 import 'package:video_player/video_player.dart';
 
@@ -100,7 +102,19 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
                       height: double.infinity,
                       width: double.infinity,
                       alignment: Alignment.center,
-                      color: Color(story.color!),
+                      decoration: BoxDecoration(
+                        color: Color(story.color ?? 0xFF00BCD4),
+                        gradient: LinearGradient(
+                            colors: [
+                              Color(story.color ?? 0xFF00BCD4),
+                              Color(story.color ?? 0xFF00BCD4),
+                              Color(story.color ?? 0xFF00BCD4),
+                              Color(story.color ?? 0xFF00BCD4).withAlpha(100),
+                              Colors.transparent
+                            ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter),
+                      ),
                       child: StoryHeading(story: story),
                     ),
                   );
@@ -113,9 +127,19 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            Image.network(
-                                "${ApiConstants.baseUrl}/${story.media!.url}",
-                                fit: BoxFit.cover),
+                            CachedNetworkImage(
+                              imageUrl:
+                                  "${ApiConstants.baseUrl}/${story.media!.url}",
+                              errorWidget: (context, url, error) =>
+                                  const MediaError(icon: Icons.broken_image),
+                              progressIndicatorBuilder:
+                                  (context, url, progress) => MediaLoading(
+                                label: "Loading Image",
+                                icon: Boxicons.bx_image,
+                                progress: progress,
+                              ),
+                              fit: BoxFit.cover,
+                            ),
                             Container(
                               decoration: const BoxDecoration(
                                 gradient: LinearGradient(
@@ -125,7 +149,7 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
                                       Colors.transparent,
                                       Colors.transparent,
                                       Colors.transparent,
-                                      Colors.transparent
+                                      Color(0xFF111111),
                                     ],
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter),
@@ -181,6 +205,12 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
                                 height: _videoController!.value.size.height,
                                 child: VideoPlayer(_videoController!)),
                           ),
+                        );
+                      } else {
+                        return const MediaLoading(
+                          icon: Boxicons.bx_video,
+                          label: "Loading Video",
+                          progress: null,
                         );
                       }
                   }
@@ -253,7 +283,17 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
         _loadStory(story: widget.stories[currentIndex]);
       });
     } else {
-      if (story.media == null) return;
+      if (story.media == null) {
+        setState(() {
+          paused = !paused;
+          if (paused) {
+            _animationController.stop();
+          } else {
+            _animationController.forward();
+          }
+        });
+        return;
+      }
       if (story.media!.type == 'image') {
         setState(() {
           paused = !paused;
