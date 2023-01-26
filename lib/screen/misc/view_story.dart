@@ -7,7 +7,7 @@ import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/story_repo.dart';
-import 'package:rootnode/widgets/error_widget.dart';
+import 'package:rootnode/widgets/placeholder.dart';
 import 'package:string_extensions/string_extensions.dart';
 import 'package:video_player/video_player.dart';
 

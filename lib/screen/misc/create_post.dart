@@ -1,6 +1,6 @@
 import 'package:boxicons/boxicons.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
 import 'package:rootnode/model/post.dart';
@@ -10,10 +10,12 @@ import 'package:rootnode/widgets/add_media.dart';
 import 'package:rootnode/widgets/radio_button.dart';
 import 'package:rootnode/widgets/switch_button.dart';
 
-class CreatePostScreen extends StatefulWidget {
-  const CreatePostScreen({super.key, this.user});
-  final User? user;
+enum PostType { image, video, markdown }
 
+class CreatePostScreen extends StatefulWidget {
+  const CreatePostScreen({super.key, this.user, required this.type});
+  final User? user;
+  final PostType type;
   @override
   State<CreatePostScreen> createState() => _CreatePostScreenState();
 }
@@ -25,7 +27,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   List<String> visibilityOption = ['Private', 'Mutual', 'Public'];
 
   Post post = Post();
-  List<PlatformFile>? files;
+  List<XFile>? files;
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +157,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         if (value == null || value.isEmpty) return;
                         files = value;
                       },
+                      type: widget.type,
                     ),
                   ),
                 ),

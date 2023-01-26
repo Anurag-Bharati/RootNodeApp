@@ -11,7 +11,7 @@ import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/screen/misc/view_post_media.dart';
-import 'package:rootnode/widgets/error_widget.dart';
+import 'package:rootnode/widgets/placeholder.dart';
 
 import 'package:string_extensions/string_extensions.dart';
 

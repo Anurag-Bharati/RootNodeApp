@@ -3,7 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/model/post.dart';
-import 'package:rootnode/widgets/error_widget.dart';
+import 'package:rootnode/widgets/placeholder.dart';
 
 class ViewPost extends StatelessWidget {
   const ViewPost({

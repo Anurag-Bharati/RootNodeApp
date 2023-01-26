@@ -1,6 +1,6 @@
 import 'package:boxicons/boxicons.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
 import 'package:rootnode/model/story.dart';
@@ -20,7 +20,7 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   List<String> visibilityOption = ['Private', 'Mutual', 'Public'];
 
   Story story = Story();
-  PlatformFile? file;
+  XFile? file;
 
   @override
   Widget build(BuildContext context) {

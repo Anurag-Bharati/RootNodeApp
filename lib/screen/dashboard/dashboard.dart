@@ -36,10 +36,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // setState(() {navVisible = false;});
 
   Future<void> _navigateToCreatePost(BuildContext context, User user) async {
+    Navigator.of(context, rootNavigator: true).pop('dialog');
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => CreatePostScreen(user: user),
+        builder: (BuildContext context) =>
+            CreatePostScreen(user: user, type: PostType.image),
       ),
     );
     if (!mounted) return;
@@ -83,7 +85,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ? IconButton(
                       splashRadius: 20,
                       onPressed: () {
-                        _navigateToCreatePost(context, widget.user!);
+                        showDialog(
+                          barrierColor: Colors.black87,
+                          context: context,
+                          builder: (dialogContex) => showPostOptions(context),
+                        );
                       },
                       icon: const Icon(Icons.add,
                           color: Colors.white70, size: 24),
@@ -151,6 +157,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
           }),
         ),
       ),
+    );
+  }
+
+  AlertDialog showPostOptions(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.white70,
+      title: Text('Choose a type',
+          textAlign: TextAlign.center,
+          style: RootNodeFontStyle.body.copyWith(color: Colors.black)),
+      actions: [
+        TextButton(
+          style: ButtonStyle(
+            backgroundColor:
+                MaterialStateColor.resolveWith((states) => Colors.black12),
+            minimumSize: MaterialStateProperty.resolveWith(
+                (states) => const Size(double.infinity, 50)),
+          ),
+          onPressed: () => _navigateToCreatePost(context, widget.user!),
+          child:
+              const Text('Image Post', style: TextStyle(color: Colors.black)),
+        ),
+        TextButton(
+          style: ButtonStyle(
+            backgroundColor:
+                MaterialStateColor.resolveWith((states) => Colors.black12),
+            minimumSize: MaterialStateProperty.resolveWith(
+                (states) => const Size(double.infinity, 50)),
+          ),
+          onPressed: () => null,
+          child:
+              const Text('Video Post', style: TextStyle(color: Colors.black)),
+        )
+      ],
+      icon: const Icon(Boxicons.bx_image_add, color: Colors.black),
+      actionsAlignment: MainAxisAlignment.spaceEvenly,
+      alignment: Alignment.center,
+      actionsOverflowButtonSpacing: 10,
     );
   }
 
