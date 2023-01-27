@@ -10,6 +10,7 @@ class RootNodeRadioButton<T> extends StatefulWidget {
     required this.selected,
     this.isColors = false,
     required this.value,
+    this.padding = const EdgeInsets.symmetric(horizontal: 10),
   })  : assert(options.length == value.length),
         assert(isColors && value.isNotEmpty
             ? value[0].runtimeType == Color ||
@@ -21,6 +22,7 @@ class RootNodeRadioButton<T> extends StatefulWidget {
   final String? name;
   final ValueChanged<T> onChanged;
   final bool isColors;
+  final EdgeInsets padding;
   @override
   State<RootNodeRadioButton<T>> createState() => _RootNodeRadioButtonState<T>();
 }
@@ -40,7 +42,7 @@ class _RootNodeRadioButtonState<T> extends State<RootNodeRadioButton<T>> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: widget.padding,
       child: Wrap(
         spacing: 10,
         runSpacing: 10,

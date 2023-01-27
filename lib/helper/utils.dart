@@ -22,6 +22,7 @@ class Utils {
   static LinearGradient getViewShadow() {
     return const LinearGradient(colors: [
       Color(0xFF111111),
+      Color(0x55111111),
       Colors.transparent,
       Colors.transparent,
       Colors.transparent,

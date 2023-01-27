@@ -50,14 +50,25 @@ class _StoriesWidgetState extends State<StoriesWidget> {
     });
   }
 
+  // TODO add debounce or convert to throttle function
+  void _refreshStory() {
+    storyPage = 1;
+    _stories.clear();
+    _getInitialStoryData();
+  }
+
   @override
   void initState() {
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       if (_scrollController.position.maxScrollExtent ==
           _scrollController.offset) {
-        print("Story Ref");
         _fetchMoreStoryData();
+      }
+      if (_scrollController.offset <=
+              _scrollController.position.minScrollExtent &&
+          !_scrollController.position.outOfRange) {
+        _refreshStory();
       }
     });
     _getInitialStoryData();

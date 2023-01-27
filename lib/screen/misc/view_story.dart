@@ -339,6 +339,13 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
   }
 
   void _loadStory({required Story story, bool animateToPage = true}) {
+    if (_videoController != null) {
+      if (_videoController!.value.isPlaying) {
+        _videoController!.pause();
+      }
+      _videoController!.dispose();
+      _videoController = null;
+    }
     _storyWatched(id: story.id!);
     _animationController.stop();
     _animationController.reset();

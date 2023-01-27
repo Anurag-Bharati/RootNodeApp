@@ -74,6 +74,7 @@ class Story {
         "type": type,
         "owner": owner?.toJson(),
         "quote": quote,
+        "color": color,
         "visibility": visibility,
         "likeable": likeable,
       };

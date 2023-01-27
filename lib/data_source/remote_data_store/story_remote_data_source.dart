@@ -7,7 +7,6 @@ import 'package:rootnode/helper/http_service.dart';
 import 'package:rootnode/helper/simple_storage.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/story.dart';
-import 'package:http_parser/http_parser.dart';
 
 class StoryRemoteDataSource {
   final Dio _httpServices = HttpServices().getDioInstance();
