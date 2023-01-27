@@ -49,12 +49,7 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
           key: _globalkey,
           child: Stack(
             alignment: Alignment.center,
-            children: [
-              Container(
-                height: double.infinity,
-                color: Colors.cyan,
-              )
-            ],
+            children: const [],
           ),
         ),
       ),

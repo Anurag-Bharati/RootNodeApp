@@ -9,6 +9,7 @@ import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/story_repo.dart';
 import 'package:rootnode/screen/misc/create_story.dart';
 import 'package:rootnode/screen/misc/view_story.dart';
+import 'package:rootnode/widgets/selection_tile.dart';
 import 'package:string_extensions/string_extensions.dart';
 
 class StoriesWidget extends StatefulWidget {
@@ -160,7 +161,38 @@ class _StoryCard extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () => isAddStory
-              ? switchRouteByPush(context, const CreateStoryScreen())
+              ? showDialog(
+                  barrierColor: const Color(0xEE111111),
+                  context: context,
+                  builder: (context) => SelectionTile(
+                    title: "Add Story",
+                    tileButton: [
+                      TileButton(
+                        type: TileType.text,
+                        icon: Boxicons.bx_text,
+                        label: "Text",
+                        onPressed: (TileType type) =>
+                            _switchScreen(context, type),
+                      ),
+                      TileButton(
+                        type: TileType.video,
+                        icon: Boxicons.bx_video,
+                        label: "Video",
+                        onPressed: (TileType type) =>
+                            _switchScreen(context, type),
+                      ),
+                      TileButton(
+                        type: TileType.image,
+                        icon: Boxicons.bx_image_add,
+                        label: "Image",
+                        onPressed: (TileType type) =>
+                            _switchScreen(context, type),
+                      ),
+                    ],
+                    widthFraction: 0.9,
+                    column: 3,
+                  ),
+                )
               : switchRouteByPush(
                   context,
                   ViewStoryScreen(
@@ -221,5 +253,11 @@ class _StoryCard extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  _switchScreen(BuildContext context, TileType type) {
+    print(type);
+    Navigator.of(context, rootNavigator: true).pop('dialog');
+    switchRouteByPush(context, const CreateStoryScreen());
   }
 }

@@ -55,7 +55,7 @@ class MediaLoading extends StatelessWidget {
         Text(label, style: RootNodeFontStyle.body),
         SizedBox(
             width: 120,
-            height: 10,
+            height: 6,
             child: LinearProgressIndicator(
               backgroundColor: Colors.white10,
               color: Colors.white54,

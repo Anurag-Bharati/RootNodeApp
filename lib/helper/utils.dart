@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart' show MultipartFile;
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:http_parser/http_parser.dart';
@@ -11,6 +11,13 @@ class Utils {
     return timeago.format(DateTime.now().subtract(Duration(minutes: min)),
         locale: 'en_short');
   }
+
+  static double getHeight(
+          {required BuildContext context, double fraction = 1}) =>
+      MediaQuery.of(context).size.height * fraction;
+  static double getWidth(
+          {required BuildContext context, double fraction = 1}) =>
+      MediaQuery.of(context).size.width * fraction;
 }
 
 class FileConverter {
