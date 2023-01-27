@@ -5,9 +5,11 @@ import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
 import 'package:rootnode/model/story.dart';
 import 'package:rootnode/repository/story_repo.dart';
+import 'package:rootnode/widgets/selection_tile.dart';
 
 class CreateStoryScreen extends StatefulWidget {
-  const CreateStoryScreen({super.key});
+  const CreateStoryScreen({super.key, required this.type});
+  final RNContentType type;
 
   @override
   State<CreateStoryScreen> createState() => _CreateStoryScreenState();
@@ -56,6 +58,7 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
     );
   }
 
+  void _getWidgetFromType() {}
   void _craftStory(context) {
     String quote = _quoteFieldController.text;
     if (quote == "" && (file == null)) {

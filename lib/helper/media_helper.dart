@@ -16,14 +16,19 @@ class MediaHelper {
   })  : _imagePicker = imagePicker ?? ImagePicker(),
         _imageCropper = imageCropper ?? ImageCropper();
 
-  Future<List<XFile>> pickMultipleFiles(
+  Future<List<XFile>> pickMultipleImages(
           {ImageSource source = ImageSource.gallery,
           int imageQuality = 80}) async =>
-      _imagePicker!.pickMultiImage(
+      await _imagePicker!.pickMultiImage(
         imageQuality: imageQuality,
       );
+  Future<XFile?> pickVideo(
+          {ImageSource source = ImageSource.gallery,
+          int imageQuality = 80}) async =>
+      await _imagePicker!
+          .pickVideo(source: source, maxDuration: const Duration(minutes: 30));
 
-  Future<XFile?> pickFile(
+  Future<XFile?> pickImage(
           {ImageSource source = ImageSource.camera,
           int imageQuality = 80}) async =>
       await _imagePicker!.pickImage(source: source, imageQuality: imageQuality);

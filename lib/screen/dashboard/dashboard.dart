@@ -12,6 +12,7 @@ import 'package:rootnode/screen/dashboard/messenger_screen.dart';
 import 'package:rootnode/screen/dashboard/node_screen.dart';
 import 'package:rootnode/screen/misc/create_post.dart';
 import 'package:rootnode/screen/misc/setting.dart';
+import 'package:rootnode/widgets/selection_tile.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key, this.user});
@@ -35,17 +36,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // setState(() {navVisible = false;});
 
-  Future<void> _navigateToCreatePost(BuildContext context, User user) async {
-    Navigator.of(context, rootNavigator: true).pop('dialog');
+  Future<void> _navigateToCreatePost(
+      BuildContext context, RNContentType type) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (BuildContext context) =>
-            CreatePostScreen(user: user, type: PostType.image),
+            CreatePostScreen(user: widget.user, type: type),
       ),
     );
     if (!mounted) return;
     if (result == null) return;
+    Navigator.of(context, rootNavigator: true).pop('dialog');
+
     ScaffoldMessenger.of(context)
       ..removeCurrentSnackBar()
       ..showSnackBar(SnackBar(
@@ -84,13 +87,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               _selectedIndex == 0
                   ? IconButton(
                       splashRadius: 20,
-                      onPressed: () {
-                        showDialog(
-                          barrierColor: Colors.black87,
-                          context: context,
-                          builder: (dialogContex) => showPostOptions(context),
-                        );
-                      },
+                      onPressed: () => _showPostOptions(context),
                       icon: const Icon(Icons.add,
                           color: Colors.white70, size: 24),
                     )
@@ -160,40 +157,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  AlertDialog showPostOptions(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: Colors.white70,
-      title: Text('Choose a type',
-          textAlign: TextAlign.center,
-          style: RootNodeFontStyle.body.copyWith(color: Colors.black)),
-      actions: [
-        TextButton(
-          style: ButtonStyle(
-            backgroundColor:
-                MaterialStateColor.resolveWith((states) => Colors.black12),
-            minimumSize: MaterialStateProperty.resolveWith(
-                (states) => const Size(double.infinity, 50)),
+  Future<dynamic> _showPostOptions(BuildContext context) {
+    return showDialog(
+      barrierColor: const Color(0xEE000000),
+      context: context,
+      builder: (context) => SelectionTile(
+        title: "Create Post",
+        tileButton: [
+          TileButton(
+            type: RNContentType.text,
+            icon: Boxicons.bx_text,
+            label: "Text",
+            onPressed: (RNContentType type) =>
+                _navigateToCreatePost(context, type),
           ),
-          onPressed: () => _navigateToCreatePost(context, widget.user!),
-          child:
-              const Text('Image Post', style: TextStyle(color: Colors.black)),
-        ),
-        TextButton(
-          style: ButtonStyle(
-            backgroundColor:
-                MaterialStateColor.resolveWith((states) => Colors.black12),
-            minimumSize: MaterialStateProperty.resolveWith(
-                (states) => const Size(double.infinity, 50)),
+          TileButton(
+            type: RNContentType.markdown,
+            icon: Boxicons.bxl_markdown,
+            label: "Markdown",
+            onPressed: (RNContentType type) =>
+                _navigateToCreatePost(context, type),
           ),
-          onPressed: () => null,
-          child:
-              const Text('Video Post', style: TextStyle(color: Colors.black)),
-        )
-      ],
-      icon: const Icon(Boxicons.bx_image_add, color: Colors.black),
-      actionsAlignment: MainAxisAlignment.spaceEvenly,
-      alignment: Alignment.center,
-      actionsOverflowButtonSpacing: 10,
+          TileButton(
+            type: RNContentType.video,
+            icon: Boxicons.bx_video,
+            label: "Video",
+            onPressed: (RNContentType type) =>
+                _navigateToCreatePost(context, type),
+          ),
+          TileButton(
+            type: RNContentType.image,
+            icon: Boxicons.bx_image,
+            label: "Image",
+            onPressed: (RNContentType type) =>
+                _navigateToCreatePost(context, type),
+          ),
+        ],
+        widthFraction: 0.7,
+        column: 2,
+        bottomLabel: "Select a type of post you want to create",
+      ),
     );
   }
 

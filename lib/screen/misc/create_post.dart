@@ -8,14 +8,13 @@ import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/widgets/add_media.dart';
 import 'package:rootnode/widgets/radio_button.dart';
+import 'package:rootnode/widgets/selection_tile.dart';
 import 'package:rootnode/widgets/switch_button.dart';
-
-enum PostType { image, video, markdown }
 
 class CreatePostScreen extends StatefulWidget {
   const CreatePostScreen({super.key, this.user, required this.type});
   final User? user;
-  final PostType type;
+  final RNContentType type;
   @override
   State<CreatePostScreen> createState() => _CreatePostScreenState();
 }
@@ -23,18 +22,50 @@ class CreatePostScreen extends StatefulWidget {
 class _CreatePostScreenState extends State<CreatePostScreen> {
   final _postRepo = PostRepoImpl();
   final _globalkey = GlobalKey<FormState>();
+  final _headingController = TextEditingController();
   final _captionFieldController = TextEditingController();
   List<String> visibilityOption = ['Private', 'Mutual', 'Public'];
-
+  String title = "Create Post";
+  bool mediaDisabled = false;
+  bool showHeading = false;
+  bool disableTextField = false;
   Post post = Post();
   List<XFile>? files;
+
+  bool disableThis = false;
+
+  @override
+  void initState() {
+    if (widget.type == RNContentType.markdown) {
+      title = "Create Markdown";
+      post.isMarkdown = true;
+      mediaDisabled = true;
+    } else if (widget.type == RNContentType.text) {
+      title = "Create Text Post";
+      mediaDisabled = true;
+      showHeading = true;
+    } else if (widget.type == RNContentType.video) {
+      title = "Create Video Post";
+      disableTextField = true;
+    } else {
+      title = "Create Image Post";
+    }
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _headingController.dispose();
+    _captionFieldController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Create Post",
+          title,
           style: RootNodeFontStyle.header,
         ),
         leadingWidth: 40,
@@ -59,31 +90,62 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  child: TextFormField(
-                    onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                    onEditingComplete: () => FocusScope.of(context).unfocus(),
-                    controller: _captionFieldController,
-                    maxLines: 3,
-                    textAlign: TextAlign.center,
-                    cursorColor: Colors.cyan[400],
-                    cursorHeight: 5,
-                    cursorWidth: 15,
-                    style: RootNodeFontStyle.captionDefault,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white10,
-                      hintText: "What's on your mind?",
-                      hintStyle: RootNodeFontStyle.body,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 10),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 22),
-                SizedBox(
+                showHeading && !disableTextField
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        child: TextFormField(
+                          onTapOutside: (event) =>
+                              FocusScope.of(context).unfocus(),
+                          onEditingComplete: () =>
+                              FocusScope.of(context).unfocus(),
+                          controller: _headingController,
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                          cursorColor: Colors.cyan[400],
+                          cursorHeight: 5,
+                          cursorWidth: 15,
+                          style: RootNodeFontStyle.captionDefault,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white10,
+                            hintText: 'Try "Read this out!"',
+                            hintStyle: RootNodeFontStyle.body,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+                disableTextField
+                    ? const SizedBox.shrink()
+                    : Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        child: TextFormField(
+                          onTapOutside: (event) =>
+                              FocusScope.of(context).unfocus(),
+                          onEditingComplete: () =>
+                              FocusScope.of(context).unfocus(),
+                          controller: _captionFieldController,
+                          maxLines: 3,
+                          textAlign: TextAlign.center,
+                          cursorColor: Colors.cyan[400],
+                          cursorHeight: 5,
+                          cursorWidth: 15,
+                          style: RootNodeFontStyle.captionDefault,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white10,
+                            hintText: "What's on your mind?",
+                            hintStyle: RootNodeFontStyle.body,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                          ),
+                        ),
+                      ),
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 5),
                   width: double.infinity,
                   child: RootNodeRadioButton(
                     selected: 2,
@@ -95,20 +157,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     },
                   ),
                 ),
-                const SizedBox(height: 10),
-                SizedBox(
-                    width: double.infinity,
-                    child: RootNodeRadioButton(
-                      selected: 1,
-                      name: "Markdown",
-                      options: const ["Yes", "No"],
-                      onChanged: (String value) {
-                        debugPrint(value);
-                        post.isMarkdown = value == "no" ? false : true;
-                      },
-                    )),
-                const SizedBox(height: 10),
                 Container(
+                  margin: const EdgeInsets.symmetric(vertical: 5),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     // color: Colors.white10,
@@ -120,8 +170,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     onChanged: (value) => post.likeable = value,
                   ),
                 ),
-                const SizedBox(height: 10),
                 Container(
+                  margin: const EdgeInsets.symmetric(vertical: 5),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     // color: Colors.white10,
@@ -133,12 +183,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     onChanged: (value) => post.commentable = value,
                   ),
                 ),
-                const SizedBox(height: 10),
                 Container(
+                  margin: const EdgeInsets.symmetric(vertical: 5),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     // color: Colors.white10,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: RootNodeSwitchButton(
                     isChecked: true,
@@ -146,23 +196,25 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     onChanged: (value) => post.shareable = value,
                   ),
                 ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: RootNodeAddMedia(
-                      onChanged: (value) {
-                        debugPrint("==FILES AT CREATE POST==");
-                        if (value == null || value.isEmpty) return;
-                        files = value;
-                      },
-                      type: widget.type,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
+                mediaDisabled
+                    ? const SizedBox.shrink()
+                    : Container(
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        width: double.infinity,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: RootNodeAddMedia(
+                            onChanged: (value) {
+                              debugPrint("==FILES AT CREATE POST==");
+                              if (value == null || value.isEmpty) return;
+                              files = value;
+                            },
+                            type: widget.type,
+                          ),
+                        ),
+                      ),
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 5),
                   width: double.infinity,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
@@ -202,10 +254,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   void _uploadPost(context) async {
+    if (disableThis) return;
+    disableThis = true;
     bool res = await _postRepo.createPost(post: post, files: files);
     if (res) {
       Navigator.pop(context, "New post created!");
     } else {
+      disableThis = false;
       showSnackbar(context, "Something went wrong!", Colors.red[400]!);
     }
   }

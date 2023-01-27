@@ -161,38 +161,7 @@ class _StoryCard extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () => isAddStory
-              ? showDialog(
-                  barrierColor: const Color(0xEE111111),
-                  context: context,
-                  builder: (context) => SelectionTile(
-                    title: "Add Story",
-                    tileButton: [
-                      TileButton(
-                        type: TileType.text,
-                        icon: Boxicons.bx_text,
-                        label: "Text",
-                        onPressed: (TileType type) =>
-                            _switchScreen(context, type),
-                      ),
-                      TileButton(
-                        type: TileType.video,
-                        icon: Boxicons.bx_video,
-                        label: "Video",
-                        onPressed: (TileType type) =>
-                            _switchScreen(context, type),
-                      ),
-                      TileButton(
-                        type: TileType.image,
-                        icon: Boxicons.bx_image_add,
-                        label: "Image",
-                        onPressed: (TileType type) =>
-                            _switchScreen(context, type),
-                      ),
-                    ],
-                    widthFraction: 0.9,
-                    column: 3,
-                  ),
-                )
+              ? _showStoryOptions(context)
               : switchRouteByPush(
                   context,
                   ViewStoryScreen(
@@ -255,9 +224,41 @@ class _StoryCard extends StatelessWidget {
     );
   }
 
-  _switchScreen(BuildContext context, TileType type) {
-    print(type);
+  Future<dynamic> _showStoryOptions(BuildContext context) {
+    return showDialog(
+      barrierColor: const Color(0xEE000000),
+      context: context,
+      builder: (context) => SelectionTile(
+        title: "Create Story",
+        tileButton: [
+          TileButton(
+            type: RNContentType.text,
+            icon: Boxicons.bx_text,
+            label: "Text",
+            onPressed: (RNContentType type) => _switchScreen(context, type),
+          ),
+          TileButton(
+            type: RNContentType.video,
+            icon: Boxicons.bx_video,
+            label: "Video",
+            onPressed: (RNContentType type) => _switchScreen(context, type),
+          ),
+          TileButton(
+            type: RNContentType.image,
+            icon: Boxicons.bx_image,
+            label: "Image",
+            onPressed: (RNContentType type) => _switchScreen(context, type),
+          ),
+        ],
+        widthFraction: 0.9,
+        column: 3,
+        bottomLabel: "Please select a type of story you want to create",
+      ),
+    );
+  }
+
+  _switchScreen(BuildContext context, RNContentType type) {
     Navigator.of(context, rootNavigator: true).pop('dialog');
-    switchRouteByPush(context, const CreateStoryScreen());
+    switchRouteByPush(context, CreateStoryScreen(type: type));
   }
 }

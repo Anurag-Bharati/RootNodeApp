@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
 
@@ -10,6 +12,7 @@ class SelectionTile extends StatelessWidget {
     this.heightFraction = 0.8,
     this.column = 2,
     this.hideTitle = false,
+    required this.bottomLabel,
   })  : assert(widthFraction <= 1 && widthFraction >= 0),
         assert(heightFraction <= 1 && heightFraction >= 0);
   final String title;
@@ -18,6 +21,7 @@ class SelectionTile extends StatelessWidget {
   final double heightFraction;
   final int column;
   final bool hideTitle;
+  final String bottomLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -26,50 +30,51 @@ class SelectionTile extends StatelessWidget {
       crossAxisAlignment: WrapCrossAlignment.center,
       alignment: WrapAlignment.center,
       runAlignment: WrapAlignment.center,
-      runSpacing: -1,
-      spacing: -1,
+      runSpacing: 10,
+      spacing: 10,
       children: [
         hideTitle
             ? const SizedBox.shrink()
             : Container(
                 padding: const EdgeInsets.only(
-                    top: 5, left: 15, right: 15, bottom: 0),
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10),
-                  ),
-                  color: Color(0xFFEEEEEE),
+                    top: 5, left: 15, right: 15, bottom: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.white10),
                 ),
                 child: Text(
                   title,
                   style: RootNodeFontStyle.caption
-                      .copyWith(color: const Color(0xFF111111), fontSize: 20),
+                      .copyWith(color: Colors.white70, fontSize: 20),
                   textAlign: TextAlign.center,
                 ),
               ),
         Container(
-            constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * heightFraction),
-            width: MediaQuery.of(context).size.width * widthFraction,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
+          constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * heightFraction),
+          width: MediaQuery.of(context).size.width * widthFraction,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: const Color(0xFFEEEEEE),
-            ),
-            child: GridView.count(
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              crossAxisCount: column,
-              shrinkWrap: true,
-              children: tileButton,
-            )),
+              border: Border.all(color: Colors.white10)),
+          child: GridView.count(
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            crossAxisCount: column,
+            shrinkWrap: true,
+            children: tileButton,
+          ),
+        ),
+        Text(
+          bottomLabel,
+          style: RootNodeFontStyle.label,
+        )
       ],
     );
   }
 }
 
-enum TileType { image, video, text, markdown }
+enum RNContentType { image, video, text, markdown }
 
 class TileButton extends StatelessWidget {
   const TileButton({
@@ -79,10 +84,10 @@ class TileButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
   });
-  final TileType type;
+  final RNContentType type;
   final IconData icon;
   final String label;
-  final Function(TileType type) onPressed;
+  final Function(RNContentType type) onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -90,18 +95,18 @@ class TileButton extends StatelessWidget {
       onTap: () => onPressed(type),
       child: Container(
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10), color: Colors.black12),
+            borderRadius: BorderRadius.circular(10), color: Colors.white10),
         child: Wrap(
           direction: Axis.vertical,
           alignment: WrapAlignment.center,
           crossAxisAlignment: WrapCrossAlignment.center,
           runAlignment: WrapAlignment.center,
           children: [
-            Icon(icon, color: const Color(0xFF111111), size: 26, weight: 0.5),
+            Icon(icon, color: Colors.white70, size: 26, weight: 0.5),
             Text(
               label,
               style: RootNodeFontStyle.body.copyWith(
-                color: const Color(0xFF111111),
+                color: Colors.white70,
               ),
             )
           ],

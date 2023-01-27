@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/helper/media_helper.dart';
-import 'package:rootnode/screen/misc/create_post.dart';
+import 'package:rootnode/widgets/selection_tile.dart';
 
 class RootNodeAddMedia extends StatefulWidget {
   const RootNodeAddMedia({
@@ -15,7 +15,7 @@ class RootNodeAddMedia extends StatefulWidget {
     required this.type,
   });
   final ValueChanged<List<XFile>?> onChanged;
-  final PostType type;
+  final RNContentType type;
 
   @override
   State<RootNodeAddMedia> createState() => _RootNodeAddMediaState();
@@ -25,6 +25,23 @@ class _RootNodeAddMediaState extends State<RootNodeAddMedia> {
   MediaHelper helper = MediaHelper.instance;
   List<XFile> xFiles = [];
   int selected = 0;
+  String label = "Select image";
+  IconData icon = Boxicons.bx_image_add;
+
+  @override
+  void initState() {
+    if (widget.type == RNContentType.video) {
+      label = "Select video";
+      icon = Boxicons.bx_video_plus;
+    }
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    xFiles.clear();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +106,7 @@ class _RootNodeAddMediaState extends State<RootNodeAddMedia> {
               dashPattern: const [8, 4],
               radius: const Radius.circular(10),
               strokeCap: StrokeCap.round,
-              child: xFiles.isEmpty
+              child: xFiles.isEmpty || widget.type == RNContentType.video
                   ? Center(
                       child: Wrap(
                         direction: Axis.horizontal,
@@ -99,12 +116,12 @@ class _RootNodeAddMediaState extends State<RootNodeAddMedia> {
                         children: [
                           Text(
                             xFiles.isEmpty
-                                ? "Select Media"
+                                ? label
                                 : "${xFiles.length} selected",
                             style: RootNodeFontStyle.body,
                           ),
-                          const Icon(
-                            Boxicons.bx_image_add,
+                          Icon(
+                            icon,
                             size: 30,
                             color: Colors.white54,
                           ),
@@ -168,33 +185,40 @@ class _RootNodeAddMediaState extends State<RootNodeAddMedia> {
             ),
           ),
         ),
-        // xFiles.isEmpty
-        //     ? const SizedBox()
-        //     : Positioned(
-        //         bottom: -20,
-        //         right: 1,
-        //         left: 1,
-        //         child: Padding(
-        //           padding: const EdgeInsets.symmetric(vertical: 20),
-        //           child: IconButton(
-        //             color: Colors.red[300],
-        //             iconSize: 24,
-        //             onPressed: _clearFiles,
-        //             icon: Icon(Boxicons.bx_trash, color: Colors.red[300]),
-        //           ),
-        //         ),
-        //       )
+        xFiles.isNotEmpty && widget.type == RNContentType.video
+            ? Positioned(
+                right: 10,
+                top: 1,
+                bottom: 1,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: IconButton(
+                    color: Colors.red[300],
+                    iconSize: 24,
+                    onPressed: _clearFiles,
+                    icon: Icon(Boxicons.bx_trash, color: Colors.red[300]),
+                  ),
+                ),
+              )
+            : const SizedBox()
       ],
     );
   }
 
-  _pickFiles(ImageSource source) async {
+  _clearFiles() async {
+    if (xFiles == null) return;
+    xFiles.clear();
+    widget.onChanged(null);
+    setState(() {});
+  }
+
+  _pickImageFiles(ImageSource source) async {
     Navigator.of(context, rootNavigator: true).pop('dialog');
     if (source == ImageSource.camera) {
-      XFile? image = await helper.pickFile(source: source);
+      XFile? image = await helper.pickImage(source: source);
       if (image != null) xFiles.add(image);
     } else {
-      xFiles = await helper.pickMultipleFiles();
+      xFiles = await helper.pickMultipleImages();
     }
     if (xFiles.isNotEmpty) {
       debugPrint("=====FILES=====");
@@ -203,14 +227,28 @@ class _RootNodeAddMediaState extends State<RootNodeAddMedia> {
       widget.onChanged(xFiles);
       setState(() {});
     }
-
     return null;
   }
 
-  _clearFiles() async {
-    if (xFiles == null) return;
-    xFiles.clear();
-    widget.onChanged(null);
-    setState(() {});
+  _pickVideoFile(ImageSource source) async {
+    Navigator.of(context, rootNavigator: true).pop('dialog');
+    XFile? video = await helper.pickVideo(source: source);
+    if (video != null) xFiles.add(video);
+    if (xFiles.isNotEmpty) {
+      debugPrint("=====FILES=====");
+      debugPrint(xFiles.map((e) => e.name).toString());
+      debugPrint("===============");
+      widget.onChanged(xFiles);
+      setState(() {});
+    }
+    return null;
+  }
+
+  _pickFiles(ImageSource source) {
+    if (widget.type == RNContentType.video) {
+      _pickVideoFile(source);
+      return;
+    }
+    _pickImageFiles(source);
   }
 }
