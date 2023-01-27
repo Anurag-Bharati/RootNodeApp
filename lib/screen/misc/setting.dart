@@ -47,11 +47,14 @@ class _SettingScreenState extends State<SettingScreen> {
             children: [
               SizedBox(
                   width: double.infinity,
-                  child: RootNodeRadioButton(
+                  child: RootNodeRadioButton<String>(
                     selected: 1,
                     name: "Parameter",
                     options: const ["Yes", "No"],
-                    onChanged: (String value) {},
+                    onChanged: (value) {
+                      print(value);
+                    },
+                    value: const ['yes', 'no'],
                   )),
               const SizedBox(height: 10),
               Container(

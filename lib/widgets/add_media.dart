@@ -13,9 +13,11 @@ class RootNodeAddMedia extends StatefulWidget {
     super.key,
     required this.onChanged,
     required this.type,
+    this.single = false,
   });
   final ValueChanged<List<XFile>?> onChanged;
   final RNContentType type;
+  final bool single;
 
   @override
   State<RootNodeAddMedia> createState() => _RootNodeAddMediaState();
@@ -206,7 +208,7 @@ class _RootNodeAddMediaState extends State<RootNodeAddMedia> {
   }
 
   _clearFiles() async {
-    if (xFiles == null) return;
+    if (xFiles.isEmpty) return;
     xFiles.clear();
     widget.onChanged(null);
     setState(() {});
@@ -214,7 +216,7 @@ class _RootNodeAddMediaState extends State<RootNodeAddMedia> {
 
   _pickImageFiles(ImageSource source) async {
     Navigator.of(context, rootNavigator: true).pop('dialog');
-    if (source == ImageSource.camera) {
+    if (source == ImageSource.camera || widget.single) {
       XFile? image = await helper.pickImage(source: source);
       if (image != null) xFiles.add(image);
     } else {

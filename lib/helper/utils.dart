@@ -18,6 +18,18 @@ class Utils {
   static double getWidth(
           {required BuildContext context, double fraction = 1}) =>
       MediaQuery.of(context).size.width * fraction;
+
+  static LinearGradient getViewShadow() {
+    return const LinearGradient(colors: [
+      Color(0xFF111111),
+      Colors.transparent,
+      Colors.transparent,
+      Colors.transparent,
+      Colors.transparent,
+      Color(0xAA111111),
+      Color(0xFF111111),
+    ], begin: Alignment.bottomCenter, end: Alignment.topCenter);
+  }
 }
 
 class FileConverter {

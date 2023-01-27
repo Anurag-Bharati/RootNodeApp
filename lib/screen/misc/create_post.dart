@@ -75,7 +75,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             color: Colors.white70,
             size: 40,
           ),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop('Canceled!');
+          },
         ),
       ),
       body: Container(
@@ -147,11 +149,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 5),
                   width: double.infinity,
-                  child: RootNodeRadioButton(
+                  child: RootNodeRadioButton<String>(
                     selected: 2,
                     name: "Visibility",
                     options: const ["Private", "Mutual", "Public"],
-                    onChanged: (String value) {
+                    value: const ["private", "mutual", "public"],
+                    onChanged: (value) {
                       debugPrint(value);
                       post.visibility = value;
                     },
