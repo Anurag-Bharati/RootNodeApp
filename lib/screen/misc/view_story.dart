@@ -33,7 +33,7 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
   late int currentIndex;
   bool paused = false;
   bool loved = false;
-  Duration imageStoryDuration = const Duration(seconds: 5);
+  Duration imageStoryDuration = const Duration(seconds: 8);
   final List<String> watchedStory = [];
 
   @override
@@ -155,41 +155,46 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
                                     end: Alignment.topCenter),
                               ),
                             ),
-                            Positioned(
-                                left: 10.0,
-                                right: 10.0,
-                                bottom: 40,
-                                child: !paused
-                                    ? Column(
-                                        children: [
-                                          const Icon(
-                                            Boxicons.bx_heading,
-                                            color: Colors.white54,
-                                            size: 20,
-                                          ),
-                                          Text(
-                                            "Heading Available!\ntap to reveal",
-                                            textAlign: TextAlign.center,
-                                            style: RootNodeFontStyle.label
-                                                .copyWith(
-                                                    fontSize: 12, height: 0),
+                            story.quote != null
+                                ? Positioned(
+                                    left: 10.0,
+                                    right: 10.0,
+                                    bottom: 40,
+                                    child: !paused
+                                        ? Column(
+                                            children: [
+                                              const Icon(
+                                                Boxicons.bx_heading,
+                                                color: Colors.white54,
+                                                size: 20,
+                                              ),
+                                              Text(
+                                                "Heading Available!\ntap to reveal",
+                                                textAlign: TextAlign.center,
+                                                style: RootNodeFontStyle.label
+                                                    .copyWith(
+                                                        fontSize: 12,
+                                                        height: 0),
+                                              )
+                                            ],
                                           )
-                                        ],
-                                      )
-                                    : const SizedBox.shrink()),
-                            AnimatedContainer(
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: paused
-                                    ? Colors.black.withOpacity(0.5)
-                                    : Colors.transparent,
-                              ),
-                              duration: const Duration(milliseconds: 400),
-                              curve: Curves.easeInOut,
-                              child: paused && story.quote != null
-                                  ? StoryHeading(story: story)
-                                  : null,
-                            ),
+                                        : const SizedBox.shrink())
+                                : const SizedBox.shrink(),
+                            story.quote != null
+                                ? AnimatedContainer(
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: paused
+                                          ? Colors.black.withOpacity(0.5)
+                                          : Colors.transparent,
+                                    ),
+                                    duration: const Duration(milliseconds: 400),
+                                    curve: Curves.easeInOut,
+                                    child: paused && story.quote != null
+                                        ? StoryHeading(story: story)
+                                        : null,
+                                  )
+                                : const SizedBox.shrink(),
                           ],
                         ),
                       );
@@ -257,8 +262,10 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
                       seenCount: story.seenBy!.length,
                     ),
                   ),
-                  SizedBox(
-                    width: 200,
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    constraints:
+                        const BoxConstraints(maxWidth: 600, minWidth: 200),
                     child: Row(
                       children: widget.stories
                           .asMap()
@@ -400,8 +407,9 @@ class StoryHeading extends StatelessWidget {
   const StoryHeading({
     super.key,
     required this.story,
+    this.solid = false,
   });
-
+  final bool solid;
   final Story story;
 
   @override
@@ -418,9 +426,9 @@ class StoryHeading extends StatelessWidget {
                 : story.quote!.length * 10,
             bottom: 5,
           ),
-          child: const Icon(
+          child: Icon(
             Boxicons.bxs_quote_left,
-            color: Colors.white54,
+            color: solid ? Colors.white : Colors.white54,
             size: 18,
           ),
         ),
@@ -430,7 +438,8 @@ class StoryHeading extends StatelessWidget {
             maxHeight: MediaQuery.of(context).size.height * 0.6,
           ),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.white54, width: 2),
+            border: Border.all(
+                color: solid ? Colors.white : Colors.white54, width: 2),
             borderRadius: BorderRadius.circular(10),
             // color: Colors.white10,
           ),
@@ -438,7 +447,8 @@ class StoryHeading extends StatelessWidget {
           child: SingleChildScrollView(
             child: Text(
               story.quote!,
-              style: RootNodeFontStyle.body.copyWith(height: 1.5),
+              style: RootNodeFontStyle.body.copyWith(
+                  height: 1.5, color: solid ? Colors.white : Colors.white70),
               overflow: TextOverflow.ellipsis,
               softWrap: true,
               textAlign: TextAlign.center,
@@ -454,9 +464,9 @@ class StoryHeading extends StatelessWidget {
                 : story.quote!.length * 10,
             top: 5,
           ),
-          child: const Icon(
+          child: Icon(
             Boxicons.bxs_quote_right,
-            color: Colors.white54,
+            color: solid ? Colors.white : Colors.white54,
             size: 18,
           ),
         )

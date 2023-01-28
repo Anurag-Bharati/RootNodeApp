@@ -14,6 +14,8 @@ class StoryRemoteDataSource {
   Future<StoryResponse?> getStoryFeed(
       {int page = 1, int refresh = 0, bool private = false}) async {
     try {
+      String? token = await SimpleStorage.getStringData("token");
+      _httpServices.options.headers["authorization"] = "Bearer $token";
       Response res = await _httpServices.get(
         "${ApiConstants.baseUrl}${ApiConstants.story}${private ? '/feed' : ''}?page=$page&refresh=$refresh",
       );

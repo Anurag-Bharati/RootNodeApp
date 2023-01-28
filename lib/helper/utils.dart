@@ -35,7 +35,7 @@ class Utils {
 
 class FileConverter {
   static final allowedVideo = ["mp4", 'mkv'];
-  static final allowedImage = ["jpeg", 'png', 'jpg', 'gif'];
+  static final allowedImage = ["jpeg", 'png', 'jpg', 'gif', 'webp'];
 
   static Future<MultipartFile?> toMultipartFile({required XFile file}) async {
     try {
