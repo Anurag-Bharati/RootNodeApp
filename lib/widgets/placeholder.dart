@@ -1,3 +1,4 @@
+import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
@@ -64,5 +65,33 @@ class MediaLoading extends StatelessWidget {
             )),
       ],
     ));
+  }
+}
+
+class DummySearchField extends StatelessWidget {
+  const DummySearchField({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+          color: const Color(0xFF333333),
+          borderRadius: BorderRadius.circular(10)),
+      child: Wrap(
+        spacing: 10,
+        children: [
+          const Icon(Boxicons.bx_search, color: Colors.white54),
+          Text(
+            "Find people, events...",
+            style: RootNodeFontStyle.label,
+          )
+        ],
+      ),
+    );
   }
 }

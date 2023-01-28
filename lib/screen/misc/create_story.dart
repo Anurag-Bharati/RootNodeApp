@@ -78,9 +78,6 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
                 onSubmit: (value) => _uploadStory(context, value),
                 type: widget.type,
                 onChanged: (value) => setState(() {
-                  print("+++++++++++++++++++");
-                  print(value);
-                  print("+++++++++++++++++++");
                   file = value;
                 }),
               ),

@@ -4,7 +4,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
-import 'package:rootnode/helper/switchRoute.dart';
+import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/screen/dashboard/event_screen.dart';
 import 'package:rootnode/screen/dashboard/home_screen.dart';
@@ -30,11 +30,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
   }
-
-  void showNavbar() => null;
-  void hideNavbar() => null;
-
-  // setState(() {navVisible = false;});
 
   Future<void> _navigateToCreatePost(
       BuildContext context, RNContentType type) async {
@@ -105,9 +100,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       body: IndexedStack(index: _selectedIndex, children: [
-        HomeScreen(
-            user: widget.user!, showNavbar: showNavbar, hideNavbar: hideNavbar),
-        const NodeScreen(),
+        HomeScreen(user: widget.user!),
+        NodeScreen(user: widget.user!),
         const MessengerScreen(),
         const EventScreen(),
       ]),
@@ -149,7 +143,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
           selectedIndex: _selectedIndex,
           onTabChange: (value) => setState(() {
-            showNavbar();
             _selectedIndex = value;
           }),
         ),
