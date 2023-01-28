@@ -11,8 +11,6 @@ import 'package:rootnode/model/post.dart';
 
 class PostRemoteDataSource {
   final Dio _httpServices = HttpServices().getDioInstance();
-  final allowedVideo = ["mp4", 'mkv'];
-  final allowedImage = ["jpeg", 'png', 'jpg', 'gif'];
 
   Future<PostResponse?> getPostFeed(
       {int page = 1, int refresh = 0, bool private = false}) async {

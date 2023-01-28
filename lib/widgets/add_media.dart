@@ -207,7 +207,7 @@ class _RootNodeAddMediaState extends State<RootNodeAddMedia> {
     );
   }
 
-  _clearFiles() async {
+  _clearFiles() {
     if (xFiles.isEmpty) return;
     xFiles.clear();
     widget.onChanged(null);

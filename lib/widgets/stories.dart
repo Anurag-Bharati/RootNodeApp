@@ -1,4 +1,5 @@
 import 'package:boxicons/boxicons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
@@ -152,8 +153,9 @@ class _StoryCard extends StatelessWidget {
                         color: color,
                       )
                     : story!.media!.type == "image"
-                        ? Image.network(
-                            "${ApiConstants.baseUrl}/${story!.media!.url!}",
+                        ? CachedNetworkImage(
+                            imageUrl:
+                                "${ApiConstants.baseUrl}/${story!.media!.url!}",
                             height: double.infinity,
                             width: 110.0,
                             fit: BoxFit.cover,
