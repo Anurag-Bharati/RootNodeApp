@@ -223,6 +223,8 @@ class RootNodeBar extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: FadeInImage.assetNetwork(
+              imageCacheHeight: 128,
+              imageCacheWidth: 128,
               fit: BoxFit.cover,
               image: user.avatar != null
                   ? "${ApiConstants.baseUrl}\\${user.avatar}"

@@ -155,6 +155,7 @@ class _StoryCard extends StatelessWidget {
                       )
                     : story!.media!.type == "image"
                         ? CachedNetworkImage(
+                            maxHeightDiskCache: 256,
                             imageUrl:
                                 "${ApiConstants.baseUrl}/${story!.media!.url!}",
                             height: double.infinity,

@@ -256,6 +256,7 @@ class PostImage extends StatelessWidget {
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
       constraints: const BoxConstraints(maxHeight: 300, minHeight: 0),
       child: CachedNetworkImage(
+          maxWidthDiskCache: 500,
           imageUrl: "${ApiConstants.baseUrl}/$url",
           fit: BoxFit.cover,
           errorWidget: (context, url, error) => const MediaError(
