@@ -72,11 +72,15 @@ class _PostHeader extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: FadeInImage.assetNetwork(
+            imageCacheWidth: 128,
+            imageCacheHeight: 128,
             fit: BoxFit.cover,
             image: post.owner!.avatar != null
                 ? "${ApiConstants.baseUrl}\\${post.owner!.avatar}"
                 : "https://icon-library.com/images/anonymous-user-icon/anonymous-user-icon-2.jpg",
             placeholder: 'assets/images/image_grey.png',
+            imageErrorBuilder: (context, error, stackTrace) =>
+                Icon(Icons.broken_image, color: Colors.red[400]!),
           ),
         ),
         const SizedBox(width: 10),

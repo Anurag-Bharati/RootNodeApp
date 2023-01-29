@@ -29,7 +29,7 @@ class _NodeScreenState extends State<NodeScreen> {
           margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: Container(
             constraints: const BoxConstraints(maxHeight: 280),
-            color: Colors.white10,
+            // color: Colors.white10,
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -58,10 +58,14 @@ class _NodeScreenState extends State<NodeScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _getAvatar(widget.user.avatar, "this"),
-                              _getAvatar(null, "test"),
-                              _getAvatar(null, "test"),
-                              _getAvatar(null, "test"),
+                              Node(
+                                uri: widget.user.avatar,
+                                date: 'this',
+                                index: 0,
+                              ),
+                              const Node(uri: null, date: 'test', index: 1),
+                              const Node(uri: null, date: 'test', index: 2),
+                              const Node(uri: null, date: 'test', index: 3),
                             ],
                           ),
                         ],
@@ -97,11 +101,11 @@ class _NodeScreenState extends State<NodeScreen> {
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _getAvatar(null, "test", invert: true),
-                              _getAvatar(null, "test", invert: true),
-                              _getAvatar(null, "test", invert: true),
-                              _getAvatar(null, "this.add", invert: true),
+                            children: const [
+                              Node(date: 'test', invert: true, index: 0),
+                              Node(date: 'test', invert: true, index: 1),
+                              Node(date: 'test', invert: true, index: 2),
+                              Node(date: 'this.add', invert: true, index: 3)
                             ],
                           ),
                         ],
@@ -116,8 +120,23 @@ class _NodeScreenState extends State<NodeScreen> {
       ],
     );
   }
+}
 
-  _getAvatar(String? uri, String date, {bool invert = false}) {
+class Node extends StatelessWidget {
+  const Node({
+    super.key,
+    this.uri,
+    required this.date,
+    this.invert = false,
+    required this.index,
+  });
+  final int index;
+  final String? uri;
+  final String date;
+  final bool invert;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(
@@ -145,19 +164,23 @@ class _NodeScreenState extends State<NodeScreen> {
                   : null,
             ),
           ),
-          Positioned(
-            top: invert ? 0 : null,
-            bottom: !invert ? 0 : null,
-            left: 0,
-            right: 0,
-            child: Text(
-              date,
-              textAlign: TextAlign.center,
-              style: RootNodeFontStyle.labelSmall.copyWith(
-                color: date.contains('this') ? Colors.orange : Colors.white54,
-              ),
-            ),
-          )
+          (index != 0 && invert) || (index != 3 && !invert)
+              ? Positioned(
+                  top: invert ? 0 : null,
+                  bottom: !invert ? 0 : null,
+                  left: 0,
+                  right: 0,
+                  child: Text(
+                    date,
+                    textAlign: TextAlign.center,
+                    style: RootNodeFontStyle.labelSmall.copyWith(
+                      color: date.contains('this')
+                          ? Colors.orange
+                          : Colors.white54,
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink()
         ],
       ),
     );
@@ -191,10 +214,10 @@ class PolyLinePainter extends CustomPainter {
       ..strokeMiterLimit = 1;
     final path = Path();
 
-    path.moveTo(size.width * 1 / 11, size.height / 1.35);
+    path.moveTo(size.width * 1 / 11, size.height / 1.38);
     path.lineTo(size.width * 1 / 11, size.height * 0.5);
     path.lineTo(size.width / 1.1, size.height * 0.5);
-    path.lineTo(size.width / 1.1, size.height * 1 / 11);
+    path.lineTo(size.width / 1.1, size.height * 0.248);
     canvas.drawPath(path, paint);
   }
 
