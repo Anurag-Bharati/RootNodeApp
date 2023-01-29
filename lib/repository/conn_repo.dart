@@ -1,3 +1,5 @@
+import 'package:rootnode/data_source/remote_data_store/conn_remote_data_source.dart';
+import 'package:rootnode/data_source/remote_data_store/response/res_conn.dart';
 import 'package:rootnode/model/conn.dart';
 
 abstract class ConnRepo {
@@ -7,7 +9,7 @@ abstract class ConnRepo {
   Future<bool> checkIfConnected({required String id});
   Future<bool> toggleConnection({required String id});
   Future<String?> updateConn({required String id});
-  Future<List<Connection>> getOldRecentConns();
+  Future<ConnOverviewResponse?> getOldRecentConns();
 }
 
 class ConnRepoImpl extends ConnRepo {
@@ -22,8 +24,8 @@ class ConnRepoImpl extends ConnRepo {
   }
 
   @override
-  Future<List<Connection>> getOldRecentConns() {
-    throw UnimplementedError();
+  Future<ConnOverviewResponse?> getOldRecentConns() async {
+    return await ConnRemoteDataSource().getOldRecentConns();
   }
 
   @override

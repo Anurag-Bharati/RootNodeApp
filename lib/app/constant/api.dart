@@ -20,4 +20,6 @@ class ApiConstants {
   static const String conn = "$apiUrl/conn";
   static const String story = "$apiUrl/story";
   static const String event = "$apiUrl/event";
+
+  static const String connOverview = "$apiUrl/conn/old-recent";
 }
