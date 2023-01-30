@@ -10,6 +10,7 @@ import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/widgets/placeholder.dart';
+import 'package:string_extensions/string_extensions.dart';
 
 class NodeScreen extends StatefulWidget {
   const NodeScreen({super.key, required this.user});
@@ -21,6 +22,16 @@ class NodeScreen extends StatefulWidget {
 class _NodeScreenState extends State<NodeScreen> {
   final _connRepo = ConnRepoImpl();
   final _scrollController = ScrollController();
+  final _recomScrollController = ScrollController();
+  final _randomScrollController = ScrollController();
+
+  final List<User> recom = [];
+  final List<User> random = [];
+  int recomCurrentPage = 1;
+  int recomTotalPage = 1;
+  int randomCurrentPage = 1;
+  int randomTotalPage = 1;
+
   late ConnOverviewResponse? overview;
   List<Node> recent = [];
   List<Node> old = [];
@@ -63,9 +74,77 @@ class _NodeScreenState extends State<NodeScreen> {
     count = overview!.data!.count ?? 0;
   }
 
+  _initRandom() async {
+    random.clear();
+    randomCurrentPage = 1;
+    final randomResponse =
+        await _connRepo.getRandomConns(page: randomCurrentPage, refresh: 1);
+    if (randomResponse != null) {
+      randomTotalPage = randomResponse.totalPages ?? 1;
+      randomTotalPage > randomCurrentPage ? randomCurrentPage++ : null;
+      random.addAll(randomResponse.users ?? []);
+    }
+  }
+
+  _initRecom() async {
+    recom.clear();
+    recomCurrentPage = 1;
+    final recomResponse =
+        await _connRepo.getRecommendedConns(page: recomCurrentPage, refresh: 1);
+    if (recomResponse != null) {
+      recomTotalPage = recomResponse.totalPages ?? 1;
+      recomTotalPage > recomCurrentPage ? recomCurrentPage++ : null;
+      recom.addAll(recomResponse.users ?? []);
+      recomCurrentPage = recomResponse.currentPage ?? 1;
+    }
+  }
+
+  _fetchMoreRecom() async {
+    if (recomCurrentPage >= recomTotalPage) return;
+    final recomResponse =
+        await _connRepo.getRecommendedConns(page: recomCurrentPage);
+    if (recomResponse != null) {
+      recomResponse.totalPages! > randomCurrentPage
+          ? randomCurrentPage++
+          : null;
+      recom.addAll(recomResponse.users ?? []);
+      setState(() {});
+    }
+  }
+
+  _fetchMoreRandom() async {
+    if (randomCurrentPage >= randomTotalPage) return;
+    final randomResponse =
+        await _connRepo.getRecommendedConns(page: randomCurrentPage);
+    if (randomResponse != null) {
+      randomResponse.totalPages! > randomCurrentPage
+          ? randomCurrentPage++
+          : null;
+      random.addAll(randomResponse.users ?? []);
+      setState(() {});
+    }
+  }
+
+  _getRecomAndRandom() async {
+    _initRandom();
+    _initRecom();
+    if (random.isNotEmpty || recom.isNotEmpty) setState(() {});
+  }
+
   @override
   void initState() {
+    _getRecomAndRandom();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _randomScrollController.dispose();
+    _recomScrollController.dispose();
+    random.clear();
+    recom.clear();
+    super.dispose();
   }
 
   @override
@@ -99,7 +178,8 @@ class _NodeScreenState extends State<NodeScreen> {
           child: ConstrainedSliverWidth(
             maxWidth: 720,
             child: NewConnectionList(
-              scrollController: _scrollController,
+              users: recom,
+              scrollController: _recomScrollController,
               type: NewConnectionListType.recommended,
               title: "Recommended Nodes",
               widget: widget,
@@ -110,7 +190,8 @@ class _NodeScreenState extends State<NodeScreen> {
           child: ConstrainedSliverWidth(
             maxWidth: 720,
             child: NewConnectionList(
-              scrollController: _scrollController,
+              users: random,
+              scrollController: _randomScrollController,
               type: NewConnectionListType.random,
               title: "Random Nodes",
               widget: widget,
@@ -131,12 +212,14 @@ class NewConnectionList extends StatelessWidget {
     required this.widget,
     required this.title,
     required this.type,
+    required this.users,
   }) : _scrollController = scrollController;
 
   final ScrollController _scrollController;
   final NodeScreen widget;
   final String title;
   final NewConnectionListType type;
+  final List<User> users;
 
   @override
   Widget build(BuildContext context) {
@@ -155,12 +238,12 @@ class NewConnectionList extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             height: 128,
-            child: type == NewConnectionListType.random
+            child: users.isNotEmpty
                 ? ListView.builder(
                     controller: _scrollController,
                     scrollDirection: Axis.horizontal,
-                    itemCount: 10,
-                    itemBuilder: (context, index) => _card())
+                    itemCount: users.length,
+                    itemBuilder: (context, index) => _card(users[index]))
                 : Container(
                     clipBehavior: Clip.antiAlias,
                     margin: const EdgeInsets.all(10),
@@ -195,7 +278,7 @@ class NewConnectionList extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          "Not many nodes to recom at the time. \nTry adding random nodes.",
+                          "Not many ${type == NewConnectionListType.recommended ? 'nodes to recommend' : 'random nodes to show'} at the time. \nTry adding some ${type == NewConnectionListType.random ? 'recommend' : 'random'} nodes.",
                           textAlign: TextAlign.center,
                           style: RootNodeFontStyle.caption,
                         )
@@ -224,7 +307,7 @@ class NewConnectionList extends StatelessWidget {
         child: Text("this", style: RootNodeFontStyle.caption),
       );
 
-  Widget _card() => Padding(
+  Widget _card(User user) => Padding(
         padding: const EdgeInsets.all(8.0),
         child: Stack(
           children: [
@@ -235,7 +318,7 @@ class NewConnectionList extends StatelessWidget {
                 width: 110.0,
                 color: Colors.transparent,
                 child: CachedNetworkImage(
-                  imageUrl: widget.user.avatar!,
+                  imageUrl: user.avatar!,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -251,7 +334,7 @@ class NewConnectionList extends StatelessWidget {
             ),
             GestureDetector(
                 onTap: () {
-                  debugPrint("Tapped Node inside the discover");
+                  debugPrint("Discover > User: ${user.fname}");
                 },
                 child: Container(
                   alignment: Alignment.center,
@@ -278,7 +361,7 @@ class NewConnectionList extends StatelessWidget {
               left: 8.0,
               right: 8.0,
               child: Text(
-                'Nice Guy',
+                "${user.fname} ${user.lname!.first()}".toTitleCase!,
                 style: RootNodeFontStyle.subtitle,
                 overflow: TextOverflow.fade,
                 textAlign: TextAlign.center,

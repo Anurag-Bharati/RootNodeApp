@@ -4,8 +4,8 @@ import 'package:rootnode/model/conn.dart';
 
 abstract class ConnRepo {
   Future<List<Connection>> getMyConns({int page = 1, int refresh = 0});
-  Future<List<Connection>> getRecommendedConns({int page = 1, int refresh = 0});
-  Future<List<Connection>> getRandomConns({int page = 1, int refresh = 0});
+  Future<ConnResponse?> getRecommendedConns({int page = 1, int refresh = 0});
+  Future<ConnResponse?> getRandomConns({int page = 1, int refresh = 0});
   Future<bool> checkIfConnected({required String id});
   Future<bool> toggleConnection({required String id});
   Future<String?> updateConn({required String id});
@@ -24,19 +24,19 @@ class ConnRepoImpl extends ConnRepo {
   }
 
   @override
-  Future<ConnOverviewResponse?> getOldRecentConns() async {
-    return await ConnRemoteDataSource().getOldRecentConns();
+  Future<ConnOverviewResponse?> getOldRecentConns() {
+    return ConnRemoteDataSource().getOldRecentConns();
   }
 
   @override
-  Future<List<Connection>> getRandomConns({int page = 1, int refresh = 0}) {
-    throw UnimplementedError();
+  Future<ConnResponse?> getRandomConns({int page = 1, int refresh = 0}) {
+    return ConnRemoteDataSource().getRandomConns(page: page, refresh: refresh);
   }
 
   @override
-  Future<List<Connection>> getRecommendedConns(
-      {int page = 1, int refresh = 0}) {
-    throw UnimplementedError();
+  Future<ConnResponse?> getRecommendedConns({int page = 1, int refresh = 0}) {
+    return ConnRemoteDataSource()
+        .getRecommendedConns(page: page, refresh: refresh);
   }
 
   @override

@@ -9,12 +9,36 @@ class ConnRemoteDataSource {
 
   Future<ConnOverviewResponse?> getOldRecentConns() async {
     try {
-      Response res = await _httpServices.get(
-        "${ApiConstants.baseUrl}${ApiConstants.connOverview}",
-      );
+      Response res = await _httpServices
+          .get("${ApiConstants.baseUrl}${ApiConstants.connOverview}");
       return res.statusCode == 200
           ? ConnOverviewResponse.fromJson(res.data)
           : null;
+    } catch (_) {
+      debugPrint(_.toString());
+      return null;
+    }
+  }
+
+  Future<ConnResponse?> getRandomConns({int page = 1, int refresh = 0}) async {
+    try {
+      Response res = await _httpServices.get(
+        "${ApiConstants.baseUrl}${ApiConstants.connRandom}?page=$page&refresh=$refresh",
+      );
+      return res.statusCode == 200 ? ConnResponse.fromJson(res.data) : null;
+    } catch (_) {
+      debugPrint(_.toString());
+      return null;
+    }
+  }
+
+  Future<ConnResponse?> getRecommendedConns(
+      {int page = 1, int refresh = 0}) async {
+    try {
+      Response res = await _httpServices.get(
+        "${ApiConstants.baseUrl}${ApiConstants.connRecom}?page=$page&refresh=$refresh",
+      );
+      return res.statusCode == 200 ? ConnResponse.fromJson(res.data) : null;
     } catch (_) {
       debugPrint(_.toString());
       return null;

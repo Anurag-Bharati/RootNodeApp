@@ -22,4 +22,6 @@ class ApiConstants {
   static const String event = "$apiUrl/event";
 
   static const String connOverview = "$apiUrl/conn/old-recent";
+  static const String connRandom = "$apiUrl/conn/random";
+  static const String connRecom = "$apiUrl/conn/recom";
 }
