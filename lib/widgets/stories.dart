@@ -174,6 +174,15 @@ class _StoryCard extends StatelessWidget {
                           ),
           ),
         ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            height: 2,
+            color: const Color(0xFF111111),
+          ),
+        ),
         GestureDetector(
           onTap: () => isAddStory
               ? _showStoryOptions(context)
