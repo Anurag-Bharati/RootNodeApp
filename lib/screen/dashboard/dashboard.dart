@@ -57,11 +57,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   int _selectedIndex = 0;
+  double triggerResponsiveNav = 480;
+  double _getWidth(context) {
+    return MediaQuery.of(context).size.width;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // extendBody: true,
+      extendBody: _getWidth(context) > 480,
       appBar: AppBar(
         elevation: 0,
         toolbarHeight: mqSmallH(context) ? 80 : 60,
@@ -106,10 +110,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const EventScreen(),
       ]),
       bottomNavigationBar: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        // transform: Matrix4.translationValues(0, navVisible ? 0 : 100, 0),
+        duration: const Duration(milliseconds: 600),
+        margin: _getWidth(context) > triggerResponsiveNav
+            ? const EdgeInsets.symmetric(horizontal: 180, vertical: 30)
+            : EdgeInsets.zero,
         height: navVisible ? kBottomNavigationBarHeight + 8 : 0,
+        padding: _getWidth(context) > triggerResponsiveNav
+            ? const EdgeInsets.symmetric(horizontal: 10, vertical: 0)
+            : EdgeInsets.zero,
+        decoration: BoxDecoration(
+          color: const Color(0xFF111111),
+          borderRadius: BorderRadius.circular(50),
+        ),
         child: GNav(
           tabMargin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           tabBorderRadius: 50,
@@ -122,7 +134,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           iconSize: mqSmallW(context)
               ? LayoutConstants.postIconBig
               : LayoutConstants.postIcon,
-          backgroundColor: const Color(0xFF111111),
+          backgroundColor: const Color(0x00111111),
           padding: mqSmallW(context)
               ? const EdgeInsets.symmetric(horizontal: 10, vertical: 8)
               : const EdgeInsets.all(5),

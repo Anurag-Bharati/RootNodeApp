@@ -5,8 +5,9 @@
    <application
         android:label="rootnode"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
-        
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
+        <!-- Remove above (*Disables http conns when set false) -->
         <!-- Activities -->
         <activity 
             android:name="com.yalantis.ucrop.UCropActivity"

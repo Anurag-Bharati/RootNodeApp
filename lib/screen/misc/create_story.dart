@@ -123,6 +123,20 @@ class _CreateMediaStoryState extends State<CreateMediaStory> {
 
   bool darkenImage = false;
 
+  double _getDynamicHeight(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    if (height > 1080) return height / 2;
+    return 300;
+  }
+
+  int _getHeightAlias(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    if (height <= 720) return 0;
+    if (height > 720 && height <= 1080) return 1;
+    if (height > 1080 && height <= 1280) return 2;
+    return 3;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -130,8 +144,9 @@ class _CreateMediaStoryState extends State<CreateMediaStory> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(
-            height:
-                file != null && widget.type != RNContentType.video ? 300 : null,
+            height: file != null && widget.type != RNContentType.video
+                ? _getDynamicHeight(context)
+                : null,
             child: file != null && widget.type == RNContentType.image
                 ? Stack(fit: StackFit.expand, children: [
                     Image.file(
@@ -173,7 +188,15 @@ class _CreateMediaStoryState extends State<CreateMediaStory> {
                           icon: Icon(Boxicons.bx_trash, color: Colors.red[300]),
                         ),
                       ),
-                    )
+                    ),
+                    Positioned(
+                        right: 0,
+                        left: 0,
+                        bottom: -1,
+                        child: Container(
+                            width: double.infinity,
+                            height: 2,
+                            color: const Color(0xFF111111)))
                   ])
                 : Align(
                     alignment: Alignment.topCenter,

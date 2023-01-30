@@ -171,14 +171,16 @@ class _PostBodyState extends State<_PostBody> {
                                 widget.post.mediaFiles[0].type == "image"
                             ? Hero(
                                 tag: widget.post.id.toString(),
-                                child: PostImage(
-                                    url: widget.post.mediaFiles[0].url!),
+                                child: AspectRatio(
+                                  aspectRatio: 4 / 3,
+                                  child: PostImage(
+                                      url: widget.post.mediaFiles[0].url!),
+                                ),
                               )
                             : Stack(
                                 children: [
                                   CarouselSlider(
                                     options: CarouselOptions(
-                                      height: 200.0,
                                       enableInfiniteScroll: false,
                                       disableCenter: true,
                                       enlargeCenterPage: true,

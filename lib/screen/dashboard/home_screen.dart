@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_post.dart';
+import 'package:rootnode/helper/responsive_helper.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/widgets/placeholder.dart';
@@ -41,6 +42,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late int publicTotal;
   int privatePage = 1;
   int publicPage = 1;
+
+  double maxContentWidth = 720;
 
   void _clearInitials() async {
     setState(() {
@@ -154,37 +157,46 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       child: CustomScrollView(
         controller: _scrollController,
         slivers: [
-          const SliverToBoxAdapter(child: DummySearchField()),
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: StoriesWidget(currentUser: widget.user),
+              child: ConstrainedSliverWidth(
+                  maxWidth: maxContentWidth, child: const DummySearchField())),
+          SliverToBoxAdapter(
+            child: ConstrainedSliverWidth(
+              maxWidth: maxContentWidth,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: StoriesWidget(currentUser: widget.user),
+              ),
             ),
           ),
           SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              decoration: BoxDecoration(
-                  color: Colors.white10,
-                  borderRadius: BorderRadius.circular(20)),
-              child: TabBar(
-                enableFeedback: true,
-                overlayColor: MaterialStateProperty.resolveWith(
-                    (states) => Colors.transparent),
-                onTap: (value) => _switchPostScope(value),
-                labelColor: Colors.white70,
-                indicatorColor:
-                    postScopeDisabled ? Colors.white30 : Colors.cyan,
-                indicatorPadding: const EdgeInsets.all(10),
-                indicatorSize: TabBarIndicatorSize.label,
-                labelStyle: RootNodeFontStyle.body,
-                unselectedLabelColor: Colors.white30,
-                splashFactory: NoSplash.splashFactory,
-                isScrollable: false,
-                dividerColor: Colors.transparent,
-                padding: EdgeInsets.zero,
-                controller: _tabController,
-                tabs: const [Tab(text: "Public"), Tab(text: "Mutual")],
+            child: ConstrainedSliverWidth(
+              maxWidth: maxContentWidth,
+              child: Container(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                decoration: BoxDecoration(
+                    color: Colors.white10,
+                    borderRadius: BorderRadius.circular(20)),
+                child: TabBar(
+                  enableFeedback: true,
+                  overlayColor: MaterialStateProperty.resolveWith(
+                      (states) => Colors.transparent),
+                  onTap: (value) => _switchPostScope(value),
+                  labelColor: Colors.white70,
+                  indicatorColor:
+                      postScopeDisabled ? Colors.white30 : Colors.cyan,
+                  indicatorPadding: const EdgeInsets.all(10),
+                  indicatorSize: TabBarIndicatorSize.label,
+                  labelStyle: RootNodeFontStyle.body,
+                  unselectedLabelColor: Colors.white30,
+                  splashFactory: NoSplash.splashFactory,
+                  isScrollable: false,
+                  dividerColor: Colors.transparent,
+                  padding: EdgeInsets.zero,
+                  controller: _tabController,
+                  tabs: const [Tab(text: "Public"), Tab(text: "Mutual")],
+                ),
               ),
             ),
           ),
@@ -203,9 +215,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       return index < _posts.length
-                          ? PostContainer(
-                              post: _posts[index],
-                              likedMeta: _postsLiked[index])
+                          ? ConstrainedSliverWidth(
+                              maxWidth: maxContentWidth,
+                              child: PostContainer(
+                                  post: _posts[index],
+                                  likedMeta: _postsLiked[index]),
+                            )
                           : PostLoader(
                               page: privateFeed ? privatePage : publicPage,
                               total: privateFeed ? privateTotal : publicTotal,

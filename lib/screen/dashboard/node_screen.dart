@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_conn.dart';
+import 'package:rootnode/helper/responsive_helper.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
@@ -73,106 +74,120 @@ class _NodeScreenState extends State<NodeScreen> {
     return CustomScrollView(
       controller: _scrollController,
       slivers: [
-        const SliverToBoxAdapter(child: DummySearchField()),
+        const SliverToBoxAdapter(
+            child: ConstrainedSliverWidth(
+                maxWidth: 720, child: DummySearchField())),
         SliverToBoxAdapter(
-            child: AnimatedContainer(
-          width: double.infinity,
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          child: Container(
-            constraints: const BoxConstraints(maxHeight: 300),
-            // color: Colors.white10,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox.expand(
-                  child: CustomPaint(
-                    isComplex: true,
-                    foregroundPainter: PolyLinePainter(),
-                  ),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      height: 100,
-                      child: Stack(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 28),
-                            child: SizedBox.expand(
-                              child: CustomPaint(
-                                foregroundPainter: LinePainter(),
-                              ),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: old.isEmpty
-                                ? [
-                                    const Node(
-                                        uri: null, date: 'N/A', index: 1),
-                                    const Node(
-                                        uri: null, date: 'N/A', index: 2),
-                                    const Node(
-                                        uri: null, date: 'N/A', index: 3),
-                                  ]
-                                : old,
-                          ),
-                        ],
+            child: ConstrainedSliverWidth(
+          maxWidth: 720,
+          child: AnimatedContainer(
+            width: double.infinity,
+            duration: const Duration(milliseconds: 300),
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Container(
+              constraints: const BoxConstraints(maxHeight: 500),
+              height: MediaQuery.of(context).size.width <= 480
+                  ? 300
+                  : MediaQuery.of(context).size.width * 0.5,
+              // color: Colors.white10,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox.expand(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28),
+                      child: CustomPaint(
+                        isComplex: true,
+                        foregroundPainter: PolyLinePainter(),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {});
-                          debugPrint("Mynodes");
-                        },
-                        child: AvatarGlow(
-                          endRadius: 35,
-                          child: CircleAvatar(
-                            backgroundColor: const Color(0xFFCCCCCC),
-                            maxRadius: 25,
-                            child: Text("+$count",
-                                style: RootNodeFontStyle.caption.copyWith(
-                                  color: const Color(0xFF111111),
-                                  fontWeight: FontWeight.bold,
-                                )),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        height: 100,
+                        child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 28),
+                              child: SizedBox.expand(
+                                child: CustomPaint(
+                                  foregroundPainter: LinePainter(),
+                                ),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: old.isEmpty
+                                  ? [
+                                      const Node(
+                                          uri: null, date: 'N/A', index: 1),
+                                      const Node(
+                                          uri: null, date: 'N/A', index: 2),
+                                      const Node(
+                                          uri: null, date: 'N/A', index: 3),
+                                    ]
+                                  : old,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {});
+                            debugPrint("Mynodes");
+                          },
+                          child: AvatarGlow(
+                            endRadius: 35,
+                            child: CircleAvatar(
+                              backgroundColor: const Color(0xFFCCCCCC),
+                              maxRadius: 25,
+                              child: Text("+$count",
+                                  style: RootNodeFontStyle.caption.copyWith(
+                                    color: const Color(0xFF111111),
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 100,
-                      child: Stack(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: SizedBox.expand(
-                              child: CustomPaint(
-                                foregroundPainter: LinePainter(),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 100,
+                        child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: SizedBox.expand(
+                                child: CustomPaint(
+                                  foregroundPainter: LinePainter(),
+                                ),
                               ),
                             ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: recent.isEmpty
-                                ? const [
-                                    Node(date: 'test', invert: true, index: 0),
-                                    Node(date: 'test', invert: true, index: 1),
-                                    Node(date: 'test', invert: true, index: 2),
-                                  ]
-                                : recent,
-                          ),
-                        ],
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: recent.isEmpty
+                                  ? const [
+                                      Node(
+                                          date: 'test', invert: true, index: 0),
+                                      Node(
+                                          date: 'test', invert: true, index: 1),
+                                      Node(
+                                          date: 'test', invert: true, index: 2),
+                                    ]
+                                  : recent,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         )),
@@ -197,7 +212,7 @@ class Node extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Stack(
         children: [
           Container(
@@ -218,7 +233,7 @@ class Node extends StatelessWidget {
                 ),
                 child: CircleAvatar(
                   maxRadius: 30,
-                  backgroundColor: const Color(0xFFBBBBBB),
+                  backgroundColor: const Color(0xFFCCCCCC),
                   foregroundImage: uri != null
                       ? CachedNetworkImageProvider(
                           "${ApiConstants.baseUrl}/$uri",
@@ -271,8 +286,8 @@ class LinePainter extends CustomPainter {
       ..color = const Color(0xFFCCCCCC)
       ..strokeWidth = 3;
     canvas.drawLine(
-      Offset(size.width * 1 / 6, size.height * 0.5),
-      Offset(size.width * 5 / 6, size.height * 0.5),
+      Offset(0, size.height * 0.5),
+      Offset(size.width, size.height * 0.5),
       paint,
     );
   }
@@ -291,10 +306,10 @@ class PolyLinePainter extends CustomPainter {
       ..strokeMiterLimit = 1;
     final path = Path();
 
-    path.moveTo(size.width * 1 / 11, size.height / 1.38);
-    path.lineTo(size.width * 1 / 11, size.height * 0.5);
-    path.lineTo(size.width / 1.1, size.height * 0.5);
-    path.lineTo(size.width / 1.1, size.height * 0.248);
+    path.moveTo(0, size.height - 80);
+    path.lineTo(0, size.height * 0.5);
+    path.lineTo(size.width, size.height * 0.5);
+    path.lineTo(size.width, 71);
     canvas.drawPath(path, paint);
   }
 

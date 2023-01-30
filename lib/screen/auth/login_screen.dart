@@ -60,114 +60,121 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF111111),
       body: SafeArea(
-        child: SizedBox(
-          height: double.infinity,
-          width: double.infinity,
-          child: CustomScrollView(
-              controller: _scrollController,
-              scrollDirection: Axis.vertical,
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Form(
-                    key: _globalkey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          margin: const EdgeInsets.only(bottom: 40),
-                          child: const RootNodeTextLogo(),
-                        ),
-                        RootNodeTextField(
-                          controller: _emailFieldController,
-                          hintText: "Email",
-                          type: TextFieldTypes.email,
-                        ),
-                        RootNodeTextField(
-                          controller: _passwordFieldController,
-                          hintText: "Password",
-                          type: TextFieldTypes.password,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.cyan,
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 600),
+            height: double.infinity,
+            width: double.infinity,
+            child: CustomScrollView(
+                controller: _scrollController,
+                scrollDirection: Axis.vertical,
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Form(
+                      key: _globalkey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            margin: const EdgeInsets.only(bottom: 40),
+                            child: const RootNodeTextLogo(),
                           ),
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 10),
-                          child: TextButton(
-                            style:
-                                const ButtonStyle(alignment: Alignment.center),
-                            onPressed: () async {
-                              if (!_globalkey.currentState!.validate()) {
-                                showSnackbar(context, "Invalid fields",
-                                    Colors.red[400]!);
-                                return;
-                              }
-                              showSnackbar(
-                                  context, "Logging in..", Colors.green[400]!,
-                                  dismissable: false);
-                              User? user = await _loginUser();
-                              if (user != null) {
+                          RootNodeTextField(
+                            controller: _emailFieldController,
+                            hintText: "Email",
+                            type: TextFieldTypes.email,
+                          ),
+                          RootNodeTextField(
+                            controller: _passwordFieldController,
+                            hintText: "Password",
+                            type: TextFieldTypes.password,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.cyan,
+                            ),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 40, vertical: 10),
+                            child: TextButton(
+                              style: const ButtonStyle(
+                                  alignment: Alignment.center),
+                              onPressed: () async {
+                                if (!_globalkey.currentState!.validate()) {
+                                  showSnackbar(context, "Invalid fields",
+                                      Colors.red[400]!);
+                                  return;
+                                }
+                                showSnackbar(
+                                    context, "Logging in..", Colors.green[400]!,
+                                    dismissable: false);
+                                User? user = await _loginUser();
+                                if (user != null) {
+                                  // ignore: use_build_context_synchronously
+                                  ScaffoldMessenger.of(context)
+                                      .removeCurrentSnackBar();
+
+                                  // ignore: use_build_context_synchronously
+                                  return switchRouteByPushReplace(
+                                      context, DashboardScreen(user: user));
+                                }
                                 // ignore: use_build_context_synchronously
-                                return switchRouteByPushReplace(
-                                    context, DashboardScreen(user: user));
-                              }
-                              // ignore: use_build_context_synchronously
-                              showSnackbar(
-                                context,
-                                "Sorry! Something went wrong",
-                                Colors.red[400]!,
-                              );
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.bold,
+                                showSnackbar(
+                                  context,
+                                  "Sorry! Something went wrong",
+                                  Colors.red[400]!,
+                                );
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 20, right: 20, top: 10),
-                          child: Wrap(
-                            alignment: WrapAlignment.center,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              const Text(
-                                "Don't have account?",
-                                style: TextStyle(
-                                    color: Colors.white70, fontSize: 16),
-                              ),
-                              TextButton(
-                                  onPressed: (() {
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                const RegisterScreen()));
-                                  }),
-                                  child: const Text(
-                                    "Register",
-                                    style: TextStyle(
-                                        color: Colors.cyan, fontSize: 16),
-                                  )),
-                            ],
-                          ),
-                        )
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 20, right: 20, top: 10),
+                            child: Wrap(
+                              alignment: WrapAlignment.center,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                const Text(
+                                  "Don't have account?",
+                                  style: TextStyle(
+                                      color: Colors.white70, fontSize: 16),
+                                ),
+                                TextButton(
+                                    onPressed: (() {
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  const RegisterScreen()));
+                                    }),
+                                    child: const Text(
+                                      "Register",
+                                      style: TextStyle(
+                                          color: Colors.cyan, fontSize: 16),
+                                    )),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ]),
+                ]),
+          ),
         ),
       ),
     );
