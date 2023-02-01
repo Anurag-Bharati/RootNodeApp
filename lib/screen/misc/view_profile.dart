@@ -4,15 +4,22 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
+import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
+import 'package:rootnode/helper/responsive_helper.dart';
 import 'package:rootnode/helper/utils.dart';
+import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user.dart';
+import 'package:rootnode/repository/story_repo.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/widgets/buttons.dart';
+import 'package:rootnode/widgets/placeholder.dart';
+import 'package:rootnode/widgets/stories.dart';
 import 'package:string_extensions/string_extensions.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key, required this.id});
+  const ProfileScreen({super.key, required this.id, required this.user});
   final String id;
+  final User user;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -20,17 +27,64 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _userRepo = UserRepoImpl();
+  final _storyRepo = StoryRepoImpl();
   User? user;
+  double maxContentWidth = 720;
+
+  late final ScrollController _scrollController;
+  late StoryResponse? _storyResponse;
+  late int storyTotal;
+
+  final List<Story> _stories = [];
+  int storyPage = 1;
+  bool storyHidden = false;
+
+  bool noPost = false;
+  bool noStory = false;
 
   _fetchUser() async {
     user = await _userRepo.getUserById(widget.id);
     if (mounted) setState(() {});
   }
 
+  void _getInitialStoryData() async {
+    _storyResponse = await _storyRepo.getStoryByUser(
+        page: storyPage, refresh: 1, id: widget.id);
+    if (_storyResponse!.stories!.isEmpty) noStory = true;
+    setState(() {
+      _stories.addAll(_storyResponse!.stories!);
+      storyTotal = _storyResponse!.totalPages!;
+    });
+  }
+
+  void _fetchMoreStoryData() async {
+    if (storyPage == storyTotal) return;
+    storyPage = storyPage == storyTotal ? storyTotal : storyPage + 1;
+    _storyResponse = await _storyRepo.getStoryByUser(
+        page: storyPage, refresh: 0, id: widget.id);
+    setState(() {
+      _stories.addAll(_storyResponse!.stories!);
+    });
+  }
+
   @override
   void initState() {
     _fetchUser();
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      if (_scrollController.position.maxScrollExtent ==
+          _scrollController.offset) {
+        _fetchMoreStoryData();
+      }
+    });
+    _getInitialStoryData();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -41,6 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           "Back",
           style: RootNodeFontStyle.header,
         ),
+        backgroundColor: Colors.pink,
         leadingWidth: 40,
         leading: IconButton(
           icon: const Icon(
@@ -48,19 +103,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
             color: Colors.white70,
             size: 40,
           ),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            setState(() {
+              storyHidden = true;
+            });
+            Navigator.of(context).pop();
+          },
         ),
       ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
         color: const Color(0xFF111111),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Container(
                 height: 300,
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -72,8 +130,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Colors.pink.withAlpha(100),
                       Colors.transparent,
                     ],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
                 ),
                 child: Padding(
@@ -183,38 +241,91 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           )
                         ],
                       ),
-                      Wrap(
-                        spacing: 10,
-                        runAlignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        alignment: WrapAlignment.spaceEvenly,
-                        runSpacing: 10,
-                        children: [
-                          RootNodeOutlinedButton(
-                            onPressed: () =>
-                                debugPrint("Share Button Pressed!"),
-                            child: Text("Share", style: RootNodeFontStyle.body),
-                          ),
-                          RootNodeOutlinedButton(
-                            onPressed: () =>
-                                debugPrint('Message Button Pressed!'),
-                            child: const Icon(Boxicons.bxs_message_square_dots,
-                                color: Colors.white54),
-                          ),
-                          RootNodeOutlinedButton(
-                            onPressed: () =>
-                                debugPrint("Follow Button Pressed!"),
-                            child:
-                                Text("Follow", style: RootNodeFontStyle.body),
-                          ),
-                        ],
-                      )
+                      user != null
+                          ? Wrap(
+                              spacing: 10,
+                              runAlignment: WrapAlignment.center,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              alignment: WrapAlignment.spaceEvenly,
+                              runSpacing: 10,
+                              children: [
+                                RootNodeOutlinedButton(
+                                  onPressed: () =>
+                                      debugPrint("Share Button Pressed!"),
+                                  child: Text("Share",
+                                      style: RootNodeFontStyle.body),
+                                ),
+                                RootNodeOutlinedButton(
+                                  onPressed: () =>
+                                      debugPrint('Message Button Pressed!'),
+                                  child: const Icon(
+                                      Boxicons.bxs_message_square_dots,
+                                      color: Colors.white54),
+                                ),
+                                RootNodeOutlinedButton(
+                                  onPressed: () {
+                                    if (widget.user.id != user!.id!) {
+                                      debugPrint("Edit Button Pressed!");
+                                    } else {
+                                      debugPrint("Follow Button Pressed!");
+                                    }
+                                  },
+                                  child: Text(
+                                      widget.user.id != user!.id
+                                          ? "Follow"
+                                          : "Edit",
+                                      style: RootNodeFontStyle.body),
+                                ),
+                              ],
+                            )
+                          : _getNamePlaceholder()
                     ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+            SliverToBoxAdapter(
+              child: ConstrainedSliverWidth(
+                maxWidth: maxContentWidth,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 124.0,
+                    child: storyHidden
+                        ? const SizedBox.shrink()
+                        : noStory
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: const MediaEmpty(
+                                    icon: Icons.error,
+                                    message: "No story posted"),
+                              )
+                            : ListView.builder(
+                                controller: _scrollController,
+                                scrollDirection: Axis.horizontal,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 0, vertical: 10.0),
+                                itemCount: _stories.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0),
+                                    child: StoryCard(
+                                        hideName: true,
+                                        stories: _stories,
+                                        index: index + 1,
+                                        color: Color(_stories[index].color!),
+                                        currentUser: user!,
+                                        story: _stories[index]),
+                                  );
+                                },
+                              ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

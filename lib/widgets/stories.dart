@@ -16,7 +16,10 @@ import 'package:string_extensions/string_extensions.dart';
 class StoriesWidget extends StatefulWidget {
   final User currentUser;
 
-  const StoriesWidget({super.key, required this.currentUser});
+  const StoriesWidget({
+    super.key,
+    required this.currentUser,
+  });
 
   @override
   State<StoriesWidget> createState() => _StoriesWidgetState();
@@ -91,7 +94,7 @@ class _StoriesWidgetState extends State<StoriesWidget> {
           if (index == 0) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: _StoryCard(
+              child: StoryCard(
                 stories: _stories,
                 index: index,
                 color: Colors.cyan,
@@ -103,7 +106,7 @@ class _StoriesWidgetState extends State<StoriesWidget> {
           }
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: _StoryCard(
+            child: StoryCard(
                 stories: _stories,
                 index: index,
                 color: Color(_stories[index - 1].color!),
@@ -116,14 +119,15 @@ class _StoriesWidgetState extends State<StoriesWidget> {
   }
 }
 
-class _StoryCard extends StatelessWidget {
+class StoryCard extends StatelessWidget {
   final bool isAddStory;
   final User currentUser;
   final Story? story;
   final List<Story> stories;
   final Color color;
   final int index;
-  const _StoryCard({
+  final bool hideName;
+  const StoryCard({
     Key? key,
     this.isAddStory = false,
     required this.currentUser,
@@ -131,6 +135,7 @@ class _StoryCard extends StatelessWidget {
     required this.color,
     required this.index,
     required this.stories,
+    this.hideName = false,
   }) : super(key: key);
 
   @override
@@ -230,20 +235,22 @@ class _StoryCard extends StatelessWidget {
                   ),
           ),
         ),
-        Positioned(
-          bottom: 8.0,
-          left: 8.0,
-          right: 8.0,
-          child: Text(
-            isAddStory
-                ? 'Add story'
-                : "${story!.owner!.fname!.toTitleCase!} ${story!.owner!.lname![0].capitalize!}.",
-            style: RootNodeFontStyle.subtitle,
-            overflow: TextOverflow.fade,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-          ),
-        ),
+        hideName
+            ? const SizedBox.shrink()
+            : Positioned(
+                bottom: 8.0,
+                left: 8.0,
+                right: 8.0,
+                child: Text(
+                  isAddStory
+                      ? 'Add story'
+                      : "${story!.owner!.fname!.toTitleCase!} ${story!.owner!.lname![0].capitalize!}.",
+                  style: RootNodeFontStyle.subtitle,
+                  overflow: TextOverflow.fade,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                ),
+              ),
       ],
     );
   }

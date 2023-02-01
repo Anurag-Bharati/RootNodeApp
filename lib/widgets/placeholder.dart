@@ -23,9 +23,43 @@ class MediaError extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   direction: Axis.vertical,
                   children: [
-                      Icon(icon, size: 30, color: Colors.red[300]),
+                      Icon(icon, size: 26, color: Colors.red[300]),
                       Text("Something went wrong!",
                           style: RootNodeFontStyle.body),
+                    ]),
+        ),
+      ),
+    );
+  }
+}
+
+class MediaEmpty extends StatelessWidget {
+  const MediaEmpty(
+      {super.key,
+      required this.icon,
+      this.minimal = false,
+      required this.message});
+
+  final IconData icon;
+  final String message;
+  final bool minimal;
+
+  @override
+  Widget build(BuildContext context) {
+    return StatefulBuilder(
+      builder: (context, setState) => Container(
+        color: Colors.white10,
+        height: double.infinity,
+        width: double.infinity,
+        child: Center(
+          child: minimal
+              ? Icon(icon, size: 26, color: Colors.cyan)
+              : Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  direction: Axis.vertical,
+                  children: [
+                      Icon(icon, size: 26, color: Colors.cyan),
+                      Text(message, style: RootNodeFontStyle.body),
                     ]),
         ),
       ),

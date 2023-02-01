@@ -192,6 +192,7 @@ class _NodeScreenState extends State<NodeScreen> {
           child: ConstrainedSliverWidth(
             maxWidth: 720,
             child: NewConnectionList(
+              rootnode: widget.user,
               users: recom,
               scrollController: _recomScrollController,
               type: NewConnectionListType.recommended,
@@ -203,6 +204,7 @@ class _NodeScreenState extends State<NodeScreen> {
           child: ConstrainedSliverWidth(
             maxWidth: 720,
             child: NewConnectionList(
+              rootnode: widget.user,
               users: random,
               scrollController: _randomScrollController,
               type: NewConnectionListType.random,
@@ -224,12 +226,14 @@ class NewConnectionList extends StatelessWidget {
     required this.title,
     required this.type,
     required this.users,
+    required this.rootnode,
   }) : _scrollController = scrollController;
 
   final ScrollController _scrollController;
   final String title;
   final NewConnectionListType type;
   final List<User> users;
+  final User rootnode;
 
   @override
   Widget build(BuildContext context) {
@@ -253,7 +257,8 @@ class NewConnectionList extends StatelessWidget {
                     controller: _scrollController,
                     scrollDirection: Axis.horizontal,
                     itemCount: users.length,
-                    itemBuilder: (context, index) => _card(users[index]))
+                    itemBuilder: (context, index) =>
+                        _card(users[index], context))
                 : Container(
                     clipBehavior: Clip.antiAlias,
                     margin: const EdgeInsets.all(10),
@@ -301,7 +306,7 @@ class NewConnectionList extends StatelessWidget {
     );
   }
 
-  Widget _card(User user) => Padding(
+  Widget _card(User user, BuildContext context) => Padding(
         padding: const EdgeInsets.all(8.0),
         child: Stack(
           children: [
@@ -332,6 +337,8 @@ class NewConnectionList extends StatelessWidget {
             ),
             GestureDetector(
                 onTap: () {
+                  switchRouteByPush(
+                      context, ProfileScreen(id: user.id!, user: rootnode));
                   debugPrint("Discover > User: ${user.fname}");
                 },
                 child: Container(
@@ -396,15 +403,20 @@ class ConnOverview extends StatelessWidget {
     }
     if (isOld) {
       generated = old
-          .map((e) => NodeAvatar(date: Utils.getTimeAgo(e.date!), user: e.user))
+          .map((e) => NodeAvatar(
+              rootnode: user, date: Utils.getTimeAgo(e.date!), user: e.user))
           .toList();
       generated.addAll(dummys!);
-      generated.insert(0, NodeAvatar(user: user, date: "this", isAction: true));
+      generated.insert(0,
+          NodeAvatar(rootnode: user, user: user, date: "this", isAction: true));
       generated.last.settings['hideDate'] = true;
     } else {
       generated = recent
           .map((e) => NodeAvatar(
-              date: Utils.getTimeAgo(e.date!), user: e.user, invert: true))
+              rootnode: user,
+              date: Utils.getTimeAgo(e.date!),
+              user: e.user,
+              invert: true))
           .toList();
       generated.insertAll(0, dummys!);
       generated.add(NodeAvatar(date: "this.add", invert: true, isAction: true));
@@ -527,7 +539,9 @@ class NodeAvatar extends StatelessWidget {
     this.invert = false,
     this.isDummy = false,
     this.isAction = false,
+    this.rootnode,
   });
+  final User? rootnode;
   final User? user;
   final String date;
   final bool invert;
@@ -549,7 +563,8 @@ class NodeAvatar extends StatelessWidget {
                 debugPrint(
                     "User: ${isDummy ? 'Dummy Node' : user != null ? user!.fname : 'No user'} | Action: $isAction");
                 if (user != null) {
-                  switchRouteByPush(context, ProfileScreen(id: user!.id!));
+                  switchRouteByPush(
+                      context, ProfileScreen(id: user!.id!, user: rootnode!));
                 }
               },
               child: Container(
