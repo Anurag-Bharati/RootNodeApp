@@ -1,3 +1,4 @@
+import 'package:rootnode/model/conn.dart';
 import 'package:rootnode/model/user.dart';
 
 class ConnResponse {
@@ -64,6 +65,25 @@ class Data {
             : List<Node>.from(json["recent"]!.map((x) => Node.fromJson(x))),
         limit: json["limit"],
         count: json["count"],
+      );
+}
+
+class MyConnsResponse {
+  MyConnsResponse(
+      {this.success, this.totalPages, this.currentPage, this.conns});
+  bool? success;
+  int? totalPages;
+  int? currentPage;
+  List<Connection>? conns;
+  factory MyConnsResponse.fromJson(Map<String, dynamic> json) =>
+      MyConnsResponse(
+        success: json["success"],
+        conns: json["data"] == null
+            ? []
+            : List<Connection>.from(
+                json["data"]!.map((x) => Connection.fromJson(x))),
+        totalPages: json["totalPages"],
+        currentPage: json["currentPage"],
       );
 }
 

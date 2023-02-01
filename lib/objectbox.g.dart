@@ -25,7 +25,7 @@ final _entities = <ModelEntity>[
   ModelEntity(
       id: const IdUid(1, 6138479246504221594),
       name: 'User',
-      lastPropertyId: const IdUid(20, 9041089780929871417),
+      lastPropertyId: const IdUid(21, 8948287723840119040),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
@@ -129,6 +129,11 @@ final _entities = <ModelEntity>[
             id: const IdUid(20, 9041089780929871417),
             name: 'usernameChangedAt',
             type: 10,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(21, 8948287723840119040),
+            name: 'connsCount',
+            type: 6,
             flags: 0)
       ],
       relations: <ModelRelation>[],
@@ -326,7 +331,7 @@ final _entities = <ModelEntity>[
   ModelEntity(
       id: const IdUid(6, 6696166484992312307),
       name: 'Connection',
-      lastPropertyId: const IdUid(5, 71323444867613403),
+      lastPropertyId: const IdUid(6, 8856298606838281125),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
@@ -341,19 +346,14 @@ final _entities = <ModelEntity>[
             flags: 2080,
             indexId: const IdUid(7, 5092965173393285103)),
         ModelProperty(
-            id: const IdUid(3, 7029449042520276148),
-            name: 'status',
-            type: 9,
-            flags: 0),
-        ModelProperty(
             id: const IdUid(4, 8798937388512365669),
             name: 'createdAt',
             type: 10,
             flags: 0),
         ModelProperty(
-            id: const IdUid(5, 71323444867613403),
-            name: 'updatedAt',
-            type: 10,
+            id: const IdUid(6, 8856298606838281125),
+            name: 'rootnode',
+            type: 9,
             flags: 0)
       ],
       relations: <ModelRelation>[],
@@ -403,7 +403,9 @@ ModelDefinition getObjectBoxModel() {
         5102395500943955716,
         7052601362960841130,
         8506438372257683967,
-        2603067226680828925
+        2603067226680828925,
+        7029449042520276148,
+        71323444867613403
       ],
       retiredRelationUids: const [403350268397340821],
       modelVersion: 5,
@@ -440,7 +442,7 @@ ModelDefinition getObjectBoxModel() {
               object.role == null ? null : fbb.writeString(object.role!);
           final statusOffset =
               object.status == null ? null : fbb.writeString(object.status!);
-          fbb.startTable(21);
+          fbb.startTable(22);
           fbb.addInt64(0, object.uid);
           fbb.addOffset(1, fnameOffset);
           fbb.addOffset(2, lnameOffset);
@@ -461,6 +463,7 @@ ModelDefinition getObjectBoxModel() {
           fbb.addInt64(17, object.createdAt?.millisecondsSinceEpoch);
           fbb.addInt64(18, object.updatedAt?.millisecondsSinceEpoch);
           fbb.addInt64(19, object.usernameChangedAt?.millisecondsSinceEpoch);
+          fbb.addInt64(20, object.connsCount);
           fbb.finish(fbb.endTable());
           return object.uid;
         },
@@ -494,6 +497,7 @@ ModelDefinition getObjectBoxModel() {
                   const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 22),
               storiesCount: const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 24),
               nodesCount: const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 26),
+              connsCount: const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 44),
               role: const fb.StringReader(asciiOptimization: true).vTableGetNullable(buffer, rootOffset, 28),
               status: const fb.StringReader(asciiOptimization: true).vTableGetNullable(buffer, rootOffset, 30),
               isVerified: const fb.BoolReader().vTableGetNullable(buffer, rootOffset, 32),
@@ -703,14 +707,14 @@ ModelDefinition getObjectBoxModel() {
         objectToFB: (Connection object, fb.Builder fbb) {
           final idOffset =
               object.id == null ? null : fbb.writeString(object.id!);
-          final statusOffset =
-              object.status == null ? null : fbb.writeString(object.status!);
-          fbb.startTable(6);
+          final rootnodeOffset = object.rootnode == null
+              ? null
+              : fbb.writeString(object.rootnode!);
+          fbb.startTable(7);
           fbb.addInt64(0, object.cid);
           fbb.addOffset(1, idOffset);
-          fbb.addOffset(2, statusOffset);
           fbb.addInt64(3, object.createdAt?.millisecondsSinceEpoch);
-          fbb.addInt64(4, object.updatedAt?.millisecondsSinceEpoch);
+          fbb.addOffset(5, rootnodeOffset);
           fbb.finish(fbb.endTable());
           return object.cid;
         },
@@ -719,19 +723,14 @@ ModelDefinition getObjectBoxModel() {
           final rootOffset = buffer.derefObject(0);
           final createdAtValue =
               const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 10);
-          final updatedAtValue =
-              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 12);
           final object = Connection(
               id: const fb.StringReader(asciiOptimization: true)
                   .vTableGetNullable(buffer, rootOffset, 6),
-              status: const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 8),
+              rootnode: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 14),
               createdAt: createdAtValue == null
                   ? null
                   : DateTime.fromMillisecondsSinceEpoch(createdAtValue),
-              updatedAt: updatedAtValue == null
-                  ? null
-                  : DateTime.fromMillisecondsSinceEpoch(updatedAtValue),
               cid: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
 
           return object;
@@ -812,6 +811,10 @@ class User_ {
   /// see [User.usernameChangedAt]
   static final usernameChangedAt =
       QueryIntegerProperty<User>(_entities[0].properties[19]);
+
+  /// see [User.connsCount]
+  static final connsCount =
+      QueryIntegerProperty<User>(_entities[0].properties[20]);
 }
 
 /// [Post] entity fields to define ObjectBox queries.
@@ -948,15 +951,11 @@ class Connection_ {
   /// see [Connection.id]
   static final id = QueryStringProperty<Connection>(_entities[4].properties[1]);
 
-  /// see [Connection.status]
-  static final status =
-      QueryStringProperty<Connection>(_entities[4].properties[2]);
-
   /// see [Connection.createdAt]
   static final createdAt =
-      QueryIntegerProperty<Connection>(_entities[4].properties[3]);
+      QueryIntegerProperty<Connection>(_entities[4].properties[2]);
 
-  /// see [Connection.updatedAt]
-  static final updatedAt =
-      QueryIntegerProperty<Connection>(_entities[4].properties[4]);
+  /// see [Connection.rootnode]
+  static final rootnode =
+      QueryStringProperty<Connection>(_entities[4].properties[3]);
 }
