@@ -25,7 +25,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  bool navVisible = true;
   @override
   void initState() {
     super.initState();
@@ -109,12 +108,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const MessengerScreen(),
         const EventScreen(),
       ]),
-      bottomNavigationBar: AnimatedContainer(
-        duration: const Duration(milliseconds: 600),
+      bottomNavigationBar: Container(
         margin: _getWidth(context) > triggerResponsiveNav
             ? const EdgeInsets.symmetric(horizontal: 180, vertical: 30)
             : EdgeInsets.zero,
-        height: navVisible ? kBottomNavigationBarHeight + 8 : 0,
+        height: kBottomNavigationBarHeight + 8,
         padding: _getWidth(context) > triggerResponsiveNav
             ? const EdgeInsets.symmetric(horizontal: 10, vertical: 0)
             : EdgeInsets.zero,

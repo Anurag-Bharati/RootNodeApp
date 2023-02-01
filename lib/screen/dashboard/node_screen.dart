@@ -21,60 +21,36 @@ class NodeScreen extends StatefulWidget {
 
 class _NodeScreenState extends State<NodeScreen> {
   final _connRepo = ConnRepoImpl();
-  final _scrollController = ScrollController();
-  final _recomScrollController = ScrollController();
-  final _randomScrollController = ScrollController();
+  late final ScrollController _scrollController;
+  late final ScrollController _recomScrollController;
+  late final ScrollController _randomScrollController;
 
   final List<User> recom = [];
-  final List<User> random = [];
   int recomCurrentPage = 1;
   int recomTotalPage = 1;
+
+  final List<User> random = [];
   int randomCurrentPage = 1;
   int randomTotalPage = 1;
 
-  late ConnOverviewResponse? overview;
-  List<Node> recent = [];
-  List<Node> old = [];
-  int count = 0;
+  List<Node>? recent;
+  List<Node>? old;
+  late int count;
+  late int limit;
 
-  _getOverview() async {
-    overview = await _connRepo.getOldRecentConns();
-    recent.clear();
-    old.clear();
-    int index = overview!.data!.recent!.length > 2 ? 0 : -1;
-    recent.addAll(overview!.data!.recent!.map((e) {
-      index++;
-      return Node(
-        index: index,
-        date: Utils.getTimeAgo(e.date!),
-        invert: true,
-        uri: e.user!.avatar ??
-            "https://icon-library.com/images/anonymous-user-icon/anonymous-user-icon-2.jpg",
-      );
-    }).toList());
-    recent.add(const Node(date: 'this.add', invert: true, index: 3));
-    index = 1;
-    old.add(
-      Node(
-        uri: widget.user.avatar,
-        date: 'this',
-        index: 0,
-      ),
-    );
-    old.addAll(overview!.data!.old!.map((e) {
-      index++;
-      return Node(
-        index: index,
-        date: Utils.getTimeAgo(e.date!),
-        uri: e.user!.avatar ??
-            "https://icon-library.com/images/anonymous-user-icon/anonymous-user-icon-2.jpg",
-      );
-    }).toList());
-
-    count = overview!.data!.count ?? 0;
+  void _getOverview() async {
+    ConnOverviewResponse? overview = await _connRepo.getOldRecentConns();
+    if (overview == null || overview.data == null) return;
+    recent = overview.data!.recent ?? [];
+    old = overview.data!.old ?? [];
+    count = overview.data!.count ?? 0;
+    limit = overview.data!.limit ?? 0;
+    if (mounted) {
+      setState(() {});
+    }
   }
 
-  _initRandom() async {
+  void _initRandom() async {
     random.clear();
     randomCurrentPage = 1;
     final randomResponse =
@@ -86,7 +62,7 @@ class _NodeScreenState extends State<NodeScreen> {
     }
   }
 
-  _initRecom() async {
+  void _initRecom() async {
     recom.clear();
     recomCurrentPage = 1;
     final recomResponse =
@@ -99,7 +75,7 @@ class _NodeScreenState extends State<NodeScreen> {
     }
   }
 
-  _fetchMoreRecom() async {
+  void _fetchMoreRecom() async {
     if (recomCurrentPage >= recomTotalPage) return;
     final recomResponse =
         await _connRepo.getRecommendedConns(page: recomCurrentPage);
@@ -112,7 +88,7 @@ class _NodeScreenState extends State<NodeScreen> {
     }
   }
 
-  _fetchMoreRandom() async {
+  void _fetchMoreRandom() async {
     if (randomCurrentPage >= randomTotalPage) return;
     final randomResponse =
         await _connRepo.getRecommendedConns(page: randomCurrentPage);
@@ -125,15 +101,40 @@ class _NodeScreenState extends State<NodeScreen> {
     }
   }
 
-  _getRecomAndRandom() async {
+  void _getRecomAndRandom() async {
     _initRandom();
     _initRecom();
     if (random.isNotEmpty || recom.isNotEmpty) setState(() {});
   }
 
   @override
+  void didUpdateWidget(covariant NodeScreen oldWidget) {
+    if (mounted) {
+      _getOverview();
+      setState(() {});
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void initState() {
+    _getOverview();
     _getRecomAndRandom();
+    _scrollController = ScrollController();
+    _randomScrollController = ScrollController()
+      ..addListener(() {
+        if (_randomScrollController.position.maxScrollExtent ==
+            _randomScrollController.offset) {
+          _fetchMoreRandom();
+        }
+      });
+    _recomScrollController = ScrollController()
+      ..addListener(() {
+        if (_recomScrollController.position.maxScrollExtent ==
+            _recomScrollController.offset) {
+          _fetchMoreRecom();
+        }
+      });
     super.initState();
   }
 
@@ -142,14 +143,11 @@ class _NodeScreenState extends State<NodeScreen> {
     _scrollController.dispose();
     _randomScrollController.dispose();
     _recomScrollController.dispose();
-    random.clear();
-    recom.clear();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _getOverview();
     return CustomScrollView(
       controller: _scrollController,
       slivers: [
@@ -159,7 +157,21 @@ class _NodeScreenState extends State<NodeScreen> {
         SliverToBoxAdapter(
           child: ConstrainedSliverWidth(
             maxWidth: 720,
-            child: ConnOverview(old: old, count: count, recent: recent),
+            child: old != null && recent != null
+                ? ConnOverview(
+                    user: widget.user,
+                    old: old!,
+                    count: count,
+                    recent: recent!,
+                    limit: limit)
+                : Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      height: 64,
+                      width: 64,
+                      child: const CircularProgressIndicator(),
+                    ),
+                  ),
           ),
         ),
         SliverToBoxAdapter(
@@ -182,7 +194,6 @@ class _NodeScreenState extends State<NodeScreen> {
               scrollController: _recomScrollController,
               type: NewConnectionListType.recommended,
               title: "Recommended Nodes",
-              widget: widget,
             ),
           ),
         ),
@@ -194,7 +205,6 @@ class _NodeScreenState extends State<NodeScreen> {
               scrollController: _randomScrollController,
               type: NewConnectionListType.random,
               title: "Random Nodes",
-              widget: widget,
             ),
           ),
         ),
@@ -209,14 +219,12 @@ class NewConnectionList extends StatelessWidget {
   const NewConnectionList({
     super.key,
     required ScrollController scrollController,
-    required this.widget,
     required this.title,
     required this.type,
     required this.users,
   }) : _scrollController = scrollController;
 
   final ScrollController _scrollController;
-  final NodeScreen widget;
   final String title;
   final NewConnectionListType type;
   final List<User> users;
@@ -278,7 +286,7 @@ class NewConnectionList extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          "Not many ${type == NewConnectionListType.recommended ? 'nodes to recommend' : 'random nodes to show'} at the time. \nTry adding some ${type == NewConnectionListType.random ? 'recommend' : 'random'} nodes.",
+                          "Not many nodes to show at the time. \nTry adding some ${type == NewConnectionListType.random ? 'recommend' : 'random'} nodes.",
                           textAlign: TextAlign.center,
                           style: RootNodeFontStyle.caption,
                         )
@@ -291,22 +299,6 @@ class NewConnectionList extends StatelessWidget {
     );
   }
 
-  Widget _oldCard() => Container(
-        clipBehavior: Clip.antiAlias,
-        margin: const EdgeInsets.all(10),
-        alignment: Alignment.bottomCenter,
-        width: 110,
-        decoration: BoxDecoration(
-            color: Colors.cyan,
-            image: DecorationImage(
-              image: CachedNetworkImageProvider(widget.user.avatar!),
-              fit: BoxFit.cover,
-            ),
-            border: Border.all(color: const Color(0xFFCCCCCC), width: 2),
-            borderRadius: BorderRadius.circular(20)),
-        child: Text("this", style: RootNodeFontStyle.caption),
-      );
-
   Widget _card(User user) => Padding(
         padding: const EdgeInsets.all(8.0),
         child: Stack(
@@ -318,8 +310,12 @@ class NewConnectionList extends StatelessWidget {
                 width: 110.0,
                 color: Colors.transparent,
                 child: CachedNetworkImage(
-                  imageUrl: user.avatar!,
+                  imageUrl: "${ApiConstants.baseUrl}/${user.avatar!}",
                   fit: BoxFit.cover,
+                  errorWidget: (context, url, error) => const MediaError(
+                    icon: Icons.broken_image,
+                    minimal: true,
+                  ),
                 ),
               ),
             ),
@@ -379,11 +375,52 @@ class ConnOverview extends StatelessWidget {
     required this.old,
     required this.count,
     required this.recent,
+    required this.limit,
+    required this.user,
   });
-
+  final User user;
+  final List<Node> recent;
   final List<Node> old;
   final int count;
-  final List<Node> recent;
+  final int limit;
+
+  List<Widget> _generateNodeAvatar(
+      {required List<Node> nodes, bool isOld = true}) {
+    List<NodeAvatar>? dummys, generated;
+    int length = nodes.length;
+    int dummyCount = limit - length;
+    if (dummyCount > 0) {
+      dummys = _generateDummyAvatar(count: dummyCount, isOld: isOld);
+    }
+    if (isOld) {
+      generated = old
+          .map((e) => NodeAvatar(date: Utils.getTimeAgo(e.date!), user: e.user))
+          .toList();
+      generated.addAll(dummys!);
+      generated.insert(0, NodeAvatar(user: user, date: "this", isAction: true));
+      generated.last.settings['hideDate'] = true;
+    } else {
+      generated = recent
+          .map((e) => NodeAvatar(
+              date: Utils.getTimeAgo(e.date!), user: e.user, invert: true))
+          .toList();
+      generated.insertAll(0, dummys!);
+      generated.add(NodeAvatar(date: "this.add", invert: true, isAction: true));
+      generated.first.settings['hideDate'] = true;
+    }
+    return generated;
+  }
+
+  List<NodeAvatar> _generateDummyAvatar(
+      {required int count, required bool isOld}) {
+    return List<NodeAvatar>.generate(
+        count,
+        (index) => NodeAvatar(
+              invert: !isOld,
+              isDummy: true,
+              date: "?",
+            ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -426,15 +463,8 @@ class ConnOverview extends StatelessWidget {
                         ),
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: old.isEmpty
-                            ? [
-                                const Node(uri: null, date: 'N/A', index: 1),
-                                const Node(uri: null, date: 'N/A', index: 2),
-                                const Node(uri: null, date: 'N/A', index: 3),
-                              ]
-                            : old,
-                      ),
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: _generateNodeAvatar(nodes: old)),
                     ],
                   ),
                 ),
@@ -442,7 +472,7 @@ class ConnOverview extends StatelessWidget {
                   padding: const EdgeInsets.all(5),
                   child: GestureDetector(
                     onTap: () {
-                      debugPrint("Mynodes");
+                      debugPrint("MyNodes");
                     },
                     child: AvatarGlow(
                       endRadius: 35,
@@ -472,15 +502,9 @@ class ConnOverview extends StatelessWidget {
                         ),
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: recent.isEmpty
-                            ? const [
-                                Node(date: 'test', invert: true, index: 0),
-                                Node(date: 'test', invert: true, index: 1),
-                                Node(date: 'test', invert: true, index: 2),
-                              ]
-                            : recent,
-                      ),
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children:
+                              _generateNodeAvatar(nodes: recent, isOld: false)),
                     ],
                   ),
                 ),
@@ -493,18 +517,21 @@ class ConnOverview extends StatelessWidget {
   }
 }
 
-class Node extends StatelessWidget {
-  const Node({
+class NodeAvatar extends StatelessWidget {
+  NodeAvatar({
     super.key,
-    this.uri,
+    this.user,
     required this.date,
     this.invert = false,
-    required this.index,
+    this.isDummy = false,
+    this.isAction = false,
   });
-  final int index;
-  final String? uri;
+  final User? user;
   final String date;
   final bool invert;
+  final bool isDummy;
+  final bool isAction;
+  final Map<String, bool> settings = {"hideDate": false};
 
   @override
   Widget build(BuildContext context) {
@@ -516,7 +543,8 @@ class Node extends StatelessWidget {
             padding:
                 EdgeInsets.only(bottom: !invert ? 20 : 0, top: invert ? 20 : 0),
             child: GestureDetector(
-              onTap: () => debugPrint(index.toString()),
+              onTap: () => debugPrint(
+                  "User: ${isDummy ? 'Dummy Node' : user != null ? user!.fname : 'No user'} | Action: $isAction"),
               child: Container(
                 padding: const EdgeInsets.all(3),
                 height: 56,
@@ -524,19 +552,17 @@ class Node extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: date == 'this.add' || !invert && index == 0
-                      ? Colors.cyan[400]
-                      : const Color(0xFFCCCCCC),
+                  color: isAction ? Colors.cyan[400] : const Color(0xFFCCCCCC),
                 ),
                 child: CircleAvatar(
                   maxRadius: 30,
                   backgroundColor: const Color(0xFFCCCCCC),
-                  foregroundImage: uri != null
+                  foregroundImage: user != null
                       ? CachedNetworkImageProvider(
-                          "${ApiConstants.baseUrl}/$uri",
+                          "${ApiConstants.baseUrl}/${user!.avatar}",
                           maxHeight: 256,
                           maxWidth: 256,
-                          cacheKey: uri,
+                          cacheKey: user!.id,
                         )
                       : null,
                   child: date == "this.add"
@@ -545,7 +571,7 @@ class Node extends StatelessWidget {
                           size: 30,
                           color: Color(0xFF111111),
                         )
-                      : uri == null
+                      : user == null
                           ? const Icon(Boxicons.bx_question_mark,
                               size: 30, color: Color(0x22111111))
                           : null,
@@ -553,8 +579,9 @@ class Node extends StatelessWidget {
               ),
             ),
           ),
-          (index != 0 && invert) || (index != 3 && !invert)
-              ? Positioned(
+          settings['hideDate']!
+              ? const SizedBox.shrink()
+              : Positioned(
                   top: invert ? 0 : null,
                   bottom: !invert ? 0 : null,
                   left: 0,
@@ -569,7 +596,6 @@ class Node extends StatelessWidget {
                     ),
                   ),
                 )
-              : const SizedBox.shrink()
         ],
       ),
     );

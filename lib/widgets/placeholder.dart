@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
 
 class MediaError extends StatelessWidget {
-  const MediaError({
-    super.key,
-    required this.icon,
-  });
+  const MediaError({super.key, required this.icon, this.minimal = false});
 
   final IconData icon;
+  final bool minimal;
 
   @override
   Widget build(BuildContext context) {
@@ -19,13 +17,16 @@ class MediaError extends StatelessWidget {
         height: double.infinity,
         width: double.infinity,
         child: Center(
-          child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              direction: Axis.vertical,
-              children: [
-                Icon(icon, size: 30, color: Colors.red[300]),
-                Text("Something went wrong!", style: RootNodeFontStyle.body),
-              ]),
+          child: minimal
+              ? Icon(icon, size: 30, color: Colors.red[300])
+              : Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  direction: Axis.vertical,
+                  children: [
+                      Icon(icon, size: 30, color: Colors.red[300]),
+                      Text("Something went wrong!",
+                          style: RootNodeFontStyle.body),
+                    ]),
         ),
       ),
     );

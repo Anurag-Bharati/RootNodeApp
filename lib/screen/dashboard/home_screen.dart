@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_post.dart';
 import 'package:rootnode/helper/responsive_helper.dart';
@@ -27,7 +26,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final _postRepo = PostRepoImpl();
   late final ScrollController _scrollController;
   late final TabController _tabController;
-  bool navHidden = false;
   bool privateFeed = false;
   bool postScopeDisabled = false;
 
@@ -107,16 +105,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _tabController = TabController(length: 2, vsync: this);
     _getInitialData();
     _scrollController.addListener(() {
-      if (_scrollController.position.userScrollDirection ==
-          ScrollDirection.forward) {
-        if (navHidden) {
-          navHidden = false;
-        }
-      } else {
-        if (!navHidden) {
-          navHidden = true;
-        }
-      }
       if (_scrollController.position.maxScrollExtent ==
           _scrollController.offset) {
         _fetchMoreData();
@@ -158,8 +146,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         controller: _scrollController,
         slivers: [
           SliverToBoxAdapter(
-              child: ConstrainedSliverWidth(
-                  maxWidth: maxContentWidth, child: const DummySearchField())),
+            child: ConstrainedSliverWidth(
+              maxWidth: maxContentWidth,
+              child: const DummySearchField(),
+            ),
+          ),
           SliverToBoxAdapter(
             child: ConstrainedSliverWidth(
               maxWidth: maxContentWidth,
