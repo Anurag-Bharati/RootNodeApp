@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:timeago/timeago.dart' as timeago;
 // ignore: depend_on_referenced_packages
 import 'package:http_parser/http_parser.dart';
+import 'package:intl/intl.dart';
 
 class Utils {
   static String getTimeAgo(DateTime dt) {
@@ -11,6 +12,11 @@ class Utils {
     int min = diff.inMinutes;
     return timeago.format(DateTime.now().subtract(Duration(minutes: min)),
         locale: 'en_short');
+  }
+
+  static String humanizeNumber(int i) {
+    if (i < 1000) return i.toString();
+    return NumberFormat.compact(locale: "en_US").format(i);
   }
 
   static double getHeight(

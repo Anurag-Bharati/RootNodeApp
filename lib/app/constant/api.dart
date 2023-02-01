@@ -1,6 +1,6 @@
 class ApiConstants {
   // static const String baseUrl = 'http://10.0.2.2:3000';
-  static const String baseUrl = 'http://192.168.1.71:3000';
+  static const String baseUrl = 'http://4d31-111-119-49-174.ngrok.io';
   static const String apiUrl = "/api/v0";
   static const String staticUrl = "/public/media/uploads/all/";
 

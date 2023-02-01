@@ -6,9 +6,11 @@ import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_conn.dart';
 import 'package:rootnode/helper/responsive_helper.dart';
+import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
+import 'package:rootnode/screen/misc/view_profile.dart';
 import 'package:rootnode/widgets/placeholder.dart';
 import 'package:string_extensions/string_extensions.dart';
 
@@ -543,8 +545,13 @@ class NodeAvatar extends StatelessWidget {
             padding:
                 EdgeInsets.only(bottom: !invert ? 20 : 0, top: invert ? 20 : 0),
             child: GestureDetector(
-              onTap: () => debugPrint(
-                  "User: ${isDummy ? 'Dummy Node' : user != null ? user!.fname : 'No user'} | Action: $isAction"),
+              onTap: () {
+                debugPrint(
+                    "User: ${isDummy ? 'Dummy Node' : user != null ? user!.fname : 'No user'} | Action: $isAction");
+                if (user != null) {
+                  switchRouteByPush(context, ProfileScreen(id: user!.id!));
+                }
+              },
               child: Container(
                 padding: const EdgeInsets.all(3),
                 height: 56,
