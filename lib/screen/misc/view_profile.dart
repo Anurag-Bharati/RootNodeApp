@@ -1,12 +1,7 @@
-import 'package:avatar_glow/avatar_glow.dart';
 import 'package:boxicons/boxicons.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
-import 'package:rootnode/helper/responsive_helper.dart';
-import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
@@ -14,8 +9,8 @@ import 'package:rootnode/repository/story_repo.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/widgets/buttons.dart';
 import 'package:rootnode/widgets/placeholder.dart';
+import 'package:rootnode/widgets/profile_card.dart';
 import 'package:rootnode/widgets/stories.dart';
-import 'package:string_extensions/string_extensions.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, required this.id, required this.user});
@@ -98,270 +93,140 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Back",
-          style: RootNodeFontStyle.header,
-        ),
-        backgroundColor: Colors.pink,
-        leadingWidth: 40,
-        leading: IconButton(
-          icon: const Icon(
-            Boxicons.bx_chevron_left,
-            color: Colors.white70,
-            size: 40,
-          ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: const Color(0xFF111111),
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Container(
-                height: 300,
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: const Color(0xFF111111),
+      child: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            stretchTriggerOffset: 10,
+            stretch: true,
+            pinned: true,
+            leadingWidth: 40,
+            expandedHeight: 350 + 124,
+            collapsedHeight: 180,
+            backgroundColor: const Color(0xFF111111),
+            title: Text("Back", style: RootNodeFontStyle.header),
+            flexibleSpace: FlexibleSpaceBar(
+              expandedTitleScale: 1,
+              titlePadding: EdgeInsets.zero,
+              title: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF111111),
+                    Color(0xFF111111),
+                    Color(0x55111111),
+                    Colors.transparent,
+                  ],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                )),
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.pink,
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.pink,
-                      Colors.pink,
-                      Colors.pink.withAlpha(100),
-                      Colors.transparent,
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Wrap(
-                    direction: Axis.vertical,
-                    alignment: WrapAlignment.start,
-                    runAlignment: WrapAlignment.spaceEvenly,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: [
-                      Stack(
-                        children: [
-                          user != null
-                              ? CircleAvatar(
-                                  maxRadius: 48,
-                                  backgroundColor: Colors.white10,
-                                  foregroundImage: CachedNetworkImageProvider(
-                                    "${ApiConstants.baseUrl}/${user!.avatar!}",
-                                    maxHeight: 256,
-                                    maxWidth: 256,
-                                    cacheKey: user!.avatar,
-                                  ),
-                                )
-                              : const AvatarGlow(
-                                  endRadius: 48,
-                                  glowColor: Colors.white10,
-                                  child: SizedBox.shrink(),
-                                ),
-                          user != null
-                              ? Positioned(
-                                  right: 0,
-                                  bottom: 5,
-                                  child: user!.isVerified!
-                                      ? const Icon(Boxicons.bxs_check_circle,
-                                          size: 20, color: Colors.green)
-                                      : const Icon(Boxicons.bxs_error_circle,
-                                          size: 20, color: Colors.amber),
-                                )
-                              : const SizedBox.shrink()
-                        ],
+                height: 124 + 10,
+                child: noStory
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: const MediaEmpty(
+                            icon: Icons.error, message: "No story posted"),
+                      )
+                    : ListView.builder(
+                        controller: _scrollController,
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 0, vertical: 10.0),
+                        itemCount: _stories.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: StoryCard(
+                                disableBorder: true,
+                                hideName: true,
+                                stories: _stories,
+                                index: index + 1,
+                                color: Color(_stories[index].color!),
+                                story: _stories[index]),
+                          );
+                        },
                       ),
-                      user != null
-                          ? Wrap(
-                              direction: Axis.vertical,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: -2,
-                              children: [
-                                Text(
-                                  "${user!.fname} ${user!.lname!}".toTitleCase!,
-                                  style: RootNodeFontStyle.header,
-                                ),
-                                Text(
-                                  "@${user!.username}",
-                                  style: RootNodeFontStyle.caption,
-                                ),
-                              ],
-                            )
-                          : _getNamePlaceholder(),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        alignment: WrapAlignment.spaceEvenly,
-                        spacing: 40,
-                        children: [
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            runSpacing: 5,
-                            spacing: -10,
-                            direction: Axis.vertical,
-                            children: [
-                              user != null
-                                  ? Text(
-                                      Utils.humanizeNumber(user!.postsCount!),
-                                      style: RootNodeFontStyle.title)
-                                  : _getCountPlaceHolder(),
-                              Text("POSTS", style: RootNodeFontStyle.label),
-                            ],
-                          ),
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            runSpacing: 5,
-                            spacing: -10,
-                            direction: Axis.vertical,
-                            children: [
-                              user != null
-                                  ? Text(
-                                      Utils.humanizeNumber(user!.storiesCount!),
-                                      style: RootNodeFontStyle.title)
-                                  : _getCountPlaceHolder(),
-                              Text("STORYS", style: RootNodeFontStyle.label),
-                            ],
-                          ),
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            runSpacing: 5,
-                            spacing: -10,
-                            direction: Axis.vertical,
-                            children: [
-                              user != null
-                                  ? Text(
-                                      Utils.humanizeNumber(user!.nodesCount!),
-                                      style: RootNodeFontStyle.title)
-                                  : _getCountPlaceHolder(),
-                              Text("NODES", style: RootNodeFontStyle.label),
-                            ],
-                          )
-                        ],
+              ),
+              collapseMode: CollapseMode.parallax,
+              stretchModes: const [StretchMode.zoomBackground],
+              background: ProfileCard(
+                actions: _actionButtons(),
+                hasConn: hasConn,
+                id: widget.id,
+                user: user,
+              ),
+              centerTitle: true,
+            ),
+            leading: IconButton(
+              icon: const Icon(Boxicons.bx_chevron_left,
+                  color: Colors.white70, size: 40),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+                (context, index) => Container(
+                      margin: EdgeInsets.only(
+                        bottom: 5,
+                        top: index == 0 ? 5 : 0,
+                        left: 10,
+                        right: 10,
                       ),
-                      user != null
-                          ? Wrap(
-                              spacing: 10,
-                              runAlignment: WrapAlignment.center,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              alignment: WrapAlignment.spaceEvenly,
-                              runSpacing: 10,
-                              children: [
-                                RootNodeOutlinedButton(
-                                  onPressed: () =>
-                                      debugPrint("Share Button Pressed!"),
-                                  child: Text("Share",
-                                      style: RootNodeFontStyle.body),
-                                ),
-                                RootNodeOutlinedButton(
-                                  onPressed: () =>
-                                      debugPrint('Message Button Pressed!'),
-                                  child: const Icon(
-                                      Boxicons.bxs_message_square_dots,
-                                      color: Colors.white54),
-                                ),
-                                RootNodeOutlinedButton(
-                                  onPressed: () async {
-                                    if (widget.user.id == user!.id!) {
-                                      debugPrint("Edit Button Pressed!");
-                                    } else {
-                                      bool? res = await _connRepo
-                                          .toggleConnection(id: widget.id);
-                                      if (res != null) {
-                                        setState(() {
-                                          hasConn = res;
-                                        });
-                                      }
-                                      debugPrint("Follow Button Pressed!");
-                                    }
-                                  },
-                                  child: hasConn != null
-                                      ? Text(
-                                          widget.user.id != user!.id
-                                              ? hasConn!
-                                                  ? "Unfollow"
-                                                  : "Follow"
-                                              : "Edit",
-                                          style: RootNodeFontStyle.body)
-                                      : const SizedBox.shrink(),
-                                ),
-                              ],
-                            )
-                          : _getNamePlaceholder()
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: ConstrainedSliverWidth(
-                maxWidth: maxContentWidth,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 124.0,
-                    child: noStory
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: const MediaEmpty(
-                                icon: Icons.error, message: "No story posted"),
-                          )
-                        : ListView.builder(
-                            controller: _scrollController,
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 0, vertical: 10.0),
-                            itemCount: _stories.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4.0),
-                                child: StoryCard(
-                                    hideName: true,
-                                    stories: _stories,
-                                    index: index + 1,
-                                    color: Color(_stories[index].color!),
-                                    story: _stories[index]),
-                              );
-                            },
-                          ),
-                  ),
-                ),
-              ),
-            ),
-            SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) => null))
-          ],
-        ),
+                      height: 300,
+                      decoration: BoxDecoration(
+                        color: Colors.white10,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                childCount: 10),
+          )
+        ],
       ),
     );
   }
 
-  Container _getCountPlaceHolder() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      height: 20,
-      width: 48,
-      decoration: BoxDecoration(
-          color: Colors.white24, borderRadius: BorderRadius.circular(10)),
-    );
+  _toggleFollow() async {
+    bool? res = await _connRepo.toggleConnection(id: widget.id);
+    if (res != null) {
+      setState(() {
+        hasConn = res;
+      });
+    }
   }
 
-  Container _getNamePlaceholder() {
-    return Container(
-      height: 48,
-      width: 200,
-      decoration: BoxDecoration(
-          color: Colors.white24, borderRadius: BorderRadius.circular(10)),
-    );
+  List<RootNodeOutlinedButton> _actionButtons() {
+    return [
+      RootNodeOutlinedButton(
+        onPressed: () => debugPrint("Share Button Pressed!"),
+        child: Text("Share", style: RootNodeFontStyle.body),
+      ),
+      RootNodeOutlinedButton(
+        onPressed: () => debugPrint('Message Button Pressed!'),
+        child:
+            const Icon(Boxicons.bxs_message_square_dots, color: Colors.white54),
+      ),
+      RootNodeOutlinedButton(
+        onPressed: () async {
+          if (widget.id == widget.user.id!) {
+            debugPrint("Edit Button Pressed!");
+          } else {
+            _toggleFollow();
+            debugPrint("Follow Button Pressed!");
+          }
+        },
+        child: hasConn != null
+            ? widget.id != widget.user.id
+                ? Text(hasConn! ? "Unfollow" : "Follow",
+                    style: RootNodeFontStyle.body)
+                : Text("Edit", style: RootNodeFontStyle.body)
+            : const SizedBox.shrink(),
+      ),
+    ];
   }
 }

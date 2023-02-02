@@ -127,6 +127,7 @@ class StoryCard extends StatelessWidget {
   final Color color;
   final int index;
   final bool hideName;
+  final bool disableBorder;
   const StoryCard({
     Key? key,
     this.isAddStory = false,
@@ -135,6 +136,7 @@ class StoryCard extends StatelessWidget {
     required this.index,
     required this.stories,
     this.hideName = false,
+    this.disableBorder = false,
   }) : super(key: key);
 
   @override
@@ -176,7 +178,7 @@ class StoryCard extends StatelessWidget {
                         ),
         ),
         Positioned(
-          bottom: 0,
+          bottom: -1,
           left: 0,
           right: 0,
           child: Container(
@@ -199,10 +201,12 @@ class StoryCard extends StatelessWidget {
             width: 110.0,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(
-                  color: const Color(0xFF111111),
-                  width: 1.0,
-                  strokeAlign: BorderSide.strokeAlignOutside),
+              border: disableBorder
+                  ? null
+                  : Border.all(
+                      color: const Color(0xFF111111),
+                      width: 1.0,
+                      strokeAlign: BorderSide.strokeAlignOutside),
               gradient: const LinearGradient(
                 colors: [
                   Color(0xFF111111),

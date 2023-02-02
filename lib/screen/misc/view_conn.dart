@@ -2,10 +2,12 @@ import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_conn.dart';
+import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/conn.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
+import 'package:rootnode/screen/misc/view_profile.dart';
 import 'package:rootnode/widgets/placeholder.dart';
 import 'package:rootnode/widgets/user_card.dart';
 
@@ -108,27 +110,35 @@ class _ViewConnScreenState extends State<ViewConnScreen> {
           SliverList(
             delegate: conns.isNotEmpty
                 ? SliverChildBuilderDelegate(
-                    (context, index) => Container(
-                          height: 80,
-                          color: Colors.white10,
-                          padding: const EdgeInsets.all(10),
-                          margin: EdgeInsets.only(
-                              bottom: 5, top: index == 0 ? 5 : 0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              UserCard(user: conns[index].node!),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 2, horizontal: 10),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.black12),
-                                child: Text(
-                                    "${Utils.getTimeAgo(conns[index].createdAt!)} ago",
-                                    style: RootNodeFontStyle.label),
-                              )
-                            ],
+                    (context, index) => GestureDetector(
+                          onTap: () => switchRouteByPush(
+                              context,
+                              ProfileScreen(
+                                  id: conns[index].node!.id!,
+                                  user: widget.user)),
+                          child: Container(
+                            height: 80,
+                            color: Colors.white10,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            margin: EdgeInsets.only(
+                                bottom: 5, top: index == 0 ? 5 : 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                UserCard(user: conns[index].node!),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 2, horizontal: 10),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.black12),
+                                  child: Text(
+                                      "${Utils.getTimeAgo(conns[index].createdAt!)} ago",
+                                      style: RootNodeFontStyle.label),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                     childCount: conns.length)
