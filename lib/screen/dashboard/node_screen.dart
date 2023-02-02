@@ -10,6 +10,7 @@ import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
+import 'package:rootnode/screen/misc/view_conn.dart';
 import 'package:rootnode/screen/misc/view_profile.dart';
 import 'package:rootnode/widgets/placeholder.dart';
 import 'package:string_extensions/string_extensions.dart';
@@ -406,7 +407,7 @@ class ConnOverview extends StatelessWidget {
           .map((e) => NodeAvatar(
               rootnode: user, date: Utils.getTimeAgo(e.date!), user: e.user))
           .toList();
-      generated.addAll(dummys!);
+      generated.addAll(dummys ?? []);
       generated.insert(0,
           NodeAvatar(rootnode: user, user: user, date: "this", isAction: true));
       generated.last.settings['hideDate'] = true;
@@ -418,7 +419,7 @@ class ConnOverview extends StatelessWidget {
               user: e.user,
               invert: true))
           .toList();
-      generated.insertAll(0, dummys!);
+      generated.insertAll(0, dummys ?? []);
       generated.add(NodeAvatar(date: "this.add", invert: true, isAction: true));
       generated.first.settings['hideDate'] = true;
     }
@@ -487,6 +488,7 @@ class ConnOverview extends StatelessWidget {
                   child: GestureDetector(
                     onTap: () {
                       debugPrint("MyNodes");
+                      switchRouteByPush(context, ViewConnScreen(user: user));
                     },
                     child: AvatarGlow(
                       endRadius: 35,

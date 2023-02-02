@@ -9,6 +9,7 @@ import 'package:rootnode/helper/responsive_helper.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user.dart';
+import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/repository/story_repo.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/widgets/buttons.dart';
@@ -28,6 +29,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final _userRepo = UserRepoImpl();
   final _storyRepo = StoryRepoImpl();
+  final _connRepo = ConnRepoImpl();
   User? user;
   double maxContentWidth = 720;
 
@@ -37,10 +39,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final List<Story> _stories = [];
   int storyPage = 1;
-  bool storyHidden = false;
 
   bool noPost = false;
   bool noStory = false;
+
+  bool? hasConn;
+
+  _fetchFollowData() async {
+    hasConn = await _connRepo.hasConnection(id: widget.id);
+    if (mounted) setState(() {});
+  }
 
   _fetchUser() async {
     user = await _userRepo.getUserById(widget.id);
@@ -69,6 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
+    _fetchFollowData();
     _fetchUser();
     _scrollController = ScrollController();
     _scrollController.addListener(() {
@@ -104,9 +113,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             size: 40,
           ),
           onPressed: () {
-            setState(() {
-              storyHidden = true;
-            });
             Navigator.of(context).pop();
           },
         ),
@@ -263,18 +269,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       color: Colors.white54),
                                 ),
                                 RootNodeOutlinedButton(
-                                  onPressed: () {
-                                    if (widget.user.id != user!.id!) {
+                                  onPressed: () async {
+                                    if (widget.user.id == user!.id!) {
                                       debugPrint("Edit Button Pressed!");
                                     } else {
+                                      bool? res = await _connRepo
+                                          .toggleConnection(id: widget.id);
+                                      if (res != null) {
+                                        setState(() {
+                                          hasConn = res;
+                                        });
+                                      }
                                       debugPrint("Follow Button Pressed!");
                                     }
                                   },
-                                  child: Text(
-                                      widget.user.id != user!.id
-                                          ? "Follow"
-                                          : "Edit",
-                                      style: RootNodeFontStyle.body),
+                                  child: hasConn != null
+                                      ? Text(
+                                          widget.user.id != user!.id
+                                              ? hasConn!
+                                                  ? "Unfollow"
+                                                  : "Follow"
+                                              : "Edit",
+                                          style: RootNodeFontStyle.body)
+                                      : const SizedBox.shrink(),
                                 ),
                               ],
                             )
@@ -292,39 +309,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: SizedBox(
                     width: double.infinity,
                     height: 124.0,
-                    child: storyHidden
-                        ? const SizedBox.shrink()
-                        : noStory
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: const MediaEmpty(
-                                    icon: Icons.error,
-                                    message: "No story posted"),
-                              )
-                            : ListView.builder(
-                                controller: _scrollController,
-                                scrollDirection: Axis.horizontal,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 0, vertical: 10.0),
-                                itemCount: _stories.length,
-                                itemBuilder: (context, index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 4.0),
-                                    child: StoryCard(
-                                        hideName: true,
-                                        stories: _stories,
-                                        index: index + 1,
-                                        color: Color(_stories[index].color!),
-                                        currentUser: user!,
-                                        story: _stories[index]),
-                                  );
-                                },
-                              ),
+                    child: noStory
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: const MediaEmpty(
+                                icon: Icons.error, message: "No story posted"),
+                          )
+                        : ListView.builder(
+                            controller: _scrollController,
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 10.0),
+                            itemCount: _stories.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: StoryCard(
+                                    hideName: true,
+                                    stories: _stories,
+                                    index: index + 1,
+                                    color: Color(_stories[index].color!),
+                                    story: _stories[index]),
+                              );
+                            },
+                          ),
                   ),
                 ),
               ),
             ),
+            SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) => null))
           ],
         ),
       ),

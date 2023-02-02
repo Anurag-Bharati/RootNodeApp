@@ -99,19 +99,20 @@ class _StoriesWidgetState extends State<StoriesWidget> {
                 index: index,
                 color: Colors.cyan,
                 isAddStory: true,
-                currentUser: widget.currentUser,
                 story: null,
               ),
             );
           }
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: StoryCard(
-                stories: _stories,
-                index: index,
-                color: Color(_stories[index - 1].color!),
-                currentUser: widget.currentUser,
-                story: _stories[index - 1]),
+            child: Hero(
+              tag: "story-${index - 1}",
+              child: StoryCard(
+                  stories: _stories,
+                  index: index,
+                  color: Color(_stories[index - 1].color!),
+                  story: _stories[index - 1]),
+            ),
           );
         },
       ),
@@ -121,7 +122,6 @@ class _StoriesWidgetState extends State<StoriesWidget> {
 
 class StoryCard extends StatelessWidget {
   final bool isAddStory;
-  final User currentUser;
   final Story? story;
   final List<Story> stories;
   final Color color;
@@ -130,7 +130,6 @@ class StoryCard extends StatelessWidget {
   const StoryCard({
     Key? key,
     this.isAddStory = false,
-    required this.currentUser,
     required this.story,
     required this.color,
     required this.index,
@@ -142,42 +141,39 @@ class StoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Hero(
-          tag: "story-${index - 1}",
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
-            child: isAddStory
-                ? Container(
-                    height: double.infinity,
-                    width: 110.0,
-                    color: Colors.cyan,
-                  )
-                : story!.media == null
-                    ? Container(
-                        height: double.infinity,
-                        width: 110.0,
-                        color: color,
-                      )
-                    : story!.media!.type == "image"
-                        ? CachedNetworkImage(
-                            maxHeightDiskCache: 256,
-                            imageUrl:
-                                "${ApiConstants.baseUrl}/${story!.media!.url!}",
-                            height: double.infinity,
-                            width: 110.0,
-                            fit: BoxFit.cover,
-                          )
-                        : Container(
-                            height: double.infinity,
-                            width: 110.0,
-                            color: color,
-                            child: const Icon(
-                              Boxicons.bx_video,
-                              color: Colors.white,
-                              size: 30,
-                            ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20.0),
+          child: isAddStory
+              ? Container(
+                  height: double.infinity,
+                  width: 110.0,
+                  color: Colors.cyan,
+                )
+              : story!.media == null
+                  ? Container(
+                      height: double.infinity,
+                      width: 110.0,
+                      color: color,
+                    )
+                  : story!.media!.type == "image"
+                      ? CachedNetworkImage(
+                          maxHeightDiskCache: 256,
+                          imageUrl:
+                              "${ApiConstants.baseUrl}/${story!.media!.url!}",
+                          height: double.infinity,
+                          width: 110.0,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          height: double.infinity,
+                          width: 110.0,
+                          color: color,
+                          child: const Icon(
+                            Boxicons.bx_video,
+                            color: Colors.white,
+                            size: 30,
                           ),
-          ),
+                        ),
         ),
         Positioned(
           bottom: 0,
