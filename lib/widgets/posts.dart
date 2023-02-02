@@ -41,9 +41,12 @@ class PostContainer extends StatelessWidget {
           isLiked: likedMeta,
         ),
         const Divider(thickness: 3, color: Color(0xFF111111)),
-        _PostFooter(
-          post: post,
-          likedMeta: likedMeta,
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 100),
+          child: _PostFooter(
+            post: post,
+            likedMeta: likedMeta,
+          ),
         )
       ]),
     );

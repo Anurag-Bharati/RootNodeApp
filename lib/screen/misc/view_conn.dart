@@ -56,7 +56,6 @@ class _ViewConnScreenState extends State<ViewConnScreen> {
         slivers: [
           SliverAppBar(
             stretchTriggerOffset: 10,
-            stretch: true,
             pinned: true,
             leadingWidth: 40,
             expandedHeight: 200,

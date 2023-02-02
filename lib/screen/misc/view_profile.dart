@@ -1,14 +1,19 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
+import 'package:rootnode/data_source/remote_data_store/response/res_post.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
+import 'package:rootnode/helper/responsive_helper.dart';
+import 'package:rootnode/model/post.dart';
 import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
+import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/repository/story_repo.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/widgets/buttons.dart';
 import 'package:rootnode/widgets/placeholder.dart';
+import 'package:rootnode/widgets/posts.dart';
 import 'package:rootnode/widgets/profile_card.dart';
 import 'package:rootnode/widgets/stories.dart';
 
@@ -25,15 +30,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _userRepo = UserRepoImpl();
   final _storyRepo = StoryRepoImpl();
   final _connRepo = ConnRepoImpl();
+  final _postRepo = PostRepoImpl();
+  late PostResponse? _postResponse;
   User? user;
   double maxContentWidth = 720;
 
-  late final ScrollController _scrollController;
+  late final ScrollController _storyScrollController;
+  late final ScrollController _postScrollController;
   late StoryResponse? _storyResponse;
   late int storyTotal;
 
   final List<Story> _stories = [];
   int storyPage = 1;
+
+  final List<Post> _posts = [];
+  List<bool> _postsLiked = [];
+  late int totalPage;
+  int currentPage = 1;
 
   bool noPost = false;
   bool noStory = false;
@@ -70,24 +83,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  void _clearInitials() async {
+    setState(() {
+      _posts.clear();
+      currentPage = 1;
+    });
+  }
+
+  void _getInitialData({int refresh = 0}) async {
+    _postResponse = await _postRepo.getPostFeed(
+      page: currentPage,
+      refresh: refresh,
+    );
+    _posts.addAll(_postResponse!.data!.posts!);
+    totalPage = _postResponse!.totalPages!;
+    _postsLiked = _postResponse!.data!.meta!.isLiked!;
+    if (mounted) setState(() {});
+  }
+
+  void _fetchMoreData() async {
+    bool condn = currentPage >= totalPage;
+    if (condn) return;
+
+    condn ? currentPage = totalPage : currentPage++;
+
+    _postResponse = await _postRepo.getPostFeed(
+      page: currentPage,
+      refresh: 0,
+    );
+    _posts.addAll(_postResponse!.data!.posts!);
+    totalPage = _postResponse!.totalPages!;
+    _postsLiked = _postResponse!.data!.meta!.isLiked!;
+  }
+
   @override
   void initState() {
+    _getInitialData();
+    _postScrollController = ScrollController()
+      ..addListener(() {
+        if (_postScrollController.position.maxScrollExtent ==
+            _postScrollController.offset) {
+          _fetchMoreData();
+        }
+      });
     _fetchFollowData();
     _fetchUser();
-    _scrollController = ScrollController();
-    _scrollController.addListener(() {
-      if (_scrollController.position.maxScrollExtent ==
-          _scrollController.offset) {
-        _fetchMoreStoryData();
-      }
-    });
+    _storyScrollController = ScrollController()
+      ..addListener(() {
+        if (_storyScrollController.position.maxScrollExtent ==
+            _storyScrollController.offset) {
+          _fetchMoreStoryData();
+        }
+      });
     _getInitialStoryData();
     super.initState();
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _storyScrollController.dispose();
+    _postScrollController.dispose();
     super.dispose();
   }
 
@@ -97,96 +152,118 @@ class _ProfileScreenState extends State<ProfileScreen> {
       width: double.infinity,
       height: double.infinity,
       color: const Color(0xFF111111),
-      child: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            stretchTriggerOffset: 10,
-            stretch: true,
-            pinned: true,
-            leadingWidth: 40,
-            expandedHeight: 350 + 124,
-            collapsedHeight: 180,
-            backgroundColor: const Color(0xFF111111),
-            title: Text("Back", style: RootNodeFontStyle.header),
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              titlePadding: EdgeInsets.zero,
-              title: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-                decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF111111),
-                    Color(0xFF111111),
-                    Color(0x55111111),
-                    Colors.transparent,
-                  ],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                )),
-                width: double.infinity,
-                height: 124 + 10,
-                child: noStory
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: const MediaEmpty(
-                            icon: Icons.error, message: "No story posted"),
-                      )
-                    : ListView.builder(
-                        controller: _scrollController,
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 0, vertical: 10.0),
-                        itemCount: _stories.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 4.0),
-                            child: StoryCard(
-                                disableBorder: true,
-                                hideName: true,
-                                stories: _stories,
-                                index: index + 1,
-                                color: Color(_stories[index].color!),
-                                story: _stories[index]),
-                          );
-                        },
-                      ),
+      child: RefreshIndicator(
+        color: Colors.cyan,
+        backgroundColor: Colors.transparent,
+        onRefresh: () async {
+          _clearInitials();
+          _getInitialData(refresh: 1);
+        },
+        child: CustomScrollView(
+          controller: _postScrollController,
+          slivers: [
+            SliverAppBar(
+              stretchTriggerOffset: 10,
+              stretch: true,
+              pinned: true,
+              leadingWidth: 40,
+              expandedHeight: 350 + 124,
+              collapsedHeight: 180,
+              backgroundColor: const Color(0xFF111111),
+              title: Text("Back", style: RootNodeFontStyle.header),
+              flexibleSpace: FlexibleSpaceBar(
+                expandedTitleScale: 1,
+                titlePadding: EdgeInsets.zero,
+                title: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+                  decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF111111),
+                      Color(0xFF111111),
+                      Color(0x55111111),
+                      Colors.transparent,
+                    ],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                  )),
+                  width: double.infinity,
+                  height: 124 + 10,
+                  child: noStory
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: const MediaEmpty(
+                              icon: Icons.error, message: "No story posted"),
+                        )
+                      : ListView.builder(
+                          controller: _storyScrollController,
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 0, vertical: 10.0),
+                          itemCount: _stories.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4.0),
+                              child: StoryCard(
+                                  disableBorder: true,
+                                  hideName: true,
+                                  stories: _stories,
+                                  index: index + 1,
+                                  color: Color(_stories[index].color!),
+                                  story: _stories[index]),
+                            );
+                          },
+                        ),
+                ),
+                collapseMode: CollapseMode.parallax,
+                stretchModes: const [StretchMode.zoomBackground],
+                background: ProfileCard(
+                  actions: _actionButtons(),
+                  hasConn: hasConn,
+                  id: widget.id,
+                  user: user,
+                ),
+                centerTitle: true,
               ),
-              collapseMode: CollapseMode.parallax,
-              stretchModes: const [StretchMode.zoomBackground],
-              background: ProfileCard(
-                actions: _actionButtons(),
-                hasConn: hasConn,
-                id: widget.id,
-                user: user,
+              leading: IconButton(
+                icon: const Icon(Boxicons.bx_chevron_left,
+                    color: Colors.white70, size: 40),
+                onPressed: () => Navigator.of(context).pop(),
               ),
-              centerTitle: true,
             ),
-            leading: IconButton(
-              icon: const Icon(Boxicons.bx_chevron_left,
-                  color: Colors.white70, size: 40),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-                (context, index) => Container(
-                      margin: EdgeInsets.only(
-                        bottom: 5,
-                        top: index == 0 ? 5 : 0,
-                        left: 10,
-                        right: 10,
-                      ),
-                      height: 300,
-                      decoration: BoxDecoration(
+            _posts.isEmpty
+                ? SliverToBoxAdapter(
+                    child: Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height / 2,
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(
                         color: Colors.white10,
-                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                childCount: 10),
-          )
-        ],
+                  )
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return index < _posts.length
+                            ? ConstrainedSliverWidth(
+                                maxWidth: maxContentWidth,
+                                child: PostContainer(
+                                    post: _posts[index],
+                                    likedMeta: _postsLiked[index]),
+                              )
+                            : PostLoader(
+                                page: currentPage,
+                                total: totalPage,
+                              );
+                      },
+                      childCount: _posts.length + 1,
+                    ),
+                  )
+          ],
+        ),
       ),
     );
   }
