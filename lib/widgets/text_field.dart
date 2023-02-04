@@ -8,11 +8,13 @@ class RootNodeTextField extends StatefulWidget {
     required this.controller,
     required this.type,
     required this.hintText,
+    this.compact = false,
   }) : super(key: key);
 
   final TextEditingController controller;
   final TextFieldTypes type;
   final String hintText;
+  final bool compact;
 
   @override
   State<RootNodeTextField> createState() => _RootNodeTextFieldState();
@@ -20,11 +22,23 @@ class RootNodeTextField extends StatefulWidget {
 
 class _RootNodeTextFieldState extends State<RootNodeTextField> {
   bool _passVisible = false;
+  late bool _compact;
+  late double _iconSize;
+  late double _fontSize;
+
+  @override
+  void initState() {
+    _compact = widget.compact;
+    _iconSize = _compact ? 16 : 20;
+    _fontSize = _compact ? 12 : 16;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        margin: EdgeInsets.symmetric(
+            horizontal: _compact ? 10 : 20, vertical: _compact ? 5 : 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -32,9 +46,7 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
           scrollPadding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom + 20 * 8),
           controller: widget.controller,
-          style: const TextStyle(
-            color: Colors.white70,
-          ),
+          style: TextStyle(color: Colors.white70, fontSize: _fontSize),
           keyboardType: widget.type == TextFieldTypes.email
               ? TextInputType.emailAddress
               : TextInputType.visiblePassword,
@@ -53,8 +65,10 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
               filled: true,
               fillColor: Colors.white10,
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.only(
-                  top: 16, bottom: 16, left: 20, right: 0),
+              contentPadding: _compact
+                  ? const EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 0)
+                  : const EdgeInsets.only(
+                      top: 16, bottom: 16, left: 20, right: 0),
               hintText: widget.hintText,
               hintStyle: const TextStyle(
                 color: Colors.white54,
@@ -63,17 +77,17 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
                 color: Colors.white54,
               ),
               errorStyle: TextStyle(color: Colors.red[400]!),
-              suffixIcon: widget.type == TextFieldTypes.password
+              suffixIcon: widget.type == TextFieldTypes.password && !_compact
                   ? IconButton(
                       color: Colors.white70,
                       padding: EdgeInsets.zero,
-                      splashRadius: 20,
-                      iconSize: 20,
+                      splashRadius: _iconSize,
+                      iconSize: _iconSize,
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       icon: Icon(
                         _passVisible ? Icons.visibility : Icons.visibility_off,
-                        size: 20,
+                        size: _iconSize,
                       ),
                       onPressed: () {
                         setState(() {
