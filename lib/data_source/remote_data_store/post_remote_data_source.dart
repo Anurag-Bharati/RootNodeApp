@@ -25,6 +25,19 @@ class PostRemoteDataSource {
     }
   }
 
+  Future<PostResponse?> getPostByUser(
+      {int page = 1, int refresh = 0, required String id}) async {
+    try {
+      Response res = await _httpServices.get(
+        "${ApiConstants.baseUrl}${ApiConstants.post}/user/$id?page=$page&refresh=$refresh",
+      );
+      return res.statusCode == 200 ? PostResponse.fromJson(res.data) : null;
+    } catch (_) {
+      debugPrint(_.toString());
+      return null;
+    }
+  }
+
   Future<bool> togglePostLike({required String id}) async {
     try {
       String? token = await SimpleStorage.getStringData("token");

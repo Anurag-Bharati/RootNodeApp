@@ -44,7 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int storyPage = 1;
 
   final List<Post> _posts = [];
-  List<bool> _postsLiked = [];
+  final List<bool> _postsLiked = [];
   late int totalPage;
   int currentPage = 1;
 
@@ -86,19 +86,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _clearInitials() async {
     setState(() {
       _posts.clear();
+      _postsLiked.clear();
       currentPage = 1;
     });
   }
 
   void _getInitialData({int refresh = 0}) async {
-    _postResponse = await _postRepo.getPostFeed(
-      page: currentPage,
-      refresh: refresh,
-    );
-    _posts.addAll(_postResponse!.data!.posts!);
-    totalPage = _postResponse!.totalPages!;
-    _postsLiked = _postResponse!.data!.meta!.isLiked!;
-    if (mounted) setState(() {});
+    _postResponse = await _postRepo.getPostByUser(
+        page: currentPage, refresh: refresh, id: widget.id);
+    if (_postResponse!.data!.posts!.isEmpty) noPost = true;
+    _posts.addAll(_postResponse!.data!.posts ?? []);
+    _postsLiked.addAll(_postResponse!.data!.meta!.isLiked ?? []);
+    totalPage = _postResponse!.totalPages ?? 1;
+    // runs after stretch animation finishes
+    WidgetsBinding.instance
+        .addPostFrameCallback((timeStamp) => mounted ? setState(() {}) : null);
   }
 
   void _fetchMoreData() async {
@@ -107,13 +109,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     condn ? currentPage = totalPage : currentPage++;
 
-    _postResponse = await _postRepo.getPostFeed(
-      page: currentPage,
-      refresh: 0,
-    );
-    _posts.addAll(_postResponse!.data!.posts!);
-    totalPage = _postResponse!.totalPages!;
-    _postsLiked = _postResponse!.data!.meta!.isLiked!;
+    _postResponse = await _postRepo.getPostByUser(
+        page: currentPage, refresh: 0, id: widget.id);
+    totalPage = _postResponse!.totalPages ?? 1;
+    _posts.addAll(_postResponse!.data!.posts ?? []);
+    _postsLiked.addAll(_postResponse!.data!.meta!.isLiked ?? []);
+    if (mounted) setState(() {});
   }
 
   @override
@@ -148,121 +149,141 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      color: const Color(0xFF111111),
-      child: RefreshIndicator(
-        color: Colors.cyan,
-        backgroundColor: Colors.transparent,
-        onRefresh: () async {
-          _clearInitials();
-          _getInitialData(refresh: 1);
-        },
-        child: CustomScrollView(
-          controller: _postScrollController,
-          slivers: [
-            SliverAppBar(
-              stretchTriggerOffset: 10,
-              stretch: true,
-              pinned: true,
-              leadingWidth: 40,
-              expandedHeight: 350 + 124,
-              collapsedHeight: 180,
-              backgroundColor: const Color(0xFF111111),
-              title: Text("Back", style: RootNodeFontStyle.header),
-              flexibleSpace: FlexibleSpaceBar(
-                expandedTitleScale: 1,
-                titlePadding: EdgeInsets.zero,
-                title: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-                  decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                    colors: [
-                      Color(0xFF111111),
-                      Color(0xFF111111),
-                      Color(0x55111111),
-                      Colors.transparent,
-                    ],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                  )),
-                  width: double.infinity,
-                  height: 124 + 10,
-                  child: noStory
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: const MediaEmpty(
-                              icon: Icons.error, message: "No story posted"),
-                        )
-                      : ListView.builder(
-                          controller: _storyScrollController,
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 0, vertical: 10.0),
-                          itemCount: _stories.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4.0),
-                              child: StoryCard(
-                                  disableBorder: true,
-                                  hideName: true,
-                                  stories: _stories,
-                                  index: index + 1,
-                                  color: Color(_stories[index].color!),
-                                  story: _stories[index]),
-                            );
-                          },
-                        ),
-                ),
-                collapseMode: CollapseMode.parallax,
-                stretchModes: const [StretchMode.zoomBackground],
-                background: ProfileCard(
-                  actions: _actionButtons(),
-                  hasConn: hasConn,
-                  id: widget.id,
-                  user: user,
-                ),
-                centerTitle: true,
-              ),
-              leading: IconButton(
-                icon: const Icon(Boxicons.bx_chevron_left,
-                    color: Colors.white70, size: 40),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-            _posts.isEmpty
-                ? SliverToBoxAdapter(
-                    child: Container(
-                      width: double.infinity,
-                      height: MediaQuery.of(context).size.height / 2,
-                      alignment: Alignment.center,
-                      child: const CircularProgressIndicator(
-                        color: Colors.white10,
-                      ),
-                    ),
-                  )
-                : SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return index < _posts.length
-                            ? ConstrainedSliverWidth(
-                                maxWidth: maxContentWidth,
-                                child: PostContainer(
-                                    post: _posts[index],
-                                    likedMeta: _postsLiked[index]),
-                              )
-                            : PostLoader(
-                                page: currentPage,
-                                total: totalPage,
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: const Color(0xFF111111),
+        child: RefreshIndicator(
+          backgroundColor: const Color(0xFF111111),
+          color: Colors.cyan,
+          onRefresh: () async {
+            _clearInitials();
+            _getInitialData(refresh: 1);
+          },
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(
+                decelerationRate: ScrollDecelerationRate.normal),
+            controller: _postScrollController,
+            slivers: [
+              SliverAppBar(
+                stretch: true,
+                pinned: true,
+                leadingWidth: 40,
+                expandedHeight: 350 + 134,
+                collapsedHeight: 180,
+                backgroundColor: const Color(0xFF111111),
+                title: Text("Back", style: RootNodeFontStyle.header),
+                flexibleSpace: FlexibleSpaceBar(
+                  expandedTitleScale: 1,
+                  titlePadding: EdgeInsets.zero,
+                  title: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                      colors: [
+                        Color(0xFF111111),
+                        Color(0xFF111111),
+                        Color(0x55111111),
+                        Colors.transparent,
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    )),
+                    width: double.infinity,
+                    height: 124 + 20,
+                    child: noStory
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: const MediaEmpty(
+                                icon: Icons.error, message: "No story posted"),
+                          )
+                        : ListView.builder(
+                            controller: _storyScrollController,
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 10.0),
+                            itemCount: _stories.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: StoryCard(
+                                    disableBorder: true,
+                                    hideName: true,
+                                    stories: _stories,
+                                    index: index + 1,
+                                    color: Color(_stories[index].color!),
+                                    story: _stories[index]),
                               );
-                      },
-                      childCount: _posts.length + 1,
-                    ),
-                  )
-          ],
+                            },
+                          ),
+                  ),
+                  collapseMode: CollapseMode.parallax,
+                  stretchModes: const [StretchMode.blurBackground],
+                  background: ProfileCard(
+                    actions: _actionButtons(),
+                    hasConn: hasConn,
+                    id: widget.id,
+                    user: user,
+                  ),
+                  centerTitle: true,
+                ),
+                leading: IconButton(
+                  icon: const Icon(Boxicons.bx_chevron_left,
+                      color: Colors.white70, size: 40),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+              _posts.isEmpty && !noPost
+                  ? SliverToBoxAdapter(
+                      child: Container(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height / 2,
+                        alignment: Alignment.center,
+                        child: const CircularProgressIndicator(
+                          color: Colors.white10,
+                        ),
+                      ),
+                    )
+                  : noPost
+                      ? SliverToBoxAdapter(
+                          child: Container(
+                            clipBehavior: Clip.antiAlias,
+                            width: double.infinity,
+                            height: 200,
+                            margin: const EdgeInsets.all(10),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20)),
+                            child: const MediaEmpty(
+                                icon: Boxicons.bx_border_none,
+                                message: "Wow! Such empty"),
+                          ),
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              return index < _posts.length
+                                  ? ConstrainedSliverWidth(
+                                      maxWidth: maxContentWidth,
+                                      child: PostContainer(
+                                          post: _posts[index],
+                                          likedMeta: _postsLiked[index]),
+                                    )
+                                  : PostLoader(
+                                      page: currentPage,
+                                      total: totalPage,
+                                    );
+                            },
+                            childCount: _posts.length + 1,
+                          ),
+                        )
+            ],
+          ),
         ),
       ),
     );
