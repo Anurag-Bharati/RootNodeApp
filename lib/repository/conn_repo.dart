@@ -1,6 +1,5 @@
 import 'package:rootnode/data_source/remote_data_store/conn_remote_data_source.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_conn.dart';
-import 'package:rootnode/model/conn.dart';
 
 abstract class ConnRepo {
   Future<MyConnsResponse?> getMyConns({int page = 1, int refresh = 0});

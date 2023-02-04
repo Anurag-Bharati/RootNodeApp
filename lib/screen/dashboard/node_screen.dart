@@ -10,6 +10,7 @@ import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
+import 'package:rootnode/screen/misc/browse_conn.dart';
 import 'package:rootnode/screen/misc/view_conn.dart';
 import 'package:rootnode/screen/misc/view_profile.dart';
 import 'package:rootnode/widgets/placeholder.dart';
@@ -420,7 +421,8 @@ class ConnOverview extends StatelessWidget {
               invert: true))
           .toList();
       generated.insertAll(0, dummys ?? []);
-      generated.add(NodeAvatar(date: "this.add", invert: true, isAction: true));
+      generated.add(NodeAvatar(
+          date: "this.add", invert: true, isAction: true, rootnode: user));
       generated.first.settings['hideDate'] = true;
     }
     return generated;
@@ -564,6 +566,10 @@ class NodeAvatar extends StatelessWidget {
               onTap: () {
                 debugPrint(
                     "User: ${isDummy ? 'Dummy Node' : user != null ? user!.fname : 'No user'} | Action: $isAction");
+                if (isAction && user == null) {
+                  print(rootnode);
+                  switchRouteByPush(context, BrowseConnScreen(user: rootnode!));
+                }
                 if (user != null) {
                   switchRouteByPush(
                       context, ProfileScreen(id: user!.id!, user: rootnode!));
