@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:rootnode/helper/notification_helper.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
@@ -55,7 +59,23 @@ class _LoginScreenState extends State<LoginScreen> {
       showSnackbar(context, "Invalid email or password", Colors.red[400]!);
       return null;
     }
+    String localTimeZone =
+        await AwesomeNotifications().getLocalTimeZoneIdentifier();
+    LocalNotificationHelper.checkNotificationEnabled().then(
+      (_) => _.createNotification(
+        schedule: NotificationInterval(
+            interval: 5, timeZone: localTimeZone, repeats: false),
+        content: NotificationContent(
+            id: 1,
+            title: "New login detected",
+            body: "A new login into your account was detected."
+                " Device: ${Platform.operatingSystem}",
+            channelKey: 'test_channel'),
+      ),
+    );
+
     User? user = await userRepo.getUserFromToken();
+
     return user;
   }
 
