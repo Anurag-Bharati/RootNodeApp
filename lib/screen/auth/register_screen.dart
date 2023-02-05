@@ -161,7 +161,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       password: _passwordFieldController.text,
     );
 
-    int status = await userRepo.saveUser(user);
+    int status = await userRepo.registerUser(user);
     _switch(status);
   }
 

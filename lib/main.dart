@@ -8,7 +8,11 @@ import 'package:rootnode/state/objectbox_state.dart';
 
 void main(List<String> args) async {
   AwesomeNotifications().initialize(
-      'resource://drawable/launcher', [LocalNotificationChannel.testChannel]);
+    'resource://drawable/launcher',
+    [LocalNotificationChannel.testChannel],
+    channelGroups: [LocalNotificationChannel.testgroup],
+    debug: true,
+  );
   WidgetsFlutterBinding.ensureInitialized();
   // ObjectBoxInstance.deleteDatabase();
   // Create an Object for ObjectBoxInstance

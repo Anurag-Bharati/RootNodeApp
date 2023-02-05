@@ -17,6 +17,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final String emailregEx =
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
   final userRepo = UserRepoImpl();
   final _emailFieldController = TextEditingController(text: "anuragbharati");
   final _scrollController = ScrollController();
@@ -40,11 +42,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<User?> _loginUser() async {
+    final bool isEmail =
+        RegExp(emailregEx).hasMatch(_emailFieldController.text);
     FocusScope.of(context).unfocus();
     bool res = await userRepo.loginUser(
       identifier: _emailFieldController.text,
       password: _passwordFieldController.text,
-      isEmail: false,
+      isEmail: isEmail,
     );
     if (!res) {
       // ignore: use_build_context_synchronously

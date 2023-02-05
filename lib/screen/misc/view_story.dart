@@ -264,7 +264,7 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
                     ? const SizedBox.shrink()
                     : Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 1.5, vertical: 10.0),
+                            horizontal: 10, vertical: 10.0),
                         child: UserInfo(
                           user: story.owner!,
                           createdAt: story.createdAt!,
@@ -295,16 +295,20 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
               ],
             ),
           ),
-          Positioned(
-              top: 5,
-              right: 5,
-              child: IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(
-                    Boxicons.bx_x,
-                    size: 20.0,
-                    color: Colors.white70,
-                  )))
+          _compact
+              ? Positioned(
+                  top: 5,
+                  right: 5,
+                  child: IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(
+                      Boxicons.bx_x,
+                      size: 20.0,
+                      color: Colors.white70,
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink()
         ],
       ),
     ));
