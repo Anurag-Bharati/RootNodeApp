@@ -21,11 +21,13 @@ class PostContainer extends StatelessWidget {
     required this.post,
     required this.likedMeta,
     this.tagPrefix,
+    this.compact = false,
   }) : super(key: key);
 
   final Post post;
   final bool likedMeta;
   final String? tagPrefix;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -36,15 +38,20 @@ class PostContainer extends StatelessWidget {
         borderRadius: LayoutConstants.postCardBorderRadius,
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _PostHeader(post: post),
-        const SizedBox(height: 16),
+        _PostHeader(
+          post: post,
+          compact: compact,
+        ),
+        SizedBox(height: compact ? 5 : 16),
         _PostBody(
+          compact: true,
           tagPrefix: tagPrefix,
           post: post,
           isLiked: likedMeta,
         ),
         const Divider(thickness: 3, color: Color(0xFF111111)),
         _PostFooter(
+          compact: true,
           post: post,
           likedMeta: likedMeta,
         )
@@ -57,9 +64,11 @@ class _PostHeader extends StatelessWidget {
   const _PostHeader({
     Key? key,
     required this.post,
+    required this.compact,
   }) : super(key: key);
 
   final Post post;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -89,29 +98,42 @@ class _PostHeader extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Wrap(direction: Axis.vertical, spacing: -5, children: [
-            Text("${post.owner!.fname!} ${post.owner!.lname!}".toTitleCase!,
-                style: RootNodeFontStyle.title),
-            Text(
-              "@${post.owner!.username!}",
-              style: RootNodeFontStyle.subtitle,
-            ),
+            compact
+                ? Text(post.owner!.fname!.toTitleCase!,
+                    style: RootNodeFontStyle.title)
+                : Text(
+                    "${post.owner!.fname!} ${post.owner!.lname!}".toTitleCase!,
+                    style: RootNodeFontStyle.title),
+            compact
+                ? Text(
+                    "${Utils.getTimeAgo(post.createdAt!)} ago",
+                    textAlign: TextAlign.center,
+                    style: RootNodeFontStyle.label,
+                  )
+                : Text(
+                    "@${post.owner!.username!}",
+                    style: RootNodeFontStyle.subtitle,
+                  ),
           ]),
         ),
-        Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 10,
-            children: [
-              Text(
-                Utils.getTimeAgo(post.createdAt!),
-                textAlign: TextAlign.center,
-                style: RootNodeFontStyle.label,
-              ),
-              const Icon(
-                Boxicons.bx_dots_vertical_rounded,
-                color: Colors.white70,
-                size: LayoutConstants.postIcon,
-              ),
-            ])
+        compact
+            ? const SizedBox.shrink()
+            : Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 10,
+                children: [
+                  Text(
+                    Utils.getTimeAgo(post.createdAt!),
+                    textAlign: TextAlign.center,
+                    style: RootNodeFontStyle.label,
+                  ),
+                  const Icon(
+                    Boxicons.bx_dots_vertical_rounded,
+                    color: Colors.white70,
+                    size: LayoutConstants.postIcon,
+                  ),
+                ],
+              )
       ]),
     );
   }
@@ -123,11 +145,13 @@ class _PostBody extends StatelessWidget {
     required this.post,
     required this.isLiked,
     this.tagPrefix,
+    required this.compact,
   }) : super(key: key);
 
   final Post post;
   final bool isLiked;
   final String? tagPrefix;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -142,8 +166,8 @@ class _PostBody extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: LayoutConstants.postPadding),
+            padding: EdgeInsets.symmetric(
+                horizontal: compact ? 10 : LayoutConstants.postPadding),
             child: Text(
               post.caption ?? "",
               softWrap: true,
@@ -157,8 +181,8 @@ class _PostBody extends StatelessWidget {
                     clipBehavior: Clip.antiAlias,
                     decoration: const BoxDecoration(
                         borderRadius: LayoutConstants.postContentBorderRadius),
-                    margin:
-                        const EdgeInsets.all(LayoutConstants.postInnerMargin),
+                    margin: EdgeInsets.all(
+                        compact ? 10 : LayoutConstants.postInnerMargin),
                     child: AnimatedSize(
                         curve: Curves.easeInQuad,
                         duration: const Duration(milliseconds: 500),
@@ -210,7 +234,7 @@ class _PostBody extends StatelessWidget {
                               )),
                   ),
                 )
-              : const SizedBox(height: 10),
+              : SizedBox(height: post.caption != null ? 10 : 0),
         ],
       ),
     );
@@ -254,10 +278,12 @@ class _PostFooter extends StatefulWidget {
     Key? key,
     required this.post,
     required this.likedMeta,
+    required this.compact,
   }) : super(key: key);
 
   final Post post;
   final bool likedMeta;
+  final bool compact;
 
   @override
   State<_PostFooter> createState() => _PostFooterState();
@@ -319,11 +345,13 @@ class _PostFooterState extends State<_PostFooter> {
             likeCountPadding: const EdgeInsets.only(top: 2, left: 8.0),
           ),
         ]),
-        const Icon(
-          Boxicons.bx_share,
-          color: Colors.white70,
-          size: 22,
-        )
+        widget.compact
+            ? const SizedBox.shrink()
+            : const Icon(
+                Boxicons.bx_share,
+                color: Colors.white70,
+                size: 22,
+              )
       ]),
     );
   }
