@@ -42,7 +42,9 @@ class PostContainer extends StatelessWidget {
           post: post,
           compact: compact,
         ),
-        SizedBox(height: compact ? 5 : 16),
+        SizedBox(
+          height: compact || post.caption == null ? 5 : 10,
+        ),
         _PostBody(
           compact: true,
           tagPrefix: tagPrefix,
