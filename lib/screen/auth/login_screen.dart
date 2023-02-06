@@ -56,6 +56,14 @@ class _LoginScreenState extends State<LoginScreen> {
       return null;
     }
     User? user = await userRepo.getUserFromToken();
+    if (user == null) {
+      // ignore: use_build_context_synchronously
+      showSnackbar(
+        context,
+        "Sorry! Something went wrong",
+        Colors.red[400]!,
+      );
+    }
     return user;
   }
 
@@ -87,11 +95,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: const RootNodeTextLogo(),
                           ),
                           RootNodeTextField(
+                            key: const ValueKey("emailField"),
                             controller: _emailFieldController,
                             hintText: "Email",
                             type: TextFieldTypes.email,
                           ),
                           RootNodeTextField(
+                            key: const ValueKey("pwdField"),
                             controller: _passwordFieldController,
                             hintText: "Password",
                             type: TextFieldTypes.password,
@@ -104,6 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             margin: const EdgeInsets.symmetric(
                                 horizontal: 40, vertical: 10),
                             child: TextButton(
+                              key: const ValueKey("loginBtn"),
                               style: const ButtonStyle(
                                   alignment: Alignment.center),
                               onPressed: () async {
@@ -126,11 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                       context, DashboardScreen(user: user));
                                 }
                                 // ignore: use_build_context_synchronously
-                                showSnackbar(
-                                  context,
-                                  "Sorry! Something went wrong",
-                                  Colors.red[400]!,
-                                );
                               },
                               child: const Padding(
                                 padding: EdgeInsets.all(10),
@@ -158,8 +164,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       color: Colors.white70, fontSize: 16),
                                 ),
                                 TextButton(
+                                    key: const ValueKey('gotoRegBtn'),
                                     onPressed: (() {
-                                      Navigator.pushReplacement(
+                                      Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                               builder: (BuildContext context) =>
