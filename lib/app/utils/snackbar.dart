@@ -4,7 +4,6 @@ void showSnackbar(BuildContext context, String message, Color color,
     {dismissable = true}) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      // width: MediaQuery.of(context).size.width * 0.8,
       elevation: 0,
       behavior: SnackBarBehavior.floating,
       backgroundColor: color,

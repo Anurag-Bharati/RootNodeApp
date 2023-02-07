@@ -5,7 +5,7 @@ import 'package:rootnode/helper/network_connectivity.dart';
 import 'package:rootnode/model/user/user.dart';
 
 abstract class UserRepo {
-  Future<int> saveUser(User user);
+  Future<int> registerUser(User user);
   Future<bool> loginUser(
       {String? identifier, String? password, bool isEmail = true});
   Future<List<User>> getUsers();
@@ -17,8 +17,8 @@ abstract class UserRepo {
 
 class UserRepoImpl extends UserRepo {
   @override
-  Future<int> saveUser(User user) async {
-    return await UserDataSource().saveUser(user);
+  Future<int> registerUser(User user) async {
+    return await UserRemoteDataSource().register(user);
   }
 
   @override
@@ -45,6 +45,7 @@ class UserRepoImpl extends UserRepo {
   @override
   Future<User?> getUserFromToken() async {
     bool status = await NetworkConnectivity.isOnline();
+
     return status ? UserRemoteDataSource().getUserFromToken() : null;
   }
 

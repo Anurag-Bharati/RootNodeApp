@@ -16,9 +16,11 @@ class ViewStoryScreen extends StatefulWidget {
     super.key,
     required this.stories,
     required this.initial,
+    this.compact = false,
   });
   final List<Story> stories;
   final int initial;
+  final bool compact;
 
   @override
   State<ViewStoryScreen> createState() => _ViewStoryScreenState();
@@ -31,6 +33,7 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
   VideoPlayerController? _videoController;
   final _stroyRepo = StoryRepoImpl();
   late int currentIndex;
+  late bool _compact;
   bool paused = false;
   bool loved = false;
   Duration imageStoryDuration = const Duration(seconds: 8);
@@ -38,6 +41,7 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
 
   @override
   void initState() {
+    _compact = widget.compact;
     currentIndex = widget.initial;
     _pageController = PageController();
     _animationController = AnimationController(vsync: this);
@@ -159,23 +163,27 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
                                 ? Positioned(
                                     left: 10.0,
                                     right: 10.0,
-                                    bottom: 40,
+                                    bottom: _compact ? 30 : 40,
                                     child: !paused
                                         ? Column(
                                             children: [
-                                              const Icon(
+                                              Icon(
                                                 Boxicons.bx_heading,
                                                 color: Colors.white54,
-                                                size: 20,
+                                                size: _compact ? 16 : 20,
                                               ),
-                                              Text(
-                                                "Heading Available!\ntap to reveal",
-                                                textAlign: TextAlign.center,
-                                                style: RootNodeFontStyle.label
-                                                    .copyWith(
-                                                        fontSize: 12,
-                                                        height: 0),
-                                              )
+                                              _compact
+                                                  ? const SizedBox.shrink()
+                                                  : Text(
+                                                      "Heading Available!\ntap to reveal",
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: RootNodeFontStyle
+                                                          .label
+                                                          .copyWith(
+                                                              fontSize: 12,
+                                                              height: 0),
+                                                    )
                                             ],
                                           )
                                         : const SizedBox.shrink())
@@ -245,45 +253,62 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
             },
           ),
           Positioned(
-              top: 20.0,
-              left: 10.0,
-              right: 10.0,
-              bottom: 20,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 1.5, vertical: 10.0),
-                    child: UserInfo(
-                      user: story.owner!,
-                      createdAt: story.createdAt!,
-                      heartCount: story.likesCount!,
-                      seenCount: story.seenBy!.length,
+            top: 20.0,
+            left: 10.0,
+            right: 10.0,
+            bottom: 20,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _compact
+                    ? const SizedBox.shrink()
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10.0),
+                        child: UserInfo(
+                          user: story.owner!,
+                          createdAt: story.createdAt!,
+                          heartCount: story.likesCount!,
+                          seenCount: story.seenBy!.length,
+                        ),
+                      ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  constraints:
+                      const BoxConstraints(maxWidth: 600, minWidth: 200),
+                  child: Row(
+                    children: widget.stories
+                        .asMap()
+                        .map((i, e) {
+                          return MapEntry(
+                            i,
+                            AnimatedBar(
+                                animationController: _animationController,
+                                position: i,
+                                currentIndex: currentIndex),
+                          );
+                        })
+                        .values
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _compact
+              ? Positioned(
+                  top: 5,
+                  right: 5,
+                  child: IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(
+                      Boxicons.bx_x,
+                      size: 20.0,
+                      color: Colors.white70,
                     ),
                   ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    constraints:
-                        const BoxConstraints(maxWidth: 600, minWidth: 200),
-                    child: Row(
-                      children: widget.stories
-                          .asMap()
-                          .map((i, e) {
-                            return MapEntry(
-                              i,
-                              AnimatedBar(
-                                  animationController: _animationController,
-                                  position: i,
-                                  currentIndex: currentIndex),
-                            );
-                          })
-                          .values
-                          .toList(),
-                    ),
-                  ),
-                ],
-              ))
+                )
+              : const SizedBox.shrink()
         ],
       ),
     ));

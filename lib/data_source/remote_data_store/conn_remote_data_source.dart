@@ -5,7 +5,7 @@ import 'package:rootnode/data_source/remote_data_store/response/res_conn.dart';
 import 'package:rootnode/helper/http_service.dart';
 
 class ConnRemoteDataSource {
-  final Dio _httpServices = HttpServices().getDioInstance();
+  final Dio _httpServices = HttpServices.getDioInstance();
 
   Future<MyConnsResponse?> getMyConns({int page = 1, int refresh = 0}) async {
     try {

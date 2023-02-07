@@ -8,7 +8,7 @@ import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user/user.dart';
 
 class UserRemoteDataSource {
-  final Dio _httpServices = HttpServices().getDioInstance();
+  final Dio _httpServices = HttpServices.getDioInstance();
 
   Future<int> register(User user) async {
     try {
@@ -18,6 +18,7 @@ class UserRemoteDataSource {
       );
       return response.statusCode == 201 ? 1 : 0;
     } catch (e) {
+      debugPrint(e.toString());
       return 0;
     }
   }
@@ -32,8 +33,11 @@ class UserRemoteDataSource {
         ApiConstants.baseUrl + ApiConstants.login,
         data: data,
       );
+
       if (res.statusCode == 200) {
-        SimpleStorage.saveStringData("token", res.data["data"]["accessToken"]);
+        String token = res.data["data"]["accessToken"];
+        SimpleStorage.saveStringData("token", token);
+        HttpServices.addHeader(key: "authorization", value: "Bearer $token");
         return true;
       } else {
         return false;
@@ -46,11 +50,10 @@ class UserRemoteDataSource {
 
   Future<User?> getUserFromToken() async {
     try {
-      String? token = await SimpleStorage.getStringData("token");
-      _httpServices.options.headers["authorization"] = "Bearer $token";
       Response res =
           await _httpServices.get(ApiConstants.baseUrl + ApiConstants.whoAmI);
-      return res.data["isAnonymous"] ? null : User.fromJson(res.data["user"]);
+
+      return res.data["user"] == null ? null : User.fromJson(res.data["user"]);
     } catch (_) {
       debugPrint(_.toString());
       return null;

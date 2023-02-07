@@ -15,10 +15,11 @@ import 'package:string_extensions/string_extensions.dart';
 
 class StoriesWidget extends StatefulWidget {
   final User currentUser;
-
+  final bool compact;
   const StoriesWidget({
     super.key,
     required this.currentUser,
+    this.compact = false,
   });
 
   @override
@@ -33,6 +34,7 @@ class _StoriesWidgetState extends State<StoriesWidget> {
   final List<Story> _stories = [];
   late int storyTotal;
   int storyPage = 1;
+  late bool _compact;
 
   void _getInitialStoryData() async {
     _storyResponse = await _storyRepo.getStoryFeed(
@@ -64,6 +66,7 @@ class _StoriesWidgetState extends State<StoriesWidget> {
 
   @override
   void initState() {
+    _compact = widget.compact;
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       if (_scrollController.position.maxScrollExtent ==
@@ -89,12 +92,13 @@ class _StoriesWidgetState extends State<StoriesWidget> {
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10.0),
-        itemCount: 1 + _stories.length,
+        itemCount: _compact ? _stories.length : 1 + _stories.length,
         itemBuilder: (context, index) {
-          if (index == 0) {
+          if (index == 0 && !_compact) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: StoryCard(
+                compact: _compact,
                 stories: _stories,
                 index: index,
                 color: Colors.cyan,
@@ -106,12 +110,15 @@ class _StoriesWidgetState extends State<StoriesWidget> {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Hero(
-              tag: "story-${index - 1}",
+              tag: _compact ? "story-$index" : "story-${index - 1}",
               child: StoryCard(
+                  compact: _compact,
                   stories: _stories,
                   index: index,
-                  color: Color(_stories[index - 1].color!),
-                  story: _stories[index - 1]),
+                  color: Color(_compact
+                      ? _stories[index].color!
+                      : _stories[index - 1].color!),
+                  story: _compact ? _stories[index] : _stories[index - 1]),
             ),
           );
         },
@@ -128,6 +135,7 @@ class StoryCard extends StatelessWidget {
   final int index;
   final bool hideName;
   final bool disableBorder;
+  final bool compact;
   const StoryCard({
     Key? key,
     this.isAddStory = false,
@@ -137,6 +145,7 @@ class StoryCard extends StatelessWidget {
     required this.stories,
     this.hideName = false,
     this.disableBorder = false,
+    this.compact = false,
   }) : super(key: key);
 
   @override
@@ -192,9 +201,9 @@ class StoryCard extends StatelessWidget {
               : switchRouteByPush(
                   context,
                   ViewStoryScreen(
-                    stories: stories,
-                    initial: index - 1,
-                  )),
+                      stories: stories,
+                      initial: compact ? index : index - 1,
+                      compact: compact)),
           child: Container(
             alignment: Alignment.center,
             height: double.infinity,
