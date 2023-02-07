@@ -5,7 +5,7 @@ import 'package:rootnode/data_source/remote_data_store/response/res_conn.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/conn.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/screen/misc/view_profile.dart';
 import 'package:rootnode/widgets/placeholder.dart';

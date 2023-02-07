@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:string_extensions/string_extensions.dart';
 
 class UserCard extends StatelessWidget {

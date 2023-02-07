@@ -1,5 +1,5 @@
 import 'package:path_provider/path_provider.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/objectbox.g.dart';
 
 class ObjectBoxInstance {

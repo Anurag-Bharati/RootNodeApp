@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
 import 'package:rootnode/model/post.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/widgets/add_media.dart';
 import 'package:rootnode/widgets/radio_button.dart';

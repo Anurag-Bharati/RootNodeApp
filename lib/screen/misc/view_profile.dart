@@ -7,7 +7,7 @@ import 'package:rootnode/helper/responsive_helper.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/model/story.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/repository/story_repo.dart';

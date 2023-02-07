@@ -5,7 +5,7 @@ import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
 import 'package:rootnode/helper/switch_route.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/screen/dashboard/event_screen.dart';
 import 'package:rootnode/screen/dashboard/home_screen.dart';
 import 'package:rootnode/screen/dashboard/messenger_screen.dart';

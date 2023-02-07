@@ -1,7 +1,8 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
-import 'package:rootnode/model/user.dart';
+
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/screen/auth/login_screen.dart';
 import 'package:rootnode/widgets/radio_button.dart';
 import 'package:rootnode/widgets/switch_button.dart';

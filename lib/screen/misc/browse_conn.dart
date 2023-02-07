@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/helper/switch_route.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/screen/misc/view_profile.dart';
 import 'package:rootnode/widgets/placeholder.dart';

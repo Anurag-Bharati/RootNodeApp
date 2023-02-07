@@ -8,7 +8,7 @@ import 'package:rootnode/widgets/placeholder.dart';
 import 'package:rootnode/widgets/posts.dart';
 import 'package:rootnode/widgets/stories.dart';
 
-import '../../model/user.dart';
+import '../../model/user/user.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String route = "home";

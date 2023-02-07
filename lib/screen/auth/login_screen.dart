@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rootnode/helper/switch_route.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/auth/register_screen.dart';
 import 'package:rootnode/screen/dashboard/dashboard.dart';

@@ -5,7 +5,7 @@ import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/story.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/story_repo.dart';
 import 'package:rootnode/widgets/placeholder.dart';
 import 'package:string_extensions/string_extensions.dart';

@@ -2,7 +2,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/data_source/local_data_store/user_data_source.dart';
 import 'package:rootnode/data_source/remote_data_store/user_remote_data_source.dart';
 import 'package:rootnode/helper/network_connectivity.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 
 abstract class UserRepo {
   Future<int> saveUser(User user);

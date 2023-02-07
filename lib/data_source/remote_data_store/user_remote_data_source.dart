@@ -5,7 +5,7 @@ import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/helper/http_service.dart';
 import 'package:rootnode/helper/simple_storage.dart';
 import 'package:rootnode/helper/utils.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 
 class UserRemoteDataSource {
   final Dio _httpServices = HttpServices().getDioInstance();

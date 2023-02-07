@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/auth/login_screen.dart';
 import 'package:rootnode/widgets/text_field.dart';

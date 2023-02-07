@@ -6,7 +6,7 @@ import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/story.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/story_repo.dart';
 import 'package:rootnode/screen/misc/create_story.dart';
 import 'package:rootnode/screen/misc/view_story.dart';
