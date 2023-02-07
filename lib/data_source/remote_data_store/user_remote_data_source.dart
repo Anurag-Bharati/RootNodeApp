@@ -36,7 +36,8 @@ class UserRemoteDataSource {
 
       if (res.statusCode == 200) {
         String token = res.data["data"]["accessToken"];
-        SimpleStorage.saveStringData("token", token);
+        await SimpleStorage.saveStringData("token", token);
+        HttpServices.removeHeader(key: "token");
         HttpServices.addHeader(key: "authorization", value: "Bearer $token");
         return true;
       } else {
@@ -52,7 +53,6 @@ class UserRemoteDataSource {
     try {
       Response res =
           await _httpServices.get(ApiConstants.baseUrl + ApiConstants.whoAmI);
-
       return res.data["user"] == null ? null : User.fromJson(res.data["user"]);
     } catch (_) {
       debugPrint(_.toString());

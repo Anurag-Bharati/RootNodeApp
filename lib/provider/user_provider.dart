@@ -4,3 +4,5 @@ import 'package:rootnode/repository/user_repo.dart';
 
 final userDetailsProvider = FutureProvider.family<User?, String>(
     (ref, id) async => UserRepoImpl().getUserById(id));
+
+final userProvider = StateProvider<User?>((ref) => null);

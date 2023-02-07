@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/auth/register_screen.dart';
 import 'package:rootnode/screen/dashboard/dashboard.dart';
@@ -41,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _scrollController.dispose();
   }
 
-  Future<User?> _loginUser() async {
+  Future<bool> _loginUser(WidgetRef ref) async {
     final bool isEmail =
         RegExp(emailregEx).hasMatch(_emailFieldController.text);
     FocusScope.of(context).unfocus();
@@ -53,10 +55,12 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!res) {
       // ignore: use_build_context_synchronously
       showSnackbar(context, "Invalid email or password", Colors.red[400]!);
-      return null;
+      return false;
     }
     User? user = await userRepo.getUserFromToken();
-    return user;
+    if (user == null) return false;
+    ref.read(sessionProvider.notifier).updateUser(user: user);
+    return true;
   }
 
   @override
@@ -103,47 +107,49 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             margin: const EdgeInsets.symmetric(
                                 horizontal: 40, vertical: 10),
-                            child: TextButton(
-                              style: const ButtonStyle(
-                                  alignment: Alignment.center),
-                              onPressed: () async {
-                                if (!_globalkey.currentState!.validate()) {
-                                  showSnackbar(context, "Invalid fields",
-                                      Colors.red[400]!);
-                                  return;
-                                }
-                                showSnackbar(
-                                    context, "Logging in..", Colors.green[400]!,
-                                    dismissable: false);
-                                User? user = await _loginUser();
-                                if (user != null) {
-                                  // ignore: use_build_context_synchronously
-                                  ScaffoldMessenger.of(context)
-                                      .removeCurrentSnackBar();
+                            child: Consumer(builder: (context, ref, child) {
+                              return TextButton(
+                                style: const ButtonStyle(
+                                    alignment: Alignment.center),
+                                onPressed: () async {
+                                  if (!_globalkey.currentState!.validate()) {
+                                    showSnackbar(context, "Invalid fields",
+                                        Colors.red[400]!);
+                                    return;
+                                  }
+                                  showSnackbar(context, "Logging in..",
+                                      Colors.green[400]!,
+                                      dismissable: false);
+                                  bool success = await _loginUser(ref);
+                                  if (success) {
+                                    // ignore: use_build_context_synchronously
+                                    ScaffoldMessenger.of(context)
+                                        .removeCurrentSnackBar();
 
+                                    // ignore: use_build_context_synchronously
+                                    return switchRouteByPushReplace(
+                                        context, const DashboardScreen());
+                                  }
                                   // ignore: use_build_context_synchronously
-                                  return switchRouteByPushReplace(
-                                      context, DashboardScreen(user: user));
-                                }
-                                // ignore: use_build_context_synchronously
-                                showSnackbar(
-                                  context,
-                                  "Sorry! Something went wrong",
-                                  Colors.red[400]!,
-                                );
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text(
-                                  'Login',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.bold,
+                                  showSnackbar(
+                                    context,
+                                    "Sorry! Something went wrong",
+                                    Colors.red[400]!,
+                                  );
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(
+                                    'Login',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
+                              );
+                            }),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(

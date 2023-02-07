@@ -138,11 +138,8 @@ class _ViewConnScreenState extends State<ViewConnScreen> {
                 delegate: conns.isNotEmpty
                     ? SliverChildBuilderDelegate(
                         (context, index) => GestureDetector(
-                              onTap: () => switchRouteByPush(
-                                  context,
-                                  ProfileScreen(
-                                      id: conns[index].node!.id!,
-                                      user: widget.user)),
+                              onTap: () => switchRouteByPush(context,
+                                  ProfileScreen(id: conns[index].node!.id!)),
                               child: Container(
                                 height: 80,
                                 color: Colors.white10,

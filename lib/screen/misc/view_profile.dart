@@ -1,5 +1,6 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_post.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
@@ -8,6 +9,7 @@ import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/repository/story_repo.dart';
@@ -19,16 +21,17 @@ import 'package:rootnode/widgets/posts.dart';
 import 'package:rootnode/widgets/profile_card.dart';
 import 'package:rootnode/widgets/stories.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key, required this.id, required this.user});
+class ProfileScreen extends ConsumerStatefulWidget {
+  const ProfileScreen({super.key, required this.id, this.isOwn = false});
   final String id;
-  final User user;
+  final bool isOwn;
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  late User rootnode;
   final _userRepo = UserRepoImpl();
   final _storyRepo = StoryRepoImpl();
   final _connRepo = ConnRepoImpl();
@@ -151,6 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    rootnode = ref.watch(sessionProvider.select((value) => value.user!));
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -227,8 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   background: ProfileCard(
                     actions: _actionButtons(),
                     hasConn: hasConn,
-                    id: widget.id,
-                    user: user,
+                    user: widget.isOwn ? rootnode : user,
                   ),
                   centerTitle: true,
                 ),
@@ -273,6 +276,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ? ConstrainedSliverWidth(
                                       maxWidth: maxContentWidth,
                                       child: PostContainer(
+                                          isOwn: rootnode.id ==
+                                              _posts[index].owner!.id,
                                           post: _posts[index],
                                           likedMeta: _postsLiked[index]),
                                     )
@@ -313,16 +318,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       RootNodeOutlinedButton(
         onPressed: () async {
-          if (widget.id == widget.user.id!) {
+          if (widget.id == rootnode.id!) {
             debugPrint("Edit Button Pressed!");
-            switchRouteByPush(context, EditProfile(user: widget.user));
+            switchRouteByPush(context, EditProfile(user: rootnode));
           } else {
             _toggleFollow();
             debugPrint("Follow Button Pressed!");
           }
         },
         child: hasConn != null
-            ? widget.id != widget.user.id
+            ? widget.id != rootnode.id
                 ? Text(hasConn! ? "Unfollow" : "Follow",
                     style: RootNodeFontStyle.body)
                 : Text("Edit", style: RootNodeFontStyle.body)

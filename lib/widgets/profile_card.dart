@@ -7,19 +7,16 @@ import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/widgets/buttons.dart';
-import 'package:string_extensions/string_extensions.dart';
 
 class ProfileCard extends StatelessWidget {
   const ProfileCard({
     super.key,
     required this.user,
     required this.hasConn,
-    required this.id,
     required this.actions,
   });
 
   final User? user;
-  final String? id;
   final bool? hasConn;
   final List<RootNodeOutlinedButton> actions;
 
@@ -91,7 +88,7 @@ class ProfileCard extends StatelessWidget {
                     spacing: -2,
                     children: [
                       Text(
-                        "${user!.fname} ${user!.lname!}".toTitleCase!,
+                        user!.fullname,
                         style: RootNodeFontStyle.header,
                       ),
                       Text(

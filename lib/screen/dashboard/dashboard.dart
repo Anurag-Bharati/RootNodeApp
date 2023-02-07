@@ -1,11 +1,13 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/screen/dashboard/event_screen.dart';
 import 'package:rootnode/screen/dashboard/home_screen.dart';
 import 'package:rootnode/screen/dashboard/messenger_screen.dart';
@@ -14,21 +16,17 @@ import 'package:rootnode/screen/misc/create_post.dart';
 import 'package:rootnode/screen/misc/setting.dart';
 import 'package:rootnode/widgets/selection_tile.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, this.user});
-  final User? user;
+class DashboardScreen extends ConsumerStatefulWidget {
+  const DashboardScreen({super.key});
 
   static const String route = "dashboardScreen";
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  late User rootnode;
 
   Future<void> _navigateToCreatePost(
       BuildContext context, RNContentType type) async {
@@ -36,7 +34,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context,
       MaterialPageRoute(
         builder: (BuildContext context) =>
-            CreatePostScreen(user: widget.user, type: type),
+            CreatePostScreen(user: rootnode, type: type),
       ),
     );
     if (!mounted) return;
@@ -62,14 +60,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    rootnode = ref.watch(sessionProvider.select((value) => value.user!));
     return Scaffold(
       extendBody: _getWidth(context) > 480,
       appBar: AppBar(
         elevation: 0,
         toolbarHeight: mqSmallH(context) ? 80 : 60,
         backgroundColor: const Color(0xFF111111),
-        title: RootNodeBar(user: widget.user!),
+        title: RootNodeBar(user: rootnode),
         actions: [
           Container(
             padding: const EdgeInsets.only(right: 10),
@@ -102,11 +106,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body: IndexedStack(index: _selectedIndex, children: [
-        HomeScreen(user: widget.user!),
-        NodeScreen(user: widget.user!),
-        const MessengerScreen(),
-        const EventScreen(),
+      body: IndexedStack(index: _selectedIndex, children: const [
+        HomeScreen(),
+        NodeScreen(),
+        MessengerScreen(),
+        EventScreen(),
       ]),
       bottomNavigationBar: Container(
         margin: _getWidth(context) > triggerResponsiveNav
@@ -222,7 +226,7 @@ class RootNodeBar extends StatelessWidget {
       children: [
         InkWell(
           borderRadius: BorderRadius.circular(50),
-          onTap: () => switchRouteByPush(context, SettingScreen(user: user)),
+          onTap: () => switchRouteByPush(context, const SettingScreen()),
           child: Container(
             height: 40,
             width: 40,
@@ -233,12 +237,10 @@ class RootNodeBar extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: FadeInImage.assetNetwork(
-              imageCacheHeight: 128,
-              imageCacheWidth: 128,
+              imageCacheHeight: 256,
+              imageCacheWidth: 256,
               fit: BoxFit.cover,
-              image: user.avatar != null
-                  ? "${ApiConstants.baseUrl}\\${user.avatar}"
-                  : "https://cdn.shopify.com/s/files/1/0344/6469/files/angry.jpg?v=1560891349",
+              image: "${ApiConstants.baseUrl}/${user.avatar}",
               placeholder: 'assets/images/image_grey.png',
             ),
           ),
@@ -250,11 +252,7 @@ class RootNodeBar extends StatelessWidget {
             spacing: -5,
             children: [
               Text("Good Morning,", style: RootNodeFontStyle.label),
-              Text(
-                  user.fname != null
-                      ? "${user.fname} ${user.lname!.substring(0, 1).toUpperCase()}."
-                      : "ANURAG",
-                  style: RootNodeFontStyle.title),
+              Text(user.fullname, style: RootNodeFontStyle.title),
             ],
           ),
         ),

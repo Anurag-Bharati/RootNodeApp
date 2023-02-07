@@ -2,6 +2,7 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_conn.dart';
@@ -9,6 +10,7 @@ import 'package:rootnode/helper/responsive_helper.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/screen/misc/browse_conn.dart';
 import 'package:rootnode/screen/misc/view_conn.dart';
@@ -16,14 +18,14 @@ import 'package:rootnode/screen/misc/view_profile.dart';
 import 'package:rootnode/widgets/placeholder.dart';
 import 'package:string_extensions/string_extensions.dart';
 
-class NodeScreen extends StatefulWidget {
-  const NodeScreen({super.key, required this.user});
-  final User user;
+class NodeScreen extends ConsumerStatefulWidget {
+  const NodeScreen({super.key});
   @override
-  State<NodeScreen> createState() => _NodeScreenState();
+  ConsumerState<NodeScreen> createState() => _NodeScreenState();
 }
 
-class _NodeScreenState extends State<NodeScreen> {
+class _NodeScreenState extends ConsumerState<NodeScreen> {
+  late User rootnode;
   final _connRepo = ConnRepoImpl();
   late final ScrollController _scrollController;
   late final ScrollController _recomScrollController;
@@ -152,6 +154,7 @@ class _NodeScreenState extends State<NodeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    rootnode = ref.watch(sessionProvider.select((value) => value.user!));
     return CustomScrollView(
       controller: _scrollController,
       slivers: [
@@ -163,7 +166,7 @@ class _NodeScreenState extends State<NodeScreen> {
             maxWidth: 720,
             child: old != null && recent != null
                 ? ConnOverview(
-                    user: widget.user,
+                    user: rootnode,
                     old: old!,
                     count: count,
                     recent: recent!,
@@ -194,7 +197,7 @@ class _NodeScreenState extends State<NodeScreen> {
           child: ConstrainedSliverWidth(
             maxWidth: 720,
             child: NewConnectionList(
-              rootnode: widget.user,
+              rootnode: rootnode,
               users: recom,
               scrollController: _recomScrollController,
               type: NewConnectionListType.recommended,
@@ -206,7 +209,7 @@ class _NodeScreenState extends State<NodeScreen> {
           child: ConstrainedSliverWidth(
             maxWidth: 720,
             child: NewConnectionList(
-              rootnode: widget.user,
+              rootnode: rootnode,
               users: random,
               scrollController: _randomScrollController,
               type: NewConnectionListType.random,
@@ -339,8 +342,7 @@ class NewConnectionList extends StatelessWidget {
             ),
             GestureDetector(
                 onTap: () {
-                  switchRouteByPush(
-                      context, ProfileScreen(id: user.id!, user: rootnode));
+                  switchRouteByPush(context, ProfileScreen(id: user.id!));
                   debugPrint("Discover > User: ${user.fname}");
                 },
                 child: Container(
@@ -405,24 +407,19 @@ class ConnOverview extends StatelessWidget {
     }
     if (isOld) {
       generated = old
-          .map((e) => NodeAvatar(
-              rootnode: user, date: Utils.getTimeAgo(e.date!), user: e.user))
+          .map((e) => NodeAvatar(date: Utils.getTimeAgo(e.date!), user: e.user))
           .toList();
       generated.addAll(dummys ?? []);
-      generated.insert(0,
-          NodeAvatar(rootnode: user, user: user, date: "this", isAction: true));
+      generated.insert(
+          0, NodeAvatar(isOwn: true, user: user, date: "this", isAction: true));
       generated.last.settings['hideDate'] = true;
     } else {
       generated = recent
           .map((e) => NodeAvatar(
-              rootnode: user,
-              date: Utils.getTimeAgo(e.date!),
-              user: e.user,
-              invert: true))
+              date: Utils.getTimeAgo(e.date!), user: e.user, invert: true))
           .toList();
       generated.insertAll(0, dummys ?? []);
-      generated.add(NodeAvatar(
-          date: "this.add", invert: true, isAction: true, rootnode: user));
+      generated.add(NodeAvatar(date: "this.add", invert: true, isAction: true));
       generated.first.settings['hideDate'] = true;
     }
     return generated;
@@ -543,14 +540,14 @@ class NodeAvatar extends StatelessWidget {
     this.invert = false,
     this.isDummy = false,
     this.isAction = false,
-    this.rootnode,
+    this.isOwn = false,
   });
-  final User? rootnode;
   final User? user;
   final String date;
   final bool invert;
   final bool isDummy;
   final bool isAction;
+  final bool isOwn;
   final Map<String, bool> settings = {"hideDate": false};
 
   @override
@@ -567,12 +564,11 @@ class NodeAvatar extends StatelessWidget {
                 debugPrint(
                     "User: ${isDummy ? 'Dummy Node' : user != null ? user!.fname : 'No user'} | Action: $isAction");
                 if (isAction && user == null) {
-                  print(rootnode);
-                  switchRouteByPush(context, BrowseConnScreen(user: rootnode!));
+                  switchRouteByPush(context, const BrowseConnScreen());
                 }
                 if (user != null) {
                   switchRouteByPush(
-                      context, ProfileScreen(id: user!.id!, user: rootnode!));
+                      context, ProfileScreen(isOwn: isOwn, id: user!.id!));
                 }
               },
               child: Container(
@@ -592,7 +588,7 @@ class NodeAvatar extends StatelessWidget {
                           "${ApiConstants.baseUrl}/${user!.avatar}",
                           maxHeight: 256,
                           maxWidth: 256,
-                          cacheKey: user!.id,
+                          cacheKey: isOwn ? null : user!.id,
                         )
                       : null,
                   child: date == "this.add"

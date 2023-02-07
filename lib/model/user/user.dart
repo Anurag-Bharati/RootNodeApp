@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:objectbox/objectbox.dart';
+import 'package:string_extensions/string_extensions.dart';
 
 part 'user.freezed.dart';
 part 'user.g.dart';
@@ -9,7 +10,7 @@ class User with _$User {
   const User._();
   @Entity(realClass: User)
   factory User({
-    @Id(assignable: true) final int? uid,
+    @JsonKey(ignore: true) @Id(assignable: true) final int? uid,
     @Unique() @JsonKey(name: '_id') final String? id,
     final String? fname,
     final String? lname,
@@ -31,6 +32,11 @@ class User with _$User {
     @Property(type: PropertyType.date) final DateTime? updatedAt,
     @Property(type: PropertyType.date) final DateTime? usernameChangedAt,
   }) = _User;
+
+  String get fullname {
+    if (fname == null && lname == null) return "Anonymous";
+    return "${fname ?? ''} ${lname ?? ''}".toTitleCase!;
+  }
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

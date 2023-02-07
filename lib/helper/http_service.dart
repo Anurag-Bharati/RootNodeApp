@@ -12,11 +12,11 @@ class HttpServices {
   };
 
   static addHeader({required String key, required String value}) {
-    getDioInstance().options.headers.putIfAbsent(key, () => value);
+    getDioInstance().options.headers[key] = value;
   }
 
   static removeHeader({required String key}) {
-    getDioInstance().options.headers.remove(key);
+    getDioInstance().options.headers[key] = null;
   }
 
   static Dio getDioInstance() {

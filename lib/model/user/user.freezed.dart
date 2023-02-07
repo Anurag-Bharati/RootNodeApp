@@ -20,6 +20,7 @@ User _$UserFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$User {
+  @JsonKey(ignore: true)
   @Id(assignable: true)
   int? get uid => throw _privateConstructorUsedError;
   @Unique()
@@ -61,7 +62,7 @@ abstract class $UserCopyWith<$Res> {
       _$UserCopyWithImpl<$Res, User>;
   @useResult
   $Res call(
-      {@Id(assignable: true) int? uid,
+      {@JsonKey(ignore: true) @Id(assignable: true) int? uid,
       @Unique() @JsonKey(name: '_id') String? id,
       String? fname,
       String? lname,
@@ -215,7 +216,7 @@ abstract class _$$_UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {@Id(assignable: true) int? uid,
+      {@JsonKey(ignore: true) @Id(assignable: true) int? uid,
       @Unique() @JsonKey(name: '_id') String? id,
       String? fname,
       String? lname,
@@ -363,7 +364,7 @@ class __$$_UserCopyWithImpl<$Res> extends _$UserCopyWithImpl<$Res, _$_User>
 @Entity(realClass: User)
 class _$_User extends _User {
   _$_User(
-      {@Id(assignable: true) this.uid,
+      {@JsonKey(ignore: true) @Id(assignable: true) this.uid,
       @Unique() @JsonKey(name: '_id') this.id,
       this.fname,
       this.lname,
@@ -389,6 +390,7 @@ class _$_User extends _User {
   factory _$_User.fromJson(Map<String, dynamic> json) => _$$_UserFromJson(json);
 
   @override
+  @JsonKey(ignore: true)
   @Id(assignable: true)
   final int? uid;
   @override
@@ -530,7 +532,8 @@ class _$_User extends _User {
 
 abstract class _User extends User {
   factory _User(
-      {@Id(assignable: true)
+      {@JsonKey(ignore: true)
+      @Id(assignable: true)
           final int? uid,
       @Unique()
       @JsonKey(name: '_id')
@@ -564,6 +567,7 @@ abstract class _User extends User {
   factory _User.fromJson(Map<String, dynamic> json) = _$_User.fromJson;
 
   @override
+  @JsonKey(ignore: true)
   @Id(assignable: true)
   int? get uid;
   @override
