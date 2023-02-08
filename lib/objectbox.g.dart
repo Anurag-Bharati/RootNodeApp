@@ -14,6 +14,7 @@ import 'package:objectbox/internal.dart'; // generated code can access "internal
 import 'package:objectbox/objectbox.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'model/comment/comment.dart';
 import 'model/conn.dart';
 import 'model/post.dart';
 import 'model/story.dart';
@@ -339,7 +340,8 @@ final _entities = <ModelEntity>[
             id: const IdUid(18, 3062967772156768618),
             name: 'username',
             type: 9,
-            flags: 0),
+            flags: 2080,
+            indexId: const IdUid(15, 8677575070794955431)),
         ModelProperty(
             id: const IdUid(19, 433008862834630105),
             name: 'createdAt',
@@ -353,6 +355,56 @@ final _entities = <ModelEntity>[
         ModelProperty(
             id: const IdUid(21, 2007629041041205793),
             name: 'usernameChangedAt',
+            type: 10,
+            flags: 0)
+      ],
+      relations: <ModelRelation>[],
+      backlinks: <ModelBacklink>[]),
+  ModelEntity(
+      id: const IdUid(10, 2667989420531770701),
+      name: 'Comment',
+      lastPropertyId: const IdUid(8, 898622646642411009),
+      flags: 0,
+      properties: <ModelProperty>[
+        ModelProperty(
+            id: const IdUid(1, 5697139504284332177),
+            name: 'cid',
+            type: 6,
+            flags: 129),
+        ModelProperty(
+            id: const IdUid(2, 3761508425932665042),
+            name: 'id',
+            type: 9,
+            flags: 2080,
+            indexId: const IdUid(14, 3922288636409474377)),
+        ModelProperty(
+            id: const IdUid(3, 8215554676776451781),
+            name: 'comment',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(4, 8252573767795983553),
+            name: 'type',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(5, 6132312336048418290),
+            name: 'likesCount',
+            type: 6,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(6, 1668686964222377843),
+            name: 'status',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(7, 2400268014759141517),
+            name: 'createdAt',
+            type: 10,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(8, 898622646642411009),
+            name: 'updatedAt',
             type: 10,
             flags: 0)
       ],
@@ -380,8 +432,8 @@ Future<Store> openStore(
 ModelDefinition getObjectBoxModel() {
   final model = ModelInfo(
       entities: _entities,
-      lastEntityId: const IdUid(9, 8275925279760383233),
-      lastIndexId: const IdUid(13, 8154792555828599654),
+      lastEntityId: const IdUid(10, 2667989420531770701),
+      lastIndexId: const IdUid(15, 8677575070794955431),
       lastRelationId: const IdUid(1, 403350268397340821),
       lastSequenceId: const IdUid(0, 0),
       retiredEntityUids: const [
@@ -808,6 +860,70 @@ ModelDefinition getObjectBoxModel() {
               usernameChangedAt: usernameChangedAtValue == null ? null : DateTime.fromMillisecondsSinceEpoch(usernameChangedAtValue));
 
           return object;
+        }),
+    Comment: EntityDefinition<Comment>(
+        model: _entities[5],
+        toOneRelations: (Comment object) => [],
+        toManyRelations: (Comment object) => {},
+        getId: (Comment object) => object.cid,
+        setId: (Comment object, int id) {
+          if (object.cid != id) {
+            throw ArgumentError('Field Comment.cid is read-only '
+                '(final or getter-only) and it was declared to be self-assigned. '
+                'However, the currently inserted object (.cid=${object.cid}) '
+                "doesn't match the inserted ID (ID $id). "
+                'You must assign an ID before calling [box.put()].');
+          }
+        },
+        objectToFB: (Comment object, fb.Builder fbb) {
+          final idOffset =
+              object.id == null ? null : fbb.writeString(object.id!);
+          final commentOffset =
+              object.comment == null ? null : fbb.writeString(object.comment!);
+          final typeOffset =
+              object.type == null ? null : fbb.writeString(object.type!);
+          final statusOffset =
+              object.status == null ? null : fbb.writeString(object.status!);
+          fbb.startTable(9);
+          fbb.addInt64(0, object.cid ?? 0);
+          fbb.addOffset(1, idOffset);
+          fbb.addOffset(2, commentOffset);
+          fbb.addOffset(3, typeOffset);
+          fbb.addInt64(4, object.likesCount);
+          fbb.addOffset(5, statusOffset);
+          fbb.addInt64(6, object.createdAt?.millisecondsSinceEpoch);
+          fbb.addInt64(7, object.updatedAt?.millisecondsSinceEpoch);
+          fbb.finish(fbb.endTable());
+          return object.cid ?? 0;
+        },
+        objectFromFB: (Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final createdAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 16);
+          final updatedAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 18);
+          final object = Comment(
+              cid: const fb.Int64Reader()
+                  .vTableGetNullable(buffer, rootOffset, 4),
+              id: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 6),
+              comment: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 8),
+              type: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 10),
+              likesCount: const fb.Int64Reader()
+                  .vTableGetNullable(buffer, rootOffset, 12),
+              status: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 14),
+              createdAt: createdAtValue == null
+                  ? null
+                  : DateTime.fromMillisecondsSinceEpoch(createdAtValue),
+              updatedAt: updatedAtValue == null
+                  ? null
+                  : DateTime.fromMillisecondsSinceEpoch(updatedAtValue));
+
+          return object;
         })
   };
 
@@ -1033,4 +1149,36 @@ class User_ {
   /// see [User.usernameChangedAt]
   static final usernameChangedAt =
       QueryIntegerProperty<User>(_entities[4].properties[20]);
+}
+
+/// [Comment] entity fields to define ObjectBox queries.
+class Comment_ {
+  /// see [Comment.cid]
+  static final cid = QueryIntegerProperty<Comment>(_entities[5].properties[0]);
+
+  /// see [Comment.id]
+  static final id = QueryStringProperty<Comment>(_entities[5].properties[1]);
+
+  /// see [Comment.comment]
+  static final comment =
+      QueryStringProperty<Comment>(_entities[5].properties[2]);
+
+  /// see [Comment.type]
+  static final type = QueryStringProperty<Comment>(_entities[5].properties[3]);
+
+  /// see [Comment.likesCount]
+  static final likesCount =
+      QueryIntegerProperty<Comment>(_entities[5].properties[4]);
+
+  /// see [Comment.status]
+  static final status =
+      QueryStringProperty<Comment>(_entities[5].properties[5]);
+
+  /// see [Comment.createdAt]
+  static final createdAt =
+      QueryIntegerProperty<Comment>(_entities[5].properties[6]);
+
+  /// see [Comment.updatedAt]
+  static final updatedAt =
+      QueryIntegerProperty<Comment>(_entities[5].properties[7]);
 }
