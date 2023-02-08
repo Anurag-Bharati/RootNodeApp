@@ -9,6 +9,7 @@ import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/connection_provider.dart';
 import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/repository/post_repo.dart';
@@ -228,11 +229,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   collapseMode: CollapseMode.parallax,
                   stretchModes: const [StretchMode.blurBackground],
-                  background: ProfileCard(
-                    actions: _actionButtons(),
-                    hasConn: hasConn,
-                    user: widget.isOwn ? rootnode : user,
-                  ),
+                  background: Consumer(builder: (context, ref, child) {
+                    return ProfileCard(
+                      actions: _actionButtons(ref),
+                      hasConn: hasConn,
+                      user: widget.isOwn ? rootnode : user,
+                    );
+                  }),
                   centerTitle: true,
                 ),
                 leading: IconButton(
@@ -296,8 +299,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  _toggleFollow() async {
+  _toggleFollow(WidgetRef ref) async {
     bool? res = await _connRepo.toggleConnection(id: widget.id);
+    ref.read(connOverviewProvider.notifier).fetchOverview();
     if (res != null) {
       setState(() {
         hasConn = res;
@@ -305,7 +309,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  List<RootNodeOutlinedButton> _actionButtons() {
+  List<RootNodeOutlinedButton> _actionButtons(WidgetRef ref) {
     return [
       RootNodeOutlinedButton(
         onPressed: () => debugPrint("Share Button Pressed!"),
@@ -322,7 +326,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             debugPrint("Edit Button Pressed!");
             switchRouteByPush(context, EditProfile(user: rootnode));
           } else {
-            _toggleFollow();
+            _toggleFollow(ref);
             debugPrint("Follow Button Pressed!");
           }
         },

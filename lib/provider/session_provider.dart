@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/helper/simple_storage.dart';
 import 'package:rootnode/model/user/user.dart';
-import 'package:rootnode/provider/user_provider.dart';
 import 'package:rootnode/repository/user_repo.dart';
 
 class SessionModel {
@@ -10,28 +9,25 @@ class SessionModel {
   final User? user;
   final bool isAuthenticated;
   final bool ready;
-  final Map<String, dynamic> metaData;
 
   const SessionModel({
     this.token,
     this.isAuthenticated = false,
     this.user,
     this.ready = false,
-    this.metaData = const {},
   });
 
-  SessionModel copyWith(
-      {String? token,
-      User? user,
-      bool? isAuthenticated,
-      bool? ready,
-      Map<String, dynamic>? metaData}) {
+  SessionModel copyWith({
+    String? token,
+    User? user,
+    bool? isAuthenticated,
+    bool? ready,
+  }) {
     return SessionModel(
       token: token ?? this.token,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       user: user ?? this.user,
       ready: ready ?? this.ready,
-      metaData: metaData ?? this.metaData,
     );
   }
 }
@@ -80,19 +76,17 @@ class SessionProvider extends StateNotifier<SessionModel> {
 
   Future<void> init() async {
     final String? tokenString = await SimpleStorage.getStringData('token');
-    state = state.copyWith(
-        ready: true, isAuthenticated: false, user: ref.read(userProvider));
+    state = state.copyWith(ready: true, isAuthenticated: false);
     if (tokenString != null) setToken(tokenString);
   }
 
   Future<void> setToken(String token) async {
     SimpleStorage.saveStringData('token', token);
     final user = await UserRepoImpl().getUserFromToken();
-    ref.read(userProvider.notifier).update((state) => user);
     state = state.copyWith(
       token: token,
       isAuthenticated: true,
-      user: ref.read(userProvider),
+      user: user,
       ready: true,
     );
   }

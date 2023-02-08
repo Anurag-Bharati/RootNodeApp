@@ -38,5 +38,10 @@ class User with _$User {
     return "${fname ?? ''} ${lname ?? ''}".toTitleCase!;
   }
 
+  String get fullnameMin {
+    if (fname == null && lname == null) return "Anonymous";
+    return "${fname ?? ''} ${lname?.charAt(0) ?? ''}.".toTitleCase!;
+  }
+
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

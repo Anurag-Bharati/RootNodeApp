@@ -58,9 +58,9 @@ class ProfileCard extends StatelessWidget {
                         backgroundColor: Colors.white10,
                         foregroundImage: CachedNetworkImageProvider(
                           "${ApiConstants.baseUrl}/${user!.avatar!}",
+                          cacheKey: user!.avatar,
                           maxHeight: 256,
                           maxWidth: 256,
-                          cacheKey: user!.avatar,
                         ),
                       )
                     : const AvatarGlow(

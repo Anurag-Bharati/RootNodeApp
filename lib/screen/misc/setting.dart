@@ -7,19 +7,18 @@ import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/helper/notification_helper.dart';
 import 'package:rootnode/provider/session_provider.dart';
-import 'package:rootnode/provider/user_provider.dart';
 import 'package:rootnode/screen/auth/login_screen.dart';
 import 'package:rootnode/widgets/radio_button.dart';
 import 'package:rootnode/widgets/switch_button.dart';
 
-class SettingScreen extends ConsumerStatefulWidget {
+class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
 
   @override
-  ConsumerState<SettingScreen> createState() => _SettingScreenState();
+  State<SettingScreen> createState() => _SettingScreenState();
 }
 
-class _SettingScreenState extends ConsumerState<SettingScreen> {
+class _SettingScreenState extends State<SettingScreen> {
   late User rootnode;
   @override
   void initState() {
@@ -29,7 +28,6 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    rootnode = ref.watch(userProvider)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -147,33 +145,10 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                       )),
                 ),
               ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: ElevatedButton(
-                      onPressed: _changeName,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 20),
-                        child: Text(
-                          "ChangeName",
-                          style: RootNodeFontStyle.body,
-                        ),
-                      )),
-                ),
-              ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  _changeName() {
-    ref
-        .read(sessionProvider.notifier)
-        .updateUser(user: User(fname: "Nice", lname: "Man"));
   }
 }
