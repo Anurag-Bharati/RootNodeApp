@@ -306,31 +306,34 @@ class NewConnectionList extends StatelessWidget {
                 color: const Color(0xFF111111),
               ),
             ),
-            GestureDetector(
-                onTap: () {
-                  switchRouteByPush(context, ProfileScreen(id: user.id!));
-                  debugPrint("Discover > User: ${user.fname}");
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  height: double.infinity,
-                  width: 110.0,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: const Color(0xFF111111),
-                        width: 1.0,
-                        strokeAlign: BorderSide.strokeAlignOutside),
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF111111),
-                        Colors.transparent,
-                      ],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
+            Consumer(builder: (context, ref, child) {
+              return GestureDetector(
+                  onTap: () {
+                    switchRouteByPush(context, ProfileScreen(id: user.id!));
+                    debugPrint("Discover > User: ${user.fname}");
+                  },
+                  onLongPress: () => _toggleFollow(ref, user.id!),
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: double.infinity,
+                    width: 110.0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: const Color(0xFF111111),
+                          width: 1.0,
+                          strokeAlign: BorderSide.strokeAlignOutside),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF111111),
+                          Colors.transparent,
+                        ],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                      ),
                     ),
-                  ),
-                )),
+                  ));
+            }),
             Positioned(
               bottom: 8.0,
               left: 8.0,
@@ -346,6 +349,11 @@ class NewConnectionList extends StatelessWidget {
           ],
         ),
       );
+
+  _toggleFollow(WidgetRef ref, String id) async {
+    await ConnRepoImpl().toggleConnection(id: id);
+    ref.read(connOverviewProvider.notifier).fetchOverview();
+  }
 }
 
 class ConnOverview extends ConsumerWidget {
@@ -394,14 +402,6 @@ class ConnOverview extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(connOverviewProvider);
-    // final old = ref.watch(connOverviewProvider.select((value) => value.old));
-    // final recent =
-    //     ref.watch(connOverviewProvider.select((value) => value.recent));
-    // final count =
-    //     ref.watch(connOverviewProvider.select((value) => value.count));
-    // final limit =
-    //     ref.watch(connOverviewProvider.select((value) => value.limit));
-
     return AnimatedContainer(
       width: double.infinity,
       duration: const Duration(milliseconds: 300),
