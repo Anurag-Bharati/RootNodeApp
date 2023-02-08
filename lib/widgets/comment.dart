@@ -1,0 +1,168 @@
+import 'package:boxicons/boxicons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:like_button/like_button.dart';
+import 'package:rootnode/app/constant/api.dart';
+import 'package:rootnode/app/constant/font.dart';
+import 'package:rootnode/app/constant/layout.dart';
+import 'package:rootnode/helper/utils.dart';
+import 'package:rootnode/model/comment/comment.dart';
+
+class CommentContainer extends StatelessWidget {
+  const CommentContainer(
+      {super.key, required this.comment, this.isOwn = false});
+  final Comment comment;
+  final bool isOwn;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Stack(
+        fit: StackFit.loose,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(left: 5),
+            height: 50,
+            width: MediaQuery.of(context).size.width * 0.5,
+            decoration: BoxDecoration(
+                color: const Color(0xFF252525),
+                borderRadius: BorderRadius.circular(40)),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                    left: 10, right: 0, top: 5, bottom: 5),
+                child: CircleAvatar(
+                  foregroundImage: CachedNetworkImageProvider(
+                    "${ApiConstants.baseUrl}/${comment.user!.avatar!}",
+                    cacheKey: comment.user!.avatar,
+                    maxHeight: 256,
+                    maxWidth: 256,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.8),
+                    margin: const EdgeInsets.only(left: 0, right: 10),
+                    padding: LayoutConstants.postPaddingTLR,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: const Color(0xFF333333),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              comment.user!.fullname,
+                              style: RootNodeFontStyle.title,
+                            ),
+                            Wrap(
+                              spacing: 10,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  Utils.getTimeAgo(comment.createdAt!),
+                                  textAlign: TextAlign.center,
+                                  style: RootNodeFontStyle.label,
+                                ),
+                                const Icon(
+                                  Boxicons.bx_dots_vertical_rounded,
+                                  color: Colors.white70,
+                                  size: LayoutConstants.postIcon,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.only(
+                              left: 5, top: 5, bottom: 10, right: 5),
+                          child: Text(
+                            comment.comment!,
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
+                            style: RootNodeFontStyle.body.copyWith(height: 1.2),
+                          ),
+                        ),
+                        const SizedBox(height: 5)
+                      ],
+                    ),
+                  ),
+                  Wrap(
+                    spacing: 5,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, left: 10),
+                        child: LikeButton(
+                          // onTap: (isLiked) => _toggleCommentLike(),
+                          isLiked: false,
+                          size: LayoutConstants.postIcon,
+                          likeCount: 0,
+                          padding: const EdgeInsets.only(right: 10),
+                          likeBuilder: (isLiked) {
+                            return isLiked
+                                ? const Icon(
+                                    Boxicons.bxs_like,
+                                    color: Colors.white70,
+                                    size: 18,
+                                  )
+                                : const Icon(
+                                    Boxicons.bx_like,
+                                    color: Colors.white70,
+                                    size: 18,
+                                  );
+                          },
+                          likeCountPadding:
+                              const EdgeInsets.only(top: 2, left: 8.0),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: LikeButton(
+                          // onTap: (isLiked) => _toggleCommentLike(),
+                          isLiked: false,
+                          size: LayoutConstants.postIcon,
+                          likeCount: 0,
+                          padding: const EdgeInsets.only(right: 10),
+                          likeBuilder: (isLiked) {
+                            return isLiked
+                                ? const Icon(
+                                    Boxicons.bxs_share,
+                                    color: Colors.white70,
+                                    size: 20,
+                                  )
+                                : const Icon(
+                                    Boxicons.bx_share,
+                                    color: Colors.white70,
+                                    size: 20,
+                                  );
+                          },
+                          likeCountPadding:
+                              const EdgeInsets.only(top: 2, left: 8.0),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
