@@ -13,6 +13,7 @@ import 'package:rootnode/model/post.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/post_repo.dart';
+import 'package:rootnode/screen/misc/comment_screen.dart';
 import 'package:rootnode/screen/misc/view_post_media.dart';
 import 'package:rootnode/widgets/placeholder.dart';
 
@@ -26,6 +27,7 @@ class PostContainer extends StatelessWidget {
     this.tagPrefix,
     this.compact = false,
     this.isOwn = false,
+    this.disableComment = false,
   }) : super(key: key);
 
   final Post post;
@@ -33,6 +35,7 @@ class PostContainer extends StatelessWidget {
   final String? tagPrefix;
   final bool compact;
   final bool isOwn;
+  final bool disableComment;
 
   @override
   Widget build(BuildContext context) {
@@ -52,14 +55,15 @@ class PostContainer extends StatelessWidget {
           height: compact || post.caption == null ? 5 : 10,
         ),
         _PostBody(
-          compact: true,
+          compact: compact,
           tagPrefix: tagPrefix,
           post: post,
           isLiked: likedMeta,
         ),
         const Divider(thickness: 3, color: Color(0xFF111111)),
         _PostFooter(
-          compact: true,
+          disableComment: disableComment,
+          compact: compact,
           post: post,
           likedMeta: likedMeta,
         )
@@ -292,11 +296,13 @@ class _PostFooter extends StatefulWidget {
     required this.post,
     required this.likedMeta,
     required this.compact,
+    required this.disableComment,
   }) : super(key: key);
 
   final Post post;
   final bool likedMeta;
   final bool compact;
+  final bool disableComment;
 
   @override
   State<_PostFooter> createState() => _PostFooterState();
@@ -339,23 +345,29 @@ class _PostFooterState extends State<_PostFooter> {
             },
             likeCountPadding: const EdgeInsets.only(top: 2, left: 8.0),
           ),
-          LikeButton(
-            size: LayoutConstants.postIcon,
-            likeCount: widget.post.commentsCount,
-            likeBuilder: (isLiked) {
-              return isLiked
-                  ? const Icon(
-                      Boxicons.bxs_message_square_detail,
-                      color: Colors.white70,
-                      size: 22,
-                    )
-                  : const Icon(
-                      Boxicons.bx_message_square_detail,
-                      color: Colors.white70,
-                      size: 22,
-                    );
+          GestureDetector(
+            onTap: () {
+              if (widget.disableComment) return;
+              switchRouteByPush(
+                  context,
+                  CommentScreen(
+                    liked: widget.likedMeta,
+                    id: widget.post.id!,
+                  ));
             },
-            likeCountPadding: const EdgeInsets.only(top: 2, left: 8.0),
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              children: [
+                const Icon(
+                  Boxicons.bx_message_square_detail,
+                  color: Colors.white70,
+                  size: 22,
+                ),
+                Text("${widget.post.commentsCount}",
+                    style: RootNodeFontStyle.label)
+              ],
+            ),
           ),
         ]),
         widget.compact

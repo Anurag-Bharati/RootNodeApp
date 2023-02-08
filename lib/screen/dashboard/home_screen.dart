@@ -52,7 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     });
   }
 
-  void _getInitialData({int refresh = 0}) async {
+  Future<void> _getInitialData({int refresh = 0}) async {
     _postResponse = await _postRepo.getPostFeed(
       page: privateFeed ? privatePage : publicPage,
       refresh: refresh,
@@ -104,7 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void initState() {
     _scrollController = ScrollController();
     _tabController = TabController(length: 2, vsync: this);
-    _getInitialData();
+    _getInitialData().then((value) => setState(() {}));
     _scrollController.addListener(() {
       if (_scrollController.position.maxScrollExtent ==
           _scrollController.offset) {
