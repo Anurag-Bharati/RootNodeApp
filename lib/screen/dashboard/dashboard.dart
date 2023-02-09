@@ -6,6 +6,7 @@ import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
 import 'package:rootnode/helper/switch_route.dart';
+import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/screen/dashboard/event_screen.dart';
@@ -251,7 +252,7 @@ class RootNodeBar extends StatelessWidget {
             direction: Axis.vertical,
             spacing: -5,
             children: [
-              Text("Good Morning,", style: RootNodeFontStyle.label),
+              Text(Utils.greetings(), style: RootNodeFontStyle.label),
               Text(user.fullname, style: RootNodeFontStyle.title),
             ],
           ),
