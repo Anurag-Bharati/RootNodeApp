@@ -102,7 +102,7 @@ class CommentContainer extends StatelessWidget {
                                     color: Colors.white70,
                                     surfaceTintColor: Colors.transparent,
                                     enableFeedback: true,
-                                    elevation: 0,
+                                    elevation: 2,
                                     icon: const Icon(
                                       Boxicons.bx_dots_vertical_rounded,
                                       size: LayoutConstants.postIcon,

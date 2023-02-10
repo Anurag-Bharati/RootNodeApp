@@ -11,6 +11,7 @@ abstract class PostRepo {
       {int page = 1, int refresh = 0, required String id});
   Future<bool> togglePostLike({required String id});
   Future<bool> createPost({required Post post, required List<XFile>? files});
+  Future<bool> deletePost({required String id});
 }
 
 class PostRepoImpl extends PostRepo {
@@ -41,5 +42,10 @@ class PostRepoImpl extends PostRepo {
   @override
   Future<Post?> getPostById({required String id}) {
     return PostRemoteDataSource().getPostById(id: id);
+  }
+
+  @override
+  Future<bool> deletePost({required String id}) {
+    return PostRemoteDataSource().deletePost(id: id);
   }
 }

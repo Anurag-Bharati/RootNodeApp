@@ -78,4 +78,16 @@ class PostRemoteDataSource {
       return null;
     }
   }
+
+  Future<bool> deletePost({required String id}) async {
+    try {
+      Response res = await _httpServices.delete(
+        "${ApiConstants.baseUrl}${ApiConstants.post}/$id",
+      );
+      return res.statusCode == 200;
+    } catch (_) {
+      debugPrint(_.toString());
+      return false;
+    }
+  }
 }

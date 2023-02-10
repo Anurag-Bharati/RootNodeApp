@@ -72,7 +72,9 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
       final res = await CommentRepoImpl()
           .getPostComments(id: widget.id, page: currentPage);
       if (res == null) return;
-      addUpdates(res);
+      setState(() {
+        addUpdates(res);
+      });
       return;
     }
     currentPage = totalPages;
@@ -83,7 +85,7 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
     _controller = ScrollController()
       ..addListener(() {
         if (_controller.position.maxScrollExtent == _controller.offset) {
-          _fetchMoreComments().then((value) => setState(() {}));
+          _fetchMoreComments();
         }
       });
     rootnode = ref.read(sessionProvider.select((value) => value.user!));

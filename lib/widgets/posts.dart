@@ -7,6 +7,7 @@ import 'package:like_button/like_button.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
+import 'package:rootnode/app/utils/snackbar.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/post.dart';
@@ -144,15 +145,52 @@ class _PostHeader extends ConsumerWidget {
                     textAlign: TextAlign.center,
                     style: RootNodeFontStyle.label,
                   ),
-                  const Icon(
-                    Boxicons.bx_dots_vertical_rounded,
-                    color: Colors.white70,
-                    size: LayoutConstants.postIcon,
+                  SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: PopupMenuButton<int>(
+                      shadowColor: Colors.white,
+                      splashRadius: 24,
+                      offset: const Offset(0, 32),
+                      padding: EdgeInsets.zero,
+                      color: Colors.white70,
+                      surfaceTintColor: Colors.transparent,
+                      enableFeedback: true,
+                      elevation: 2,
+                      icon: const Icon(
+                        Boxicons.bx_dots_vertical_rounded,
+                        size: LayoutConstants.postIcon,
+                      ),
+                      onSelected: (value) => _handleThreeDots(context, value),
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuItem<int>>[
+                        isOwn
+                            ? const PopupMenuItem<int>(
+                                height: 42, value: 0, child: Text('Edit'))
+                            : const PopupMenuItem<int>(
+                                height: 42, value: 1, child: Text('Report')),
+                        isOwn
+                            ? const PopupMenuItem<int>(
+                                height: 42, value: -1, child: Text('Remove'))
+                            : const PopupMenuItem<int>(
+                                height: 42, value: -2, child: Text('Hide')),
+                      ],
+                    ),
                   ),
                 ],
               )
       ]),
     );
+  }
+
+  _handleThreeDots(BuildContext context, int value) {
+    if (value == -1) {
+      PostRepoImpl().deletePost(id: post.id!).then((value) => value
+          ? showSnackbar(context, "Deletion successful!", Colors.green[400]!)
+          : showSnackbar(context, "Something went wrong!", Colors.red[400]!));
+      return;
+    }
+    showSnackbar(context, "Coming soon!", const Color(0xFF555555));
   }
 }
 
