@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/auth/login_screen.dart';
 import 'package:rootnode/widgets/text_field.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   static const route = "register";
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
-  final userRepo = UserRepoImpl();
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
+  late final UserRepo userRepo;
   final _fnameFieldController = TextEditingController();
   final _lnameFieldController = TextEditingController();
   final _confirmFieldController = TextEditingController();
@@ -22,6 +23,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordFieldController = TextEditingController();
   final _scrollController = ScrollController();
   final _globalkey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    userRepo = ref.read(userRepoProvider);
+    super.initState();
+  }
 
   @override
   void dispose() {

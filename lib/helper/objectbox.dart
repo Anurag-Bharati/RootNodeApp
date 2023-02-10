@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/objectbox.g.dart';
@@ -33,5 +35,10 @@ class ObjectBoxInstance {
   User? getUserById(String id) {
     Query<User> query = _userBox.query(User_.id.equals(id)).build();
     return query.findUnique();
+  }
+
+  static Future<void> deleteDatabase() async {
+    var dir = await getApplicationDocumentsDirectory();
+    Directory('${dir.path}/user_data').deleteSync(recursive: true);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
@@ -11,16 +12,16 @@ import 'package:rootnode/widgets/radio_button.dart';
 import 'package:rootnode/widgets/selection_tile.dart';
 import 'package:rootnode/widgets/switch_button.dart';
 
-class CreatePostScreen extends StatefulWidget {
+class CreatePostScreen extends ConsumerStatefulWidget {
   const CreatePostScreen({super.key, this.user, required this.type});
   final User? user;
   final RNContentType type;
   @override
-  State<CreatePostScreen> createState() => _CreatePostScreenState();
+  ConsumerState<CreatePostScreen> createState() => _CreatePostScreenState();
 }
 
-class _CreatePostScreenState extends State<CreatePostScreen> {
-  final _postRepo = PostRepoImpl();
+class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
+  late final PostRepo _postRepo;
   final _globalkey = GlobalKey<FormState>();
   final _headingController = TextEditingController();
   final _captionFieldController = TextEditingController();
@@ -36,6 +37,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   @override
   void initState() {
+    _postRepo = ref.read(postRepoProvider);
     if (widget.type == RNContentType.markdown) {
       title = "Create Markdown";
       post.isMarkdown = true;

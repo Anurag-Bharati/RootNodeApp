@@ -24,7 +24,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with TickerProviderStateMixin {
   late User rootnode;
-  final _postRepo = PostRepoImpl();
+  late final PostRepo _postRepo;
   late final ScrollController _scrollController;
   late final TabController _tabController;
   bool privateFeed = false;
@@ -102,6 +102,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   void initState() {
+    _postRepo = ref.read(postRepoProvider);
     _scrollController = ScrollController();
     _tabController = TabController(length: 2, vsync: this);
     _getInitialData();

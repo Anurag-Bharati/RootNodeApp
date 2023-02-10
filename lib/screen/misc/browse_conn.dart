@@ -19,7 +19,7 @@ class BrowseConnScreen extends ConsumerStatefulWidget {
 
 class _BrowseConnScreenState extends ConsumerState<BrowseConnScreen> {
   late User rootnode;
-  final _connRepo = ConnRepoImpl();
+  late final ConnRepo _connRepo;
   late final ScrollController _scrollController;
   final List<User> random = [];
   int randomCurrentPage = 1;
@@ -58,6 +58,7 @@ class _BrowseConnScreenState extends ConsumerState<BrowseConnScreen> {
 
   @override
   void initState() {
+    _connRepo = ref.read(connRepoProvider);
     _scrollController = ScrollController()
       ..addListener(() {
         if (_scrollController.position.maxScrollExtent ==

@@ -26,7 +26,7 @@ class NodeScreen extends ConsumerStatefulWidget {
 
 class _NodeScreenState extends ConsumerState<NodeScreen> {
   late User rootnode;
-  final _connRepo = ConnRepoImpl();
+  late final ConnRepoImpl _connRepo;
   late final ScrollController _scrollController;
   late final ScrollController _recomScrollController;
   late final ScrollController _randomScrollController;
@@ -105,6 +105,7 @@ class _NodeScreenState extends ConsumerState<NodeScreen> {
 
   @override
   void initState() {
+    _connRepo = ref.read(connRepoProvider);
     ref.read(connOverviewProvider.notifier).fetchOverview();
     _getRecomAndRandom().then((value) => setState(() {}));
     _scrollController = ScrollController();
@@ -351,7 +352,8 @@ class NewConnectionList extends StatelessWidget {
       );
 
   _toggleFollow(WidgetRef ref, String id) async {
-    await ConnRepoImpl().toggleConnection(id: id);
+    final connRepo = ref.read(connRepoProvider);
+    await connRepo.toggleConnection(id: id);
     ref.read(connOverviewProvider.notifier).fetchOverview();
   }
 }

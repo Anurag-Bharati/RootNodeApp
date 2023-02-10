@@ -286,7 +286,7 @@ class PostImage extends StatelessWidget {
   }
 }
 
-class _PostFooter extends StatefulWidget {
+class _PostFooter extends ConsumerStatefulWidget {
   const _PostFooter({
     Key? key,
     required this.post,
@@ -299,18 +299,24 @@ class _PostFooter extends StatefulWidget {
   final bool compact;
 
   @override
-  State<_PostFooter> createState() => _PostFooterState();
+  ConsumerState<_PostFooter> createState() => _PostFooterState();
 }
 
-class _PostFooterState extends State<_PostFooter> {
-  final postRepo = PostRepoImpl();
+class _PostFooterState extends ConsumerState<_PostFooter> {
+  late final PostRepo _postRepo;
   bool liking = false;
   Future<bool> togglePostLike() async {
     if (liking) return !widget.likedMeta;
     liking = true;
-    bool res = await postRepo.togglePostLike(id: widget.post.id!);
+    bool res = await _postRepo.togglePostLike(id: widget.post.id!);
     liking = false;
     return res;
+  }
+
+  @override
+  void initState() {
+    _postRepo = ref.read(postRepoProvider);
+    super.initState();
   }
 
   @override

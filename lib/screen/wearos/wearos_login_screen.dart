@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
@@ -7,16 +8,16 @@ import 'package:rootnode/widgets/text_field.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
 import 'package:wear/wear.dart';
 
-class WearOsLoginScreen extends StatefulWidget {
+class WearOsLoginScreen extends ConsumerStatefulWidget {
   final String? email;
   const WearOsLoginScreen({super.key, this.email});
 
   @override
-  State<WearOsLoginScreen> createState() => _WearOsLoginScreenState();
+  ConsumerState<WearOsLoginScreen> createState() => _WearOsLoginScreenState();
 }
 
-class _WearOsLoginScreenState extends State<WearOsLoginScreen> {
-  final userRepo = UserRepoImpl();
+class _WearOsLoginScreenState extends ConsumerState<WearOsLoginScreen> {
+  late final UserRepo _userRepo;
   final _emailFieldController = TextEditingController(text: "anuragbharati");
   final _scrollController = ScrollController();
   final _passwordFieldController = TextEditingController(text: "anurag");
@@ -24,6 +25,7 @@ class _WearOsLoginScreenState extends State<WearOsLoginScreen> {
 
   @override
   void initState() {
+    _userRepo = ref.read(userRepoProvider);
     if (widget.email != null) {
       _emailFieldController.text = widget.email!;
     }
@@ -40,7 +42,7 @@ class _WearOsLoginScreenState extends State<WearOsLoginScreen> {
 
   Future<User?> _loginUser() async {
     FocusScope.of(context).unfocus();
-    bool res = await userRepo.loginUser(
+    bool res = await _userRepo.loginUser(
       identifier: _emailFieldController.text,
       password: _passwordFieldController.text,
       isEmail: false,
@@ -50,7 +52,7 @@ class _WearOsLoginScreenState extends State<WearOsLoginScreen> {
       showSnackbar(context, "Invalid email or password", Colors.red[400]!);
       return null;
     }
-    User? user = await userRepo.getUserFromToken();
+    User? user = await _userRepo.getUserFromToken();
     return user;
   }
 

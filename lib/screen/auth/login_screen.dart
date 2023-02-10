@@ -9,19 +9,19 @@ import 'package:rootnode/screen/dashboard/dashboard.dart';
 import 'package:rootnode/widgets/text_field.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   static const route = "login";
   final String? email;
   const LoginScreen({super.key, this.email});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final String emailregEx =
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
-  final userRepo = UserRepoImpl();
+  late final UserRepo userRepo;
   final _emailFieldController = TextEditingController(text: "anuragbharati");
   final _scrollController = ScrollController();
   final _passwordFieldController = TextEditingController(text: "anurag");
@@ -29,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
+    userRepo = ref.read(userRepoProvider);
     if (widget.email != null) {
       _emailFieldController.text = widget.email!;
     }

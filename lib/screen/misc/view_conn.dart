@@ -1,5 +1,6 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_conn.dart';
 import 'package:rootnode/helper/switch_route.dart';
@@ -11,25 +12,25 @@ import 'package:rootnode/screen/misc/view_profile.dart';
 import 'package:rootnode/widgets/placeholder.dart';
 import 'package:rootnode/widgets/user_card.dart';
 
-class ViewConnScreen extends StatefulWidget {
+class ViewConnScreen extends ConsumerStatefulWidget {
   const ViewConnScreen({super.key, required this.user});
   final User user;
 
   @override
-  State<ViewConnScreen> createState() => _ViewConnScreenState();
+  ConsumerState<ViewConnScreen> createState() => _ViewConnScreenState();
 }
 
-class _ViewConnScreenState extends State<ViewConnScreen> {
-  final _connRepo = ConnRepoImpl();
+class _ViewConnScreenState extends ConsumerState<ViewConnScreen> {
   late final ScrollController _scrollController;
 
   final List<Connection> conns = [];
   int currentPage = 1;
 
   _getInitialConns() async {
+    final connRepo = ref.read(connRepoProvider);
     currentPage = 1;
     MyConnsResponse? res =
-        await _connRepo.getMyConns(page: currentPage, refresh: 1);
+        await connRepo.getMyConns(page: currentPage, refresh: 1);
     if (res != null) {
       currentPage++;
       conns.clear();

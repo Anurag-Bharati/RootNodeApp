@@ -34,9 +34,11 @@ class SessionModel {
 
 class SessionProvider extends StateNotifier<SessionModel> {
   final Ref ref;
+  final UserRepo userRepo;
   static const _initial = SessionModel();
 
-  SessionProvider(this.ref, [SessionModel sessionModel = _initial])
+  SessionProvider(this.ref, this.userRepo,
+      [SessionModel sessionModel = _initial])
       : super(sessionModel) {
     init();
   }
@@ -82,7 +84,7 @@ class SessionProvider extends StateNotifier<SessionModel> {
 
   Future<void> setToken(String token) async {
     SimpleStorage.saveStringData('token', token);
-    final user = await UserRepoImpl().getUserFromToken();
+    final user = await userRepo.getUserFromToken();
     state = state.copyWith(
       token: token,
       isAuthenticated: true,
@@ -93,5 +95,8 @@ class SessionProvider extends StateNotifier<SessionModel> {
 }
 
 final sessionProvider = StateNotifierProvider<SessionProvider, SessionModel>(
-  (ref) => SessionProvider(ref),
+  (ref) {
+    final userRepo = ref.watch(userRepoProvider);
+    return SessionProvider(ref, userRepo);
+  },
 );

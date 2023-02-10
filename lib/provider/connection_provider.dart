@@ -37,9 +37,10 @@ class ConnOverviewModel {
 class ConnOverviewProvider extends StateNotifier<ConnOverviewModel> {
   final Ref ref;
   static const _initial = ConnOverviewModel();
-
+  final ConnRepo connRepo;
   ConnOverviewProvider(
-    this.ref, [
+    this.ref,
+    this.connRepo, [
     ConnOverviewModel connOverviewModel = _initial,
   ]) : super(connOverviewModel);
 
@@ -92,7 +93,7 @@ class ConnOverviewProvider extends StateNotifier<ConnOverviewModel> {
   }
 
   Future<void> fetchOverview() async {
-    ConnOverviewResponse? overview = await ConnRepoImpl().getOldRecentConns();
+    ConnOverviewResponse? overview = await connRepo.getOldRecentConns();
     if (overview == null || overview.data == null) return;
     state = state.copyWith(
       old: overview.data!.old ?? [],
@@ -113,5 +114,8 @@ class ConnOverviewProvider extends StateNotifier<ConnOverviewModel> {
 
 final connOverviewProvider =
     StateNotifierProvider<ConnOverviewProvider, ConnOverviewModel>(
-  (ref) => ConnOverviewProvider(ref),
+  (ref) {
+    final connRepo = ref.watch(connRepoProvider);
+    return ConnOverviewProvider(ref, connRepo);
+  },
 );

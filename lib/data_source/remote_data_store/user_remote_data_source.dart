@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/helper/http_service.dart';
@@ -7,12 +8,19 @@ import 'package:rootnode/helper/simple_storage.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user/user.dart';
 
+final userRemoteDSProvider = Provider((ref) {
+  final httpService = ref.watch(httpServiceProvider);
+  return UserRemoteDataSource(httpService: httpService);
+});
+
 class UserRemoteDataSource {
-  final Dio _httpServices = HttpServices.getDioInstance();
+  final Dio httpService;
+
+  UserRemoteDataSource({required this.httpService});
 
   Future<int> register(User user) async {
     try {
-      Response response = await _httpServices.post(
+      Response response = await httpService.post(
         ApiConstants.baseUrl + ApiConstants.register,
         data: user.toJson(),
       );
@@ -29,7 +37,7 @@ class UserRemoteDataSource {
       var data = {'password': password};
       data[isEmail ? "email" : "username"] = identifier;
 
-      Response res = await _httpServices.post(
+      Response res = await httpService.post(
         ApiConstants.baseUrl + ApiConstants.login,
         data: data,
       );
@@ -52,7 +60,7 @@ class UserRemoteDataSource {
   Future<User?> getUserFromToken() async {
     try {
       Response res =
-          await _httpServices.get(ApiConstants.baseUrl + ApiConstants.whoAmI);
+          await httpService.get(ApiConstants.baseUrl + ApiConstants.whoAmI);
       return res.data["user"] == null ? null : User.fromJson(res.data["user"]);
     } catch (_) {
       debugPrint(_.toString());
@@ -62,7 +70,7 @@ class UserRemoteDataSource {
 
   Future<User?> getUserById({required String id}) async {
     try {
-      Response res = await _httpServices
+      Response res = await httpService
           .get('${ApiConstants.baseUrl}${ApiConstants.user}/$id');
       return User.fromJson(res.data["user"]);
     } catch (_) {
@@ -82,7 +90,7 @@ class UserRemoteDataSource {
         data['profile'] = file;
       }
       final formData = FormData.fromMap(data);
-      Response res = await _httpServices
+      Response res = await httpService
           .put('${ApiConstants.baseUrl}${ApiConstants.user}', data: formData);
       return User.fromJson(res.data["user"]);
     } catch (_) {
@@ -93,7 +101,7 @@ class UserRemoteDataSource {
 
   Future<bool> checkIfUsernameAvailable({required String username}) async {
     try {
-      Response res = await _httpServices.get(
+      Response res = await httpService.get(
           "${ApiConstants.baseUrl}${ApiConstants.isUsernameUnique}?username=$username");
       return res.statusCode == 200;
     } catch (_) {
