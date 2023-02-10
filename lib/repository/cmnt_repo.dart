@@ -1,5 +1,6 @@
 import 'package:rootnode/data_source/remote_data_store/cmnt_remote_data_source.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_cmnt.dart';
+import 'package:rootnode/model/comment/comment.dart';
 
 abstract class CommentRepo {
   Future<CommentResponse?> getPostComments({
@@ -12,15 +13,15 @@ abstract class CommentRepo {
   });
   Future<bool> toggleCommentLike({required String id});
   Future<Object?> updateCommentByID({required String id});
-  Future<Object?> deleteCommentById({required String id});
+  Future<bool> deleteCommentById({required String id});
   Future<Object?> getCommentByID({required String id});
+  Future<Comment?> createComment({required String id, required String comment});
 }
 
 class CommentRepoImpl extends CommentRepo {
   @override
-  Future<Object?> deleteCommentById({required String id}) {
-    // TODO: implement deleteCommentById
-    throw UnimplementedError();
+  Future<bool> deleteCommentById({required String id}) {
+    return CmntRemoteDataSource().deleteCommentById(id: id);
   }
 
   @override
@@ -42,13 +43,18 @@ class CommentRepoImpl extends CommentRepo {
 
   @override
   Future<bool> toggleCommentLike({required String id}) {
-    // TODO: implement toggleCommentLike
-    throw UnimplementedError();
+    return CmntRemoteDataSource().toggleCommentLike(id: id);
   }
 
   @override
   Future<Object?> updateCommentByID({required String id}) {
     // TODO: implement updateCommentByID
     throw UnimplementedError();
+  }
+
+  @override
+  Future<Comment?> createComment(
+      {required String id, required String comment}) {
+    return CmntRemoteDataSource().createComment(id: id, comment: comment);
   }
 }

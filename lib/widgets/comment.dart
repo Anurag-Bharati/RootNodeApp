@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -5,14 +7,22 @@ import 'package:like_button/like_button.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
+import 'package:rootnode/app/utils/snackbar.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/comment/comment.dart';
+import 'package:rootnode/repository/cmnt_repo.dart';
 
 class CommentContainer extends StatelessWidget {
   const CommentContainer(
-      {super.key, required this.comment, this.isOwn = false});
+      {super.key,
+      required this.comment,
+      this.isOwn = false,
+      required this.isLiked,
+      required this.onDelete});
   final Comment comment;
+  final bool isLiked;
   final bool isOwn;
+  final Function onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +47,8 @@ class CommentContainer extends StatelessWidget {
                 padding: const EdgeInsets.only(
                     left: 10, right: 0, top: 5, bottom: 5),
                 child: CircleAvatar(
+                  backgroundColor: Colors.white10,
+                  foregroundColor: Colors.white10,
                   foregroundImage: CachedNetworkImageProvider(
                     "${ApiConstants.baseUrl}/${comment.user!.avatar!}",
                     cacheKey: comment.user!.avatar,
@@ -71,7 +83,7 @@ class CommentContainer extends StatelessWidget {
                               style: RootNodeFontStyle.title,
                             ),
                             Wrap(
-                              spacing: 10,
+                              spacing: 5,
                               crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
@@ -79,10 +91,37 @@ class CommentContainer extends StatelessWidget {
                                   textAlign: TextAlign.center,
                                   style: RootNodeFontStyle.label,
                                 ),
-                                const Icon(
-                                  Boxicons.bx_dots_vertical_rounded,
-                                  color: Colors.white70,
-                                  size: LayoutConstants.postIcon,
+                                SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: PopupMenuButton<int>(
+                                    shadowColor: Colors.white,
+                                    splashRadius: 24,
+                                    offset: const Offset(0, 32),
+                                    padding: EdgeInsets.zero,
+                                    color: Colors.white70,
+                                    surfaceTintColor: Colors.transparent,
+                                    enableFeedback: true,
+                                    elevation: 0,
+                                    icon: const Icon(
+                                      Boxicons.bx_dots_vertical_rounded,
+                                      size: LayoutConstants.postIcon,
+                                    ),
+                                    onSelected: (value) =>
+                                        _handleThreeDots(context, value),
+                                    itemBuilder: (BuildContext context) =>
+                                        <PopupMenuItem<int>>[
+                                      isOwn
+                                          ? const PopupMenuItem<int>(
+                                              height: 24,
+                                              value: -1,
+                                              child: Text('Remove'))
+                                          : const PopupMenuItem<int>(
+                                              height: 24,
+                                              value: 1,
+                                              child: Text('Report')),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -108,10 +147,10 @@ class CommentContainer extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 10, left: 10),
                         child: LikeButton(
-                          // onTap: (isLiked) => _toggleCommentLike(),
-                          isLiked: false,
+                          onTap: (isLiked) => _toggleCommentLike(),
+                          isLiked: isLiked,
                           size: LayoutConstants.postIcon,
-                          likeCount: 0,
+                          likeCount: comment.likesCount,
                           padding: const EdgeInsets.only(right: 10),
                           likeBuilder: (isLiked) {
                             return isLiked
@@ -164,5 +203,18 @@ class CommentContainer extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<bool?> _toggleCommentLike() async {
+    return await CommentRepoImpl().toggleCommentLike(id: comment.id!);
+  }
+
+  _handleThreeDots(BuildContext context, int value) async {
+    if (value == -1) {
+      bool res = await CommentRepoImpl().deleteCommentById(id: comment.id!);
+      res
+          ? onDelete()
+          : showSnackbar(context, "Something went wrong", Colors.red[400]!);
+    }
   }
 }

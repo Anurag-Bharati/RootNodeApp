@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rootnode/app/utils/snackbar.dart';
+import 'package:rootnode/repository/cmnt_repo.dart';
 
 class BottomCommentBar extends ConsumerStatefulWidget {
   const BottomCommentBar({
+    required this.onSuccess,
+    required this.id,
     Key? key,
   }) : super(key: key);
+  final String id;
+  final Function onSuccess;
 
   @override
   ConsumerState<BottomCommentBar> createState() => _BottomChatFieldState();
@@ -58,7 +64,7 @@ class _BottomChatFieldState extends ConsumerState<BottomCommentBar> {
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.all(10),
                   suffix: GestureDetector(
-                    onTap: () => debugPrint("NICE"),
+                    onTap: () => _postComment(),
                     child: Container(
                       height: 40,
                       width: 40,
@@ -77,5 +83,23 @@ class _BottomChatFieldState extends ConsumerState<BottomCommentBar> {
         ),
       ],
     );
+  }
+
+  _postComment() async {
+    String comment = _controller.text;
+    if (comment.trim() == "") {
+      showSnackbar(context, "Invalid comment", Colors.red[400]!);
+      return;
+    }
+    final res =
+        await CommentRepoImpl().createComment(id: widget.id, comment: comment);
+    if (res != null) {
+      hideKeyboard();
+      _controller.clear();
+      widget.onSuccess();
+      return;
+    }
+    // ignore: use_build_context_synchronously
+    showSnackbar(context, "Something went wrong", Colors.red[400]!);
   }
 }

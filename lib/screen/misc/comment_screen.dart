@@ -27,11 +27,15 @@ class CommentScreen extends ConsumerStatefulWidget {
 }
 
 class _CommentScreenState extends ConsumerState<CommentScreen> {
+  late final ScrollController _controller;
   late User rootnode;
   Post? post;
   CommentResponse? commentResponse;
   final List<Comment> comments = [];
+  List<bool> isLiked = [];
   late final bool isOwn;
+  int currentPage = 1;
+  int totalPages = 1;
 
   Future<void> _fetchPost() async =>
       post = await PostRepoImpl().getPostById(id: widget.id);
@@ -39,19 +43,66 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
   Future<void> _fetchComments() async =>
       commentResponse = await CommentRepoImpl().getPostComments(id: widget.id);
 
+  Future<void> _refresh() async => {
+        _fetchPost()
+            .then((value) => _fetchComments().then((value) => setState(() {
+                  setInitials();
+                })))
+      };
+
+  void setInitials() {
+    comments.clear();
+    isLiked.clear();
+    comments.addAll(commentResponse!.data!.comments ?? []);
+    isLiked.addAll(commentResponse!.data!.meta!.isLiked ?? []);
+    currentPage = commentResponse!.currentPage ?? 1;
+    totalPages = commentResponse!.totalPages ?? 1;
+  }
+
+  void addUpdates(CommentResponse res) {
+    comments.addAll(res.data!.comments ?? []);
+    isLiked.addAll(res.data!.meta!.isLiked ?? []);
+    currentPage = res.currentPage ?? 1;
+    totalPages = res.totalPages ?? 1;
+  }
+
+  Future<void> _fetchMoreComments() async {
+    if (currentPage < totalPages) {
+      currentPage++;
+      final res = await CommentRepoImpl()
+          .getPostComments(id: widget.id, page: currentPage);
+      if (res == null) return;
+      addUpdates(res);
+      return;
+    }
+    currentPage = totalPages;
+  }
+
   @override
   void initState() {
+    _controller = ScrollController()
+      ..addListener(() {
+        if (_controller.position.maxScrollExtent == _controller.offset) {
+          _fetchMoreComments().then((value) => setState(() {}));
+        }
+      });
     rootnode = ref.read(sessionProvider.select((value) => value.user!));
     _fetchPost().then((value) => setState(() {
           isOwn = rootnode.id! == post!.owner!.id!;
         }));
 
     _fetchComments().then((value) {
-      if (commentResponse == null) return;
-      comments.addAll(commentResponse!.comments ?? []);
+      setInitials();
       setState(() {});
     });
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -77,6 +128,7 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
         commentResponse != null
             ? Expanded(
                 child: ListView.builder(
+                  controller: _controller,
                   itemBuilder: (context, index) {
                     if (index == 0) {
                       return post != null
@@ -91,8 +143,12 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
                       padding: EdgeInsets.only(
                           bottom: index == comments.length ? 10 : 0),
                       child: Center(
-                          child:
-                              CommentContainer(comment: comments[index - 1])),
+                          child: CommentContainer(
+                        isOwn: comments[index - 1].user!.id == rootnode.id,
+                        comment: comments[index - 1],
+                        isLiked: isLiked[index - 1],
+                        onDelete: _refresh,
+                      )),
                     );
                   },
                   itemCount: comments.length + 1,
@@ -117,7 +173,7 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
                   itemCount: 5,
                 ),
               ),
-        const BottomCommentBar(),
+        BottomCommentBar(id: widget.id, onSuccess: _refresh),
       ]),
     );
   }
