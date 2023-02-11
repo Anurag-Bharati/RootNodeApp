@@ -1,9 +1,18 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.anurag.rootnode.rootnode">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.anurag.rootnode.rootnode">
+        <!-- Permissions -->
+       <uses-permission android:name="android.permission.INTERNET"/>
+    
    <application
         android:label="rootnode"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        
+        <!-- Activities -->
+        <activity 
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            
         <activity
             android:name=".MainActivity"
             android:exported="true"

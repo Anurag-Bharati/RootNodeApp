@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rootnode/helper/switchRoute.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/auth/register_screen.dart';
@@ -17,9 +18,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final userRepo = UserRepoImpl();
-  final _emailFieldController = TextEditingController();
+  final _emailFieldController = TextEditingController(text: "anuragbharati");
   final _scrollController = ScrollController();
-  final _passwordFieldController = TextEditingController();
+  final _passwordFieldController = TextEditingController(text: "anurag");
   final _globalkey = GlobalKey<FormState>();
 
   @override
@@ -36,6 +37,22 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailFieldController.dispose();
     _passwordFieldController.dispose();
     _scrollController.dispose();
+  }
+
+  Future<User?> _loginUser() async {
+    FocusScope.of(context).unfocus();
+    bool res = await userRepo.loginUser(
+      identifier: _emailFieldController.text,
+      password: _passwordFieldController.text,
+      isEmail: false,
+    );
+    if (!res) {
+      // ignore: use_build_context_synchronously
+      showSnackbar(context, "Invalid email or password", Colors.red[400]!);
+      return null;
+    }
+    User? user = await userRepo.getUserFromToken();
+    return user;
   }
 
   @override
@@ -84,36 +101,26 @@ class _LoginScreenState extends State<LoginScreen> {
                             style:
                                 const ButtonStyle(alignment: Alignment.center),
                             onPressed: () async {
-                              FocusScope.of(context).unfocus();
-                              if (_globalkey.currentState!.validate()) {
-                                showSnackbar(
-                                    context, "Logging in..", Colors.green[400]!,
-                                    dismissable: false);
-                                User? res = await userRepo.loginUser(
-                                  _emailFieldController.text,
-                                  _passwordFieldController.text,
-                                );
-                                if (res == null) {
-                                  // ignore: use_build_context_synchronously
-                                  showSnackbar(
-                                      context,
-                                      "Invalid email or password",
-                                      Colors.red[400]!);
-                                  return;
-                                }
-                                Future.delayed(
-                                  const Duration(seconds: 2),
-                                  () => Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            DashboardScreen(user: res)),
-                                  ),
-                                );
-                              } else {
+                              if (!_globalkey.currentState!.validate()) {
                                 showSnackbar(context, "Invalid fields",
                                     Colors.red[400]!);
+                                return;
                               }
+                              showSnackbar(
+                                  context, "Logging in..", Colors.green[400]!,
+                                  dismissable: false);
+                              User? user = await _loginUser();
+                              if (user != null) {
+                                // ignore: use_build_context_synchronously
+                                return switchRouteByPushReplace(
+                                    context, DashboardScreen(user: user));
+                              }
+                              // ignore: use_build_context_synchronously
+                              showSnackbar(
+                                context,
+                                "Sorry! Something went wrong",
+                                Colors.red[400]!,
+                              );
                             },
                             child: const Padding(
                               padding: EdgeInsets.all(10),

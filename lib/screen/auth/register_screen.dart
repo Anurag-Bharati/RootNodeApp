@@ -167,8 +167,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     Color color = status > 0 ? Colors.green : Colors.red;
     showSnackbar(context, msg, color);
     if (status > 0) {
-      Future.delayed(const Duration(seconds: 2),
-          () => _backToLogin(context, _emailFieldController.text));
+      _backToLogin(context, _emailFieldController.text);
     }
   }
 

@@ -21,12 +21,17 @@ class ObjectBoxInstance {
   }
 
   int saveUser(User user) => _userBox.put(user);
-  User? loginUser(String email, String password) {
+  bool loginUser(String email, String password) {
     Query<User> query = _userBox
         .query(User_.email.equals(email).and(User_.password.equals(password)))
         .build();
-    return query.findUnique();
+    User? status = query.findUnique();
+    return status != null;
   }
 
   List<User> getAllUser() => _userBox.getAll();
+  User? getUserById(String id) {
+    Query<User> query = _userBox.query(User_.id.equals(id)).build();
+    return query.findUnique();
+  }
 }

@@ -1,13 +1,18 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
+import 'package:rootnode/helper/switchRoute.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/screen/dashboard/event_screen.dart';
 import 'package:rootnode/screen/dashboard/home_screen.dart';
 import 'package:rootnode/screen/dashboard/messenger_screen.dart';
 import 'package:rootnode/screen/dashboard/node_screen.dart';
+import 'package:rootnode/screen/misc/create_post.dart';
+import 'package:rootnode/screen/misc/setting.dart';
+import 'package:rootnode/widgets/selection_tile.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key, this.user});
@@ -31,6 +36,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // setState(() {navVisible = false;});
 
+  Future<void> _navigateToCreatePost(
+      BuildContext context, RNContentType type) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) =>
+            CreatePostScreen(user: widget.user, type: type),
+      ),
+    );
+    if (!mounted) return;
+    if (result == null) return;
+    Navigator.of(context, rootNavigator: true).pop('dialog');
+
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(
+          '$result',
+          style: RootNodeFontStyle.label.copyWith(color: Colors.cyan),
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: const Color(0xFF111111),
+      ));
+  }
+
   int _selectedIndex = 0;
 
   @override
@@ -41,9 +71,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         elevation: 0,
         toolbarHeight: mqSmallH(context) ? 80 : 60,
         backgroundColor: const Color(0xFF111111),
-        title: RootNodeBar(
-          username: widget.user == null ? null : widget.user!.username,
-        ),
+        title: RootNodeBar(user: widget.user!),
         actions: [
           Container(
             padding: const EdgeInsets.only(right: 10),
@@ -59,7 +87,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               _selectedIndex == 0
                   ? IconButton(
                       splashRadius: 20,
-                      onPressed: () {},
+                      onPressed: () => _showPostOptions(context),
                       icon: const Icon(Icons.add,
                           color: Colors.white70, size: 24),
                     )
@@ -77,7 +105,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       body: IndexedStack(index: _selectedIndex, children: [
-        HomeScreen(showNavbar: showNavbar, hideNavbar: hideNavbar),
+        HomeScreen(
+            user: widget.user!, showNavbar: showNavbar, hideNavbar: hideNavbar),
         const NodeScreen(),
         const MessengerScreen(),
         const EventScreen(),
@@ -128,6 +157,49 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  Future<dynamic> _showPostOptions(BuildContext context) {
+    return showDialog(
+      barrierColor: const Color(0xEE000000),
+      context: context,
+      builder: (context) => SelectionTile(
+        title: "Create Post",
+        tileButton: [
+          TileButton(
+            type: RNContentType.text,
+            icon: Boxicons.bx_text,
+            label: "Text",
+            onPressed: (RNContentType type) =>
+                _navigateToCreatePost(context, type),
+          ),
+          TileButton(
+            type: RNContentType.markdown,
+            icon: Boxicons.bxl_markdown,
+            label: "Markdown",
+            onPressed: (RNContentType type) =>
+                _navigateToCreatePost(context, type),
+          ),
+          TileButton(
+            type: RNContentType.video,
+            icon: Boxicons.bx_video,
+            label: "Video",
+            onPressed: (RNContentType type) =>
+                _navigateToCreatePost(context, type),
+          ),
+          TileButton(
+            type: RNContentType.image,
+            icon: Boxicons.bx_image,
+            label: "Image",
+            onPressed: (RNContentType type) =>
+                _navigateToCreatePost(context, type),
+          ),
+        ],
+        widthFraction: 0.7,
+        column: 2,
+        bottomLabel: "Select a type of post you want to create",
+      ),
+    );
+  }
+
   bool mqSmallW(BuildContext context) =>
       MediaQuery.of(context).size.width > 320;
   bool mqSmallH(BuildContext context) =>
@@ -135,10 +207,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 class RootNodeBar extends StatelessWidget {
-  final String? username;
+  final User user;
   const RootNodeBar({
     Key? key,
-    this.username,
+    required this.user,
   }) : super(key: key);
 
   @override
@@ -147,7 +219,7 @@ class RootNodeBar extends StatelessWidget {
       children: [
         InkWell(
           borderRadius: BorderRadius.circular(50),
-          onTap: () {},
+          onTap: () => switchRouteByPush(context, SettingScreen(user: user)),
           child: Container(
             height: 40,
             width: 40,
@@ -159,8 +231,9 @@ class RootNodeBar extends StatelessWidget {
             ),
             child: FadeInImage.assetNetwork(
               fit: BoxFit.cover,
-              image:
-                  "https://cdn.shopify.com/s/files/1/0344/6469/files/angry.jpg?v=1560891349",
+              image: user.avatar != null
+                  ? "${ApiConstants.baseUrl}\\${user.avatar}"
+                  : "https://cdn.shopify.com/s/files/1/0344/6469/files/angry.jpg?v=1560891349",
               placeholder: 'assets/images/image_grey.png',
             ),
           ),
@@ -172,7 +245,11 @@ class RootNodeBar extends StatelessWidget {
             spacing: -5,
             children: [
               Text("Good Morning,", style: RootNodeFontStyle.label),
-              Text(username ?? "ANURAG", style: RootNodeFontStyle.title),
+              Text(
+                  user.fname != null
+                      ? "${user.fname} ${user.lname!.substring(0, 1).toUpperCase()}."
+                      : "ANURAG",
+                  style: RootNodeFontStyle.title),
             ],
           ),
         ),

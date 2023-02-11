@@ -40,6 +40,22 @@ dependencies:
     path_provider: ^2.0.11
     cupertino_icons: ^1.0.2
     shared_preferences: ^2.0.17
+    dio: ^4.0.6
+    dio_cookie_manager: ^2.0.0
+    cookie_jar: ^3.0.1
+    mime: ^1.0.4
+    connectivity_plus: ^3.0.2
+    timeago: ^3.3.0
+    string_extensions: ^0.6.6
+    carousel_slider: ^4.2.1
+    video_player: ^2.5.1
+    visibility_detector: ^0.3.3
+    # chewie: ^1.4.0
+    dotted_border: ^2.0.0+3
+    open_file: ^3.2.1
+    cached_network_image: ^3.2.3
+    image_picker: ^0.8.6+1
+    image_cropper: ^3.0.1
 
 dev_dependencies:
     flutter_test:
