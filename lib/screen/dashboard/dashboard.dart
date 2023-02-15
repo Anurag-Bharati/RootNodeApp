@@ -4,7 +4,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
-import 'package:rootnode/helper/switchRoute.dart';
+import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/screen/dashboard/event_screen.dart';
 import 'package:rootnode/screen/dashboard/home_screen.dart';
@@ -25,16 +25,10 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  bool navVisible = true;
   @override
   void initState() {
     super.initState();
   }
-
-  void showNavbar() => null;
-  void hideNavbar() => null;
-
-  // setState(() {navVisible = false;});
 
   Future<void> _navigateToCreatePost(
       BuildContext context, RNContentType type) async {
@@ -62,11 +56,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   int _selectedIndex = 0;
+  double triggerResponsiveNav = 480;
+  double _getWidth(context) {
+    return MediaQuery.of(context).size.width;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // extendBody: true,
+      extendBody: _getWidth(context) > 480,
       appBar: AppBar(
         elevation: 0,
         toolbarHeight: mqSmallH(context) ? 80 : 60,
@@ -105,17 +103,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       body: IndexedStack(index: _selectedIndex, children: [
-        HomeScreen(
-            user: widget.user!, showNavbar: showNavbar, hideNavbar: hideNavbar),
-        const NodeScreen(),
+        HomeScreen(user: widget.user!),
+        NodeScreen(user: widget.user!),
         const MessengerScreen(),
         const EventScreen(),
       ]),
-      bottomNavigationBar: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        // transform: Matrix4.translationValues(0, navVisible ? 0 : 100, 0),
-        height: navVisible ? kBottomNavigationBarHeight + 8 : 0,
+      bottomNavigationBar: Container(
+        margin: _getWidth(context) > triggerResponsiveNav
+            ? const EdgeInsets.symmetric(horizontal: 180, vertical: 30)
+            : EdgeInsets.zero,
+        height: kBottomNavigationBarHeight + 8,
+        padding: _getWidth(context) > triggerResponsiveNav
+            ? const EdgeInsets.symmetric(horizontal: 10, vertical: 0)
+            : EdgeInsets.zero,
+        decoration: BoxDecoration(
+          color: const Color(0xFF111111),
+          borderRadius: BorderRadius.circular(50),
+        ),
         child: GNav(
           tabMargin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           tabBorderRadius: 50,
@@ -128,7 +132,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           iconSize: mqSmallW(context)
               ? LayoutConstants.postIconBig
               : LayoutConstants.postIcon,
-          backgroundColor: const Color(0xFF111111),
+          backgroundColor: const Color(0x00111111),
           padding: mqSmallW(context)
               ? const EdgeInsets.symmetric(horizontal: 10, vertical: 8)
               : const EdgeInsets.all(5),
@@ -149,7 +153,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
           selectedIndex: _selectedIndex,
           onTabChange: (value) => setState(() {
-            showNavbar();
             _selectedIndex = value;
           }),
         ),
@@ -230,6 +233,8 @@ class RootNodeBar extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: FadeInImage.assetNetwork(
+              imageCacheHeight: 128,
+              imageCacheWidth: 128,
               fit: BoxFit.cover,
               image: user.avatar != null
                   ? "${ApiConstants.baseUrl}\\${user.avatar}"

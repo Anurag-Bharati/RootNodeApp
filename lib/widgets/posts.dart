@@ -6,7 +6,7 @@ import 'package:like_button/like_button.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
-import 'package:rootnode/helper/switchRoute.dart';
+import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/repository/post_repo.dart';
@@ -72,11 +72,15 @@ class _PostHeader extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: FadeInImage.assetNetwork(
+            imageCacheWidth: 128,
+            imageCacheHeight: 128,
             fit: BoxFit.cover,
             image: post.owner!.avatar != null
                 ? "${ApiConstants.baseUrl}\\${post.owner!.avatar}"
                 : "https://icon-library.com/images/anonymous-user-icon/anonymous-user-icon-2.jpg",
             placeholder: 'assets/images/image_grey.png',
+            imageErrorBuilder: (context, error, stackTrace) =>
+                Icon(Icons.broken_image, color: Colors.red[400]!),
           ),
         ),
         const SizedBox(width: 10),
@@ -167,14 +171,16 @@ class _PostBodyState extends State<_PostBody> {
                                 widget.post.mediaFiles[0].type == "image"
                             ? Hero(
                                 tag: widget.post.id.toString(),
-                                child: PostImage(
-                                    url: widget.post.mediaFiles[0].url!),
+                                child: AspectRatio(
+                                  aspectRatio: 4 / 3,
+                                  child: PostImage(
+                                      url: widget.post.mediaFiles[0].url!),
+                                ),
                               )
                             : Stack(
                                 children: [
                                   CarouselSlider(
                                     options: CarouselOptions(
-                                      height: 200.0,
                                       enableInfiniteScroll: false,
                                       disableCenter: true,
                                       enlargeCenterPage: true,
@@ -231,6 +237,7 @@ class PostVideoPlayer extends StatefulWidget {
 class _PostVideoPlayerState extends State<PostVideoPlayer> {
   @override
   Widget build(BuildContext context) {
+    // ignore: todo
     // TODO: implement build
     throw UnimplementedError();
   }
@@ -251,6 +258,7 @@ class PostImage extends StatelessWidget {
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
       constraints: const BoxConstraints(maxHeight: 300, minHeight: 0),
       child: CachedNetworkImage(
+          maxWidthDiskCache: 500,
           imageUrl: "${ApiConstants.baseUrl}/$url",
           fit: BoxFit.cover,
           errorWidget: (context, url, error) => const MediaError(

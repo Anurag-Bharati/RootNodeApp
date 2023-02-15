@@ -1,10 +1,10 @@
-import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_post.dart';
+import 'package:rootnode/helper/responsive_helper.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/repository/post_repo.dart';
+import 'package:rootnode/widgets/placeholder.dart';
 import 'package:rootnode/widgets/posts.dart';
 import 'package:rootnode/widgets/stories.dart';
 
@@ -13,13 +13,10 @@ import '../../model/user.dart';
 class HomeScreen extends StatefulWidget {
   static const String route = "home";
   final User user;
-  final VoidCallback showNavbar;
-  final VoidCallback hideNavbar;
-  const HomeScreen(
-      {super.key,
-      required this.user,
-      required this.showNavbar,
-      required this.hideNavbar});
+  const HomeScreen({
+    super.key,
+    required this.user,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -29,7 +26,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final _postRepo = PostRepoImpl();
   late final ScrollController _scrollController;
   late final TabController _tabController;
-  bool navHidden = false;
   bool privateFeed = false;
   bool postScopeDisabled = false;
 
@@ -44,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late int publicTotal;
   int privatePage = 1;
   int publicPage = 1;
+
+  double maxContentWidth = 720;
 
   void _clearInitials() async {
     setState(() {
@@ -107,20 +105,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _tabController = TabController(length: 2, vsync: this);
     _getInitialData();
     _scrollController.addListener(() {
-      if (_scrollController.position.userScrollDirection ==
-          ScrollDirection.forward) {
-        if (navHidden) {
-          debugPrint("Show");
-          widget.showNavbar();
-          navHidden = false;
-        }
-      } else {
-        if (!navHidden) {
-          debugPrint("Hide");
-          widget.hideNavbar();
-          navHidden = true;
-        }
-      }
       if (_scrollController.position.maxScrollExtent ==
           _scrollController.offset) {
         _fetchMoreData();
@@ -161,37 +145,49 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       child: CustomScrollView(
         controller: _scrollController,
         slivers: [
-          const SliverToBoxAdapter(child: DummySearchField()),
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: StoriesWidget(currentUser: widget.user),
+            child: ConstrainedSliverWidth(
+              maxWidth: maxContentWidth,
+              child: const DummySearchField(),
             ),
           ),
           SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              decoration: BoxDecoration(
-                  color: Colors.white10,
-                  borderRadius: BorderRadius.circular(20)),
-              child: TabBar(
-                enableFeedback: true,
-                overlayColor: MaterialStateProperty.resolveWith(
-                    (states) => Colors.transparent),
-                onTap: (value) => _switchPostScope(value),
-                labelColor: Colors.white70,
-                indicatorColor:
-                    postScopeDisabled ? Colors.white30 : Colors.cyan,
-                indicatorPadding: const EdgeInsets.all(10),
-                indicatorSize: TabBarIndicatorSize.label,
-                labelStyle: RootNodeFontStyle.body,
-                unselectedLabelColor: Colors.white30,
-                splashFactory: NoSplash.splashFactory,
-                isScrollable: false,
-                dividerColor: Colors.transparent,
-                padding: EdgeInsets.zero,
-                controller: _tabController,
-                tabs: const [Tab(text: "Public"), Tab(text: "Mutual")],
+            child: ConstrainedSliverWidth(
+              maxWidth: maxContentWidth,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: StoriesWidget(currentUser: widget.user),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: ConstrainedSliverWidth(
+              maxWidth: maxContentWidth,
+              child: Container(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                decoration: BoxDecoration(
+                    color: Colors.white10,
+                    borderRadius: BorderRadius.circular(20)),
+                child: TabBar(
+                  enableFeedback: true,
+                  overlayColor: MaterialStateProperty.resolveWith(
+                      (states) => Colors.transparent),
+                  onTap: (value) => _switchPostScope(value),
+                  labelColor: Colors.white70,
+                  indicatorColor:
+                      postScopeDisabled ? Colors.white30 : Colors.cyan,
+                  indicatorPadding: const EdgeInsets.all(10),
+                  indicatorSize: TabBarIndicatorSize.label,
+                  labelStyle: RootNodeFontStyle.body,
+                  unselectedLabelColor: Colors.white30,
+                  splashFactory: NoSplash.splashFactory,
+                  isScrollable: false,
+                  dividerColor: Colors.transparent,
+                  padding: EdgeInsets.zero,
+                  controller: _tabController,
+                  tabs: const [Tab(text: "Public"), Tab(text: "Mutual")],
+                ),
               ),
             ),
           ),
@@ -210,9 +206,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       return index < _posts.length
-                          ? PostContainer(
-                              post: _posts[index],
-                              likedMeta: _postsLiked[index])
+                          ? ConstrainedSliverWidth(
+                              maxWidth: maxContentWidth,
+                              child: PostContainer(
+                                  post: _posts[index],
+                                  likedMeta: _postsLiked[index]),
+                            )
                           : PostLoader(
                               page: privateFeed ? privatePage : publicPage,
                               total: privateFeed ? privateTotal : publicTotal,
@@ -223,34 +222,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 )
         ],
         // POST
-      ),
-    );
-  }
-}
-
-class DummySearchField extends StatelessWidget {
-  const DummySearchField({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-          color: const Color(0xFF333333),
-          borderRadius: BorderRadius.circular(10)),
-      child: Wrap(
-        spacing: 10,
-        children: [
-          const Icon(Boxicons.bx_search, color: Colors.white54),
-          Text(
-            "Find people, events...",
-            style: RootNodeFontStyle.label,
-          )
-        ],
       ),
     );
   }

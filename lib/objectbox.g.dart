@@ -14,6 +14,7 @@ import 'package:objectbox/internal.dart'; // generated code can access "internal
 import 'package:objectbox/objectbox.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'model/conn.dart';
 import 'model/post.dart';
 import 'model/story.dart';
 import 'model/user.dart';
@@ -321,6 +322,41 @@ final _entities = <ModelEntity>[
             flags: 0)
       ],
       relations: <ModelRelation>[],
+      backlinks: <ModelBacklink>[]),
+  ModelEntity(
+      id: const IdUid(6, 6696166484992312307),
+      name: 'Connection',
+      lastPropertyId: const IdUid(5, 71323444867613403),
+      flags: 0,
+      properties: <ModelProperty>[
+        ModelProperty(
+            id: const IdUid(1, 7471840709173409632),
+            name: 'cid',
+            type: 6,
+            flags: 129),
+        ModelProperty(
+            id: const IdUid(2, 5820315525903084918),
+            name: 'id',
+            type: 9,
+            flags: 2080,
+            indexId: const IdUid(7, 5092965173393285103)),
+        ModelProperty(
+            id: const IdUid(3, 7029449042520276148),
+            name: 'status',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(4, 8798937388512365669),
+            name: 'createdAt',
+            type: 10,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(5, 71323444867613403),
+            name: 'updatedAt',
+            type: 10,
+            flags: 0)
+      ],
+      relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[])
 ];
 
@@ -344,8 +380,8 @@ Future<Store> openStore(
 ModelDefinition getObjectBoxModel() {
   final model = ModelInfo(
       entities: _entities,
-      lastEntityId: const IdUid(5, 3915084085433421223),
-      lastIndexId: const IdUid(6, 2994870038586928502),
+      lastEntityId: const IdUid(6, 6696166484992312307),
+      lastIndexId: const IdUid(7, 5092965173393285103),
       lastRelationId: const IdUid(1, 403350268397340821),
       lastSequenceId: const IdUid(0, 0),
       retiredEntityUids: const [2699268489578170829],
@@ -655,6 +691,50 @@ ModelDefinition getObjectBoxModel() {
               storyId: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
 
           return object;
+        }),
+    Connection: EntityDefinition<Connection>(
+        model: _entities[4],
+        toOneRelations: (Connection object) => [],
+        toManyRelations: (Connection object) => {},
+        getId: (Connection object) => object.cid,
+        setId: (Connection object, int id) {
+          object.cid = id;
+        },
+        objectToFB: (Connection object, fb.Builder fbb) {
+          final idOffset =
+              object.id == null ? null : fbb.writeString(object.id!);
+          final statusOffset =
+              object.status == null ? null : fbb.writeString(object.status!);
+          fbb.startTable(6);
+          fbb.addInt64(0, object.cid);
+          fbb.addOffset(1, idOffset);
+          fbb.addOffset(2, statusOffset);
+          fbb.addInt64(3, object.createdAt?.millisecondsSinceEpoch);
+          fbb.addInt64(4, object.updatedAt?.millisecondsSinceEpoch);
+          fbb.finish(fbb.endTable());
+          return object.cid;
+        },
+        objectFromFB: (Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final createdAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 10);
+          final updatedAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 12);
+          final object = Connection(
+              id: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 6),
+              status: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 8),
+              createdAt: createdAtValue == null
+                  ? null
+                  : DateTime.fromMillisecondsSinceEpoch(createdAtValue),
+              updatedAt: updatedAtValue == null
+                  ? null
+                  : DateTime.fromMillisecondsSinceEpoch(updatedAtValue),
+              cid: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
+
+          return object;
         })
   };
 
@@ -857,4 +937,26 @@ class Story_ {
 
   /// see [Story.color]
   static final color = QueryIntegerProperty<Story>(_entities[3].properties[12]);
+}
+
+/// [Connection] entity fields to define ObjectBox queries.
+class Connection_ {
+  /// see [Connection.cid]
+  static final cid =
+      QueryIntegerProperty<Connection>(_entities[4].properties[0]);
+
+  /// see [Connection.id]
+  static final id = QueryStringProperty<Connection>(_entities[4].properties[1]);
+
+  /// see [Connection.status]
+  static final status =
+      QueryStringProperty<Connection>(_entities[4].properties[2]);
+
+  /// see [Connection.createdAt]
+  static final createdAt =
+      QueryIntegerProperty<Connection>(_entities[4].properties[3]);
+
+  /// see [Connection.updatedAt]
+  static final updatedAt =
+      QueryIntegerProperty<Connection>(_entities[4].properties[4]);
 }

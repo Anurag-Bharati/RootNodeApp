@@ -1,14 +1,13 @@
+import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
 
 class MediaError extends StatelessWidget {
-  const MediaError({
-    super.key,
-    required this.icon,
-  });
+  const MediaError({super.key, required this.icon, this.minimal = false});
 
   final IconData icon;
+  final bool minimal;
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +17,16 @@ class MediaError extends StatelessWidget {
         height: double.infinity,
         width: double.infinity,
         child: Center(
-          child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              direction: Axis.vertical,
-              children: [
-                Icon(icon, size: 30, color: Colors.red[300]),
-                Text("Something went wrong!", style: RootNodeFontStyle.body),
-              ]),
+          child: minimal
+              ? Icon(icon, size: 30, color: Colors.red[300])
+              : Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  direction: Axis.vertical,
+                  children: [
+                      Icon(icon, size: 30, color: Colors.red[300]),
+                      Text("Something went wrong!",
+                          style: RootNodeFontStyle.body),
+                    ]),
         ),
       ),
     );
@@ -64,5 +66,33 @@ class MediaLoading extends StatelessWidget {
             )),
       ],
     ));
+  }
+}
+
+class DummySearchField extends StatelessWidget {
+  const DummySearchField({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+          color: const Color(0xFF333333),
+          borderRadius: BorderRadius.circular(10)),
+      child: Wrap(
+        spacing: 10,
+        children: [
+          const Icon(Boxicons.bx_search, color: Colors.white54),
+          Text(
+            "Find people, events...",
+            style: RootNodeFontStyle.label,
+          )
+        ],
+      ),
+    );
   }
 }

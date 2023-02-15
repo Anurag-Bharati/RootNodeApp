@@ -2,7 +2,6 @@ import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/model/user.dart';
-import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/auth/login_screen.dart';
 import 'package:rootnode/widgets/radio_button.dart';
 import 'package:rootnode/widgets/switch_button.dart';
@@ -16,7 +15,6 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  final _userRepo = UserRepoImpl();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,9 +49,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     selected: 1,
                     name: "Parameter",
                     options: const ["Yes", "No"],
-                    onChanged: (value) {
-                      print(value);
-                    },
+                    onChanged: (value) {},
                     value: const ['yes', 'no'],
                   )),
               const SizedBox(height: 10),

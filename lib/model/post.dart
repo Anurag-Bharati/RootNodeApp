@@ -81,7 +81,7 @@ class Post {
         "owner": owner?.toJson(),
         "caption": caption,
         "isMarkdown": isMarkdown,
-        "mediaFiles": mediaFiles == null
+        "mediaFiles": mediaFiles.isEmpty
             ? []
             : List<MediaFile>.from(mediaFiles.map((x) => x.toJson())),
         "likesCount": likesCount,

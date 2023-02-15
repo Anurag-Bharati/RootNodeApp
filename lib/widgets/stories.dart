@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
-import 'package:rootnode/helper/switchRoute.dart';
+import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/story.dart';
 import 'package:rootnode/model/user.dart';
 import 'package:rootnode/repository/story_repo.dart';
@@ -51,6 +51,7 @@ class _StoriesWidgetState extends State<StoriesWidget> {
     });
   }
 
+  // ignore: todo
   // TODO add debounce or convert to throttle function
   void _refreshStory() {
     storyPage = 1;
@@ -154,6 +155,7 @@ class _StoryCard extends StatelessWidget {
                       )
                     : story!.media!.type == "image"
                         ? CachedNetworkImage(
+                            maxHeightDiskCache: 256,
                             imageUrl:
                                 "${ApiConstants.baseUrl}/${story!.media!.url!}",
                             height: double.infinity,
@@ -170,6 +172,15 @@ class _StoryCard extends StatelessWidget {
                               size: 30,
                             ),
                           ),
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            height: 2,
+            color: const Color(0xFF111111),
           ),
         ),
         GestureDetector(

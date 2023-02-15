@@ -1,4 +1,5 @@
 class ApiConstants {
+  // static const String baseUrl = 'http://10.0.2.2:3000';
   static const String baseUrl = 'http://192.168.1.71:3000';
   static const String apiUrl = "/api/v0";
   static const String staticUrl = "/public/media/uploads/all/";
@@ -19,4 +20,8 @@ class ApiConstants {
   static const String conn = "$apiUrl/conn";
   static const String story = "$apiUrl/story";
   static const String event = "$apiUrl/event";
+
+  static const String connOverview = "$apiUrl/conn/old-recent";
+  static const String connRandom = "$apiUrl/conn/random";
+  static const String connRecom = "$apiUrl/conn/recom";
 }

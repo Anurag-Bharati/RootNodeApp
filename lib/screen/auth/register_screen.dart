@@ -38,108 +38,112 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF111111),
       body: SafeArea(
-        child: Container(
-          alignment: Alignment.center,
-          height: double.infinity,
-          child: CustomScrollView(
-            scrollDirection: Axis.vertical,
-            controller: _scrollController,
-            slivers: [
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Form(
-                  key: _globalkey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        alignment: Alignment.topLeft,
-                        child: GestureDetector(
-                          onTap: () => _backToLogin(context, null),
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: const [
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(
-                                  Icons.arrow_back_ios,
-                                  color: Colors.white70,
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 600),
+            alignment: Alignment.center,
+            height: double.infinity,
+            child: CustomScrollView(
+              scrollDirection: Axis.vertical,
+              controller: _scrollController,
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Form(
+                    key: _globalkey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          alignment: Alignment.topLeft,
+                          child: GestureDetector(
+                            onTap: () => _backToLogin(context, null),
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: const [
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    Icons.arrow_back_ios,
+                                    color: Colors.white70,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                "Back",
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 20,
-                                ),
-                              )
-                            ],
+                                Text(
+                                  "Back",
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 20,
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      RootNodeTextField(
-                        controller: _fnameFieldController,
-                        hintText: "First name",
-                        type: TextFieldTypes.email,
-                      ),
-                      RootNodeTextField(
-                        controller: _lnameFieldController,
-                        hintText: "Last name",
-                        type: TextFieldTypes.email,
-                      ),
-                      RootNodeTextField(
-                        controller: _emailFieldController,
-                        hintText: "Email",
-                        type: TextFieldTypes.email,
-                      ),
-                      RootNodeTextField(
-                        controller: _passwordFieldController,
-                        hintText: "Password",
-                        type: TextFieldTypes.password,
-                      ),
-                      RootNodeTextField(
-                        controller: _confirmFieldController,
-                        hintText: "Confirm password",
-                        type: TextFieldTypes.password,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.cyan,
+                        RootNodeTextField(
+                          controller: _fnameFieldController,
+                          hintText: "First name",
+                          type: TextFieldTypes.email,
                         ),
-                        margin: const EdgeInsets.only(
-                            left: 40, right: 40, top: 10, bottom: 40),
-                        child: TextButton(
-                          style: const ButtonStyle(alignment: Alignment.center),
-                          onPressed: () {
-                            FocusScope.of(context).unfocus();
-                            if (_globalkey.currentState!.validate()) {
-                              _saveUser();
-                            } else {
-                              showSnackbar(
-                                  context, "Invalid fields", Colors.red[400]!);
-                            }
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Text(
-                              'Register',
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white70,
-                                fontWeight: FontWeight.bold,
+                        RootNodeTextField(
+                          controller: _lnameFieldController,
+                          hintText: "Last name",
+                          type: TextFieldTypes.email,
+                        ),
+                        RootNodeTextField(
+                          controller: _emailFieldController,
+                          hintText: "Email",
+                          type: TextFieldTypes.email,
+                        ),
+                        RootNodeTextField(
+                          controller: _passwordFieldController,
+                          hintText: "Password",
+                          type: TextFieldTypes.password,
+                        ),
+                        RootNodeTextField(
+                          controller: _confirmFieldController,
+                          hintText: "Confirm password",
+                          type: TextFieldTypes.password,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.cyan,
+                          ),
+                          margin: const EdgeInsets.only(
+                              left: 40, right: 40, top: 10, bottom: 40),
+                          child: TextButton(
+                            style:
+                                const ButtonStyle(alignment: Alignment.center),
+                            onPressed: () {
+                              FocusScope.of(context).unfocus();
+                              if (_globalkey.currentState!.validate()) {
+                                _saveUser();
+                              } else {
+                                showSnackbar(context, "Invalid fields",
+                                    Colors.red[400]!);
+                              }
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                'Register',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),

@@ -55,4 +55,12 @@ class RootNodeFontStyle {
       color: Colors.white54,
       overflow: TextOverflow.ellipsis,
       decoration: TextDecoration.none);
+  static TextStyle get labelSmall => const TextStyle(
+      fontSize: 12.0,
+      fontWeight: FontWeight.w300,
+      fontFamily: 'Poppins',
+      height: 0,
+      color: Colors.white54,
+      overflow: TextOverflow.ellipsis,
+      decoration: TextDecoration.none);
 }
