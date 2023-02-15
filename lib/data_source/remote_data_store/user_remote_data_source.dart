@@ -54,4 +54,15 @@ class UserRemoteDataSource {
       return null;
     }
   }
+
+  Future<User?> getUserById({required String id}) async {
+    try {
+      Response res = await _httpServices
+          .get('${ApiConstants.baseUrl}${ApiConstants.user}/$id');
+      return User.fromJson(res.data["user"]);
+    } catch (_) {
+      debugPrint(_.toString());
+      return null;
+    }
+  }
 }

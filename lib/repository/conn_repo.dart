@@ -1,26 +1,25 @@
 import 'package:rootnode/data_source/remote_data_store/conn_remote_data_source.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_conn.dart';
-import 'package:rootnode/model/conn.dart';
 
 abstract class ConnRepo {
-  Future<List<Connection>> getMyConns({int page = 1, int refresh = 0});
+  Future<MyConnsResponse?> getMyConns({int page = 1, int refresh = 0});
   Future<ConnResponse?> getRecommendedConns({int page = 1, int refresh = 0});
   Future<ConnResponse?> getRandomConns({int page = 1, int refresh = 0});
-  Future<bool> checkIfConnected({required String id});
-  Future<bool> toggleConnection({required String id});
+  Future<bool?> hasConnection({required String id});
+  Future<bool?> toggleConnection({required String id});
   Future<String?> updateConn({required String id});
   Future<ConnOverviewResponse?> getOldRecentConns();
 }
 
 class ConnRepoImpl extends ConnRepo {
   @override
-  Future<bool> checkIfConnected({required String id}) {
-    throw UnimplementedError();
+  Future<bool?> hasConnection({required String id}) {
+    return ConnRemoteDataSource().hasConnection(id: id);
   }
 
   @override
-  Future<List<Connection>> getMyConns({int page = 1, int refresh = 0}) {
-    throw UnimplementedError();
+  Future<MyConnsResponse?> getMyConns({int page = 1, int refresh = 0}) {
+    return ConnRemoteDataSource().getMyConns(page: page, refresh: refresh);
   }
 
   @override
@@ -40,8 +39,8 @@ class ConnRepoImpl extends ConnRepo {
   }
 
   @override
-  Future<bool> toggleConnection({required String id}) {
-    throw UnimplementedError();
+  Future<bool?> toggleConnection({required String id}) {
+    return ConnRemoteDataSource().toggleConnection(id: id);
   }
 
   @override

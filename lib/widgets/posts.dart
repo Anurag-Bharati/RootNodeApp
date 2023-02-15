@@ -20,10 +20,12 @@ class PostContainer extends StatelessWidget {
     Key? key,
     required this.post,
     required this.likedMeta,
+    this.tagPrefix,
   }) : super(key: key);
 
   final Post post;
   final bool likedMeta;
+  final String? tagPrefix;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +39,7 @@ class PostContainer extends StatelessWidget {
         _PostHeader(post: post),
         const SizedBox(height: 16),
         _PostBody(
+          tagPrefix: tagPrefix,
           post: post,
           isLiked: likedMeta,
         ),
@@ -114,25 +117,17 @@ class _PostHeader extends StatelessWidget {
   }
 }
 
-class _PostBody extends StatefulWidget {
+class _PostBody extends StatelessWidget {
   const _PostBody({
     Key? key,
     required this.post,
     required this.isLiked,
+    this.tagPrefix,
   }) : super(key: key);
 
   final Post post;
   final bool isLiked;
-
-  @override
-  State<_PostBody> createState() => _PostBodyState();
-}
-
-class _PostBodyState extends State<_PostBody> {
-  @override
-  void initState() {
-    super.initState();
-  }
+  final String? tagPrefix;
 
   @override
   Widget build(BuildContext context) {
@@ -140,8 +135,8 @@ class _PostBodyState extends State<_PostBody> {
       onTap: () => switchRouteByPush(
           context,
           ViewPost(
-            post: widget.post,
-            likedMeta: widget.isLiked,
+            post: post,
+            likedMeta: isLiked,
           )),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,12 +145,12 @@ class _PostBodyState extends State<_PostBody> {
             padding: const EdgeInsets.symmetric(
                 horizontal: LayoutConstants.postPadding),
             child: Text(
-              widget.post.caption ?? "",
+              post.caption ?? "",
               softWrap: true,
               style: RootNodeFontStyle.caption,
             ),
           ),
-          widget.post.mediaFiles.isNotEmpty
+          post.mediaFiles.isNotEmpty
               ? Center(
                   child: Container(
                     width: double.maxFinite,
@@ -167,14 +162,14 @@ class _PostBodyState extends State<_PostBody> {
                     child: AnimatedSize(
                         curve: Curves.easeInQuad,
                         duration: const Duration(milliseconds: 500),
-                        child: widget.post.mediaFiles.length == 1 &&
-                                widget.post.mediaFiles[0].type == "image"
+                        child: post.mediaFiles.length == 1 &&
+                                post.mediaFiles[0].type == "image"
                             ? Hero(
-                                tag: widget.post.id.toString(),
+                                tag: post.id.toString(),
                                 child: AspectRatio(
                                   aspectRatio: 4 / 3,
-                                  child: PostImage(
-                                      url: widget.post.mediaFiles[0].url!),
+                                  child:
+                                      PostImage(url: post.mediaFiles[0].url!),
                                 ),
                               )
                             : Stack(
@@ -188,14 +183,15 @@ class _PostBodyState extends State<_PostBody> {
                                           CenterPageEnlargeStrategy.scale,
                                       viewportFraction: 1,
                                     ),
-                                    items: widget.post.mediaFiles.map((e) {
+                                    items: post.mediaFiles.map((e) {
                                       return Builder(
-                                        key: PageStorageKey(widget.key),
+                                        key: PageStorageKey(key),
                                         builder: (BuildContext context) {
                                           return e.type! == 'image'
                                               ? Hero(
-                                                  tag:
-                                                      widget.post.id.toString(),
+                                                  tag: tagPrefix != null
+                                                      ? '$tagPrefix-${post.id!}'
+                                                      : post.id!,
                                                   child: PostImage(url: e.url!))
                                               : Container(color: Colors.cyan);
                                         },
@@ -221,35 +217,15 @@ class _PostBodyState extends State<_PostBody> {
   }
 }
 
-//  Make Singleton controller for video player.
-class PostVideoPlayer extends StatefulWidget {
-  const PostVideoPlayer({
-    super.key,
-    required this.url,
-  });
-
-  final String url;
-
-  @override
-  State<PostVideoPlayer> createState() => _PostVideoPlayerState();
-}
-
-class _PostVideoPlayerState extends State<PostVideoPlayer> {
-  @override
-  Widget build(BuildContext context) {
-    // ignore: todo
-    // TODO: implement build
-    throw UnimplementedError();
-  }
-}
-
 class PostImage extends StatelessWidget {
   const PostImage({
     super.key,
     required this.url,
+    this.tagPrefix,
   });
 
   final String url;
+  final String? tagPrefix;
 
   @override
   Widget build(BuildContext context) {

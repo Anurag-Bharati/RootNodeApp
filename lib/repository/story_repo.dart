@@ -6,6 +6,8 @@ import 'package:rootnode/model/story.dart';
 abstract class StoryRepo {
   Future<StoryResponse?> getStoryFeed(
       {int page = 1, int refresh = 0, bool private = false});
+  Future<StoryResponse?> getStoryByUser(
+      {int page = 1, int refresh = 0, required String id});
   Future<Story?> getStoryById({required String id});
   Future<bool> storyWatched({required String id});
   Future<bool> createStory({required Story story, XFile? file});
@@ -22,6 +24,13 @@ class StoryRepoImpl extends StoryRepo {
   @override
   Future<Story?> getStoryById({required String id}) {
     return StoryRemoteDataSource().getStoryById(id: id);
+  }
+
+  @override
+  Future<StoryResponse?> getStoryByUser(
+      {int page = 1, int refresh = 0, required String id}) {
+    return StoryRemoteDataSource()
+        .getStoryByUser(page: page, refresh: refresh, id: id);
   }
 
   @override

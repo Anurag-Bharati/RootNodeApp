@@ -18,7 +18,7 @@ class ViewPost extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Hero(
-        tag: post.id.toString(),
+        tag: post.id!,
         child: SizedBox(
             height: double.infinity,
             width: double.infinity,

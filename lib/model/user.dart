@@ -14,6 +14,7 @@ class User {
       this.postsCount,
       this.storiesCount,
       this.nodesCount,
+      this.connsCount,
       this.role,
       this.status,
       this.isVerified,
@@ -39,6 +40,7 @@ class User {
   int? postsCount;
   int? storiesCount;
   int? nodesCount;
+  int? connsCount;
   String? role;
   String? status;
   bool? isVerified;
@@ -66,6 +68,7 @@ class User {
         postsCount: json["postsCount"],
         storiesCount: json["storiesCount"],
         nodesCount: json["nodesCount"],
+        connsCount: json["connsCount"],
         role: json["role"],
         status: json["status"],
         isVerified: json["isVerified"],

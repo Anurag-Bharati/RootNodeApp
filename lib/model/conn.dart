@@ -3,24 +3,23 @@ import 'package:rootnode/model/user.dart';
 
 @Entity()
 class Connection {
-  Connection(
-      {this.id,
-      this.rootnode,
-      this.node,
-      this.status,
-      this.createdAt,
-      this.updatedAt,
-      this.cid = 0});
+  Connection({this.id, this.rootnode, this.node, this.createdAt, this.cid = 0});
 
   @Id(assignable: true)
   int cid;
   @Unique()
   String? id;
-  User? rootnode;
+  String? rootnode;
   User? node;
-  String? status;
   @Property(type: PropertyType.date)
   DateTime? createdAt;
-  @Property(type: PropertyType.date)
-  DateTime? updatedAt;
+
+  factory Connection.fromJson(Map<String, dynamic> json) => Connection(
+        id: json["_id"],
+        rootnode: json["rootnode"],
+        node: json["node"] == null ? null : User.fromJson(json["node"]),
+        createdAt: json["createdAt"] == null
+            ? null
+            : DateTime.parse(json["createdAt"]),
+      );
 }

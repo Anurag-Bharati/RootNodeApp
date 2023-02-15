@@ -16,7 +16,10 @@ import 'package:string_extensions/string_extensions.dart';
 class StoriesWidget extends StatefulWidget {
   final User currentUser;
 
-  const StoriesWidget({super.key, required this.currentUser});
+  const StoriesWidget({
+    super.key,
+    required this.currentUser,
+  });
 
   @override
   State<StoriesWidget> createState() => _StoriesWidgetState();
@@ -91,24 +94,25 @@ class _StoriesWidgetState extends State<StoriesWidget> {
           if (index == 0) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: _StoryCard(
+              child: StoryCard(
                 stories: _stories,
                 index: index,
                 color: Colors.cyan,
                 isAddStory: true,
-                currentUser: widget.currentUser,
                 story: null,
               ),
             );
           }
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: _StoryCard(
-                stories: _stories,
-                index: index,
-                color: Color(_stories[index - 1].color!),
-                currentUser: widget.currentUser,
-                story: _stories[index - 1]),
+            child: Hero(
+              tag: "story-${index - 1}",
+              child: StoryCard(
+                  stories: _stories,
+                  index: index,
+                  color: Color(_stories[index - 1].color!),
+                  story: _stories[index - 1]),
+            ),
           );
         },
       ),
@@ -116,66 +120,65 @@ class _StoriesWidgetState extends State<StoriesWidget> {
   }
 }
 
-class _StoryCard extends StatelessWidget {
+class StoryCard extends StatelessWidget {
   final bool isAddStory;
-  final User currentUser;
   final Story? story;
   final List<Story> stories;
   final Color color;
   final int index;
-  const _StoryCard({
+  final bool hideName;
+  final bool disableBorder;
+  const StoryCard({
     Key? key,
     this.isAddStory = false,
-    required this.currentUser,
     required this.story,
     required this.color,
     required this.index,
     required this.stories,
+    this.hideName = false,
+    this.disableBorder = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Hero(
-          tag: "story-${index - 1}",
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
-            child: isAddStory
-                ? Container(
-                    height: double.infinity,
-                    width: 110.0,
-                    color: Colors.cyan,
-                  )
-                : story!.media == null
-                    ? Container(
-                        height: double.infinity,
-                        width: 110.0,
-                        color: color,
-                      )
-                    : story!.media!.type == "image"
-                        ? CachedNetworkImage(
-                            maxHeightDiskCache: 256,
-                            imageUrl:
-                                "${ApiConstants.baseUrl}/${story!.media!.url!}",
-                            height: double.infinity,
-                            width: 110.0,
-                            fit: BoxFit.cover,
-                          )
-                        : Container(
-                            height: double.infinity,
-                            width: 110.0,
-                            color: color,
-                            child: const Icon(
-                              Boxicons.bx_video,
-                              color: Colors.white,
-                              size: 30,
-                            ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20.0),
+          child: isAddStory
+              ? Container(
+                  height: double.infinity,
+                  width: 110.0,
+                  color: Colors.cyan,
+                )
+              : story!.media == null
+                  ? Container(
+                      height: double.infinity,
+                      width: 110.0,
+                      color: color,
+                    )
+                  : story!.media!.type == "image"
+                      ? CachedNetworkImage(
+                          maxHeightDiskCache: 256,
+                          imageUrl:
+                              "${ApiConstants.baseUrl}/${story!.media!.url!}",
+                          height: double.infinity,
+                          width: 110.0,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          height: double.infinity,
+                          width: 110.0,
+                          color: color,
+                          child: const Icon(
+                            Boxicons.bx_video,
+                            color: Colors.white,
+                            size: 30,
                           ),
-          ),
+                        ),
         ),
         Positioned(
-          bottom: 0,
+          bottom: -1,
           left: 0,
           right: 0,
           child: Container(
@@ -198,10 +201,12 @@ class _StoryCard extends StatelessWidget {
             width: 110.0,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(
-                  color: const Color(0xFF111111),
-                  width: 1.0,
-                  strokeAlign: BorderSide.strokeAlignOutside),
+              border: disableBorder
+                  ? null
+                  : Border.all(
+                      color: const Color(0xFF111111),
+                      width: 1.0,
+                      strokeAlign: BorderSide.strokeAlignOutside),
               gradient: const LinearGradient(
                 colors: [
                   Color(0xFF111111),
@@ -230,20 +235,22 @@ class _StoryCard extends StatelessWidget {
                   ),
           ),
         ),
-        Positioned(
-          bottom: 8.0,
-          left: 8.0,
-          right: 8.0,
-          child: Text(
-            isAddStory
-                ? 'Add story'
-                : "${story!.owner!.fname!.toTitleCase!} ${story!.owner!.lname![0].capitalize!}.",
-            style: RootNodeFontStyle.subtitle,
-            overflow: TextOverflow.fade,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-          ),
-        ),
+        hideName
+            ? const SizedBox.shrink()
+            : Positioned(
+                bottom: 8.0,
+                left: 8.0,
+                right: 8.0,
+                child: Text(
+                  isAddStory
+                      ? 'Add story'
+                      : "${story!.owner!.fname!.toTitleCase!} ${story!.owner!.lname![0].capitalize!}.",
+                  style: RootNodeFontStyle.subtitle,
+                  overflow: TextOverflow.fade,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                ),
+              ),
       ],
     );
   }

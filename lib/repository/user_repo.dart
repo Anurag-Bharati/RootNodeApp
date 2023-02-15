@@ -36,7 +36,7 @@ class UserRepoImpl extends UserRepo {
 
   @override
   Future<User?> getUserById(String id) {
-    return UserDataSource().getUserById(id);
+    return UserRemoteDataSource().getUserById(id: id);
   }
 
   @override

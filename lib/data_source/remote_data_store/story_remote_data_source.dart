@@ -37,6 +37,21 @@ class StoryRemoteDataSource {
     }
   }
 
+  Future<StoryResponse?> getStoryByUser(
+      {int page = 1, int refresh = 0, required String id}) async {
+    try {
+      String? token = await SimpleStorage.getStringData("token");
+      _httpServices.options.headers["authorization"] = "Bearer $token";
+      Response res = await _httpServices.get(
+        "${ApiConstants.baseUrl}${ApiConstants.story}/user/$id?page=$page&refresh=$refresh",
+      );
+      return res.statusCode == 200 ? StoryResponse.fromJson(res.data) : null;
+    } catch (_) {
+      debugPrint(_.toString());
+      return null;
+    }
+  }
+
   Future<bool> storyWatched({required String id}) async {
     try {
       String? token = await SimpleStorage.getStringData("token");

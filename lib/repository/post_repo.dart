@@ -6,6 +6,8 @@ import 'package:rootnode/model/post.dart';
 abstract class PostRepo {
   Future<PostResponse?> getPostFeed(
       {int page = 1, int refresh = 0, bool private = false});
+  Future<PostResponse?> getPostByUser(
+      {int page = 1, int refresh = 0, required String id});
   Future<bool> togglePostLike({required String id});
   Future<bool> createPost({required Post post, required List<XFile>? files});
 }
@@ -16,6 +18,13 @@ class PostRepoImpl extends PostRepo {
       {int page = 1, int refresh = 0, bool private = false}) {
     return PostRemoteDataSource()
         .getPostFeed(page: page, refresh: refresh, private: private);
+  }
+
+  @override
+  Future<PostResponse?> getPostByUser(
+      {int page = 1, int refresh = 0, required String id}) {
+    return PostRemoteDataSource()
+        .getPostByUser(page: page, refresh: refresh, id: id);
   }
 
   @override
