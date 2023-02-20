@@ -18,6 +18,7 @@ class UserRemoteDataSource {
       );
       return response.statusCode == 201 ? 1 : 0;
     } catch (e) {
+      debugPrint(e.toString());
       return 0;
     }
   }
