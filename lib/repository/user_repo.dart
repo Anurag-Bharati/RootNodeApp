@@ -45,6 +45,7 @@ class UserRepoImpl extends UserRepo {
   @override
   Future<User?> getUserFromToken() async {
     bool status = await NetworkConnectivity.isOnline();
+
     return status ? UserRemoteDataSource().getUserFromToken() : null;
   }
 

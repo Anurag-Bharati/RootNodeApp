@@ -4,18 +4,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
 import 'package:rootnode/helper/http_service.dart';
-import 'package:rootnode/helper/simple_storage.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/story.dart';
 
 class StoryRemoteDataSource {
-  final Dio _httpServices = HttpServices().getDioInstance();
+  final Dio _httpServices = HttpServices.getDioInstance();
 
   Future<StoryResponse?> getStoryFeed(
       {int page = 1, int refresh = 0, bool private = false}) async {
     try {
-      String? token = await SimpleStorage.getStringData("token");
-      _httpServices.options.headers["authorization"] = "Bearer $token";
       Response res = await _httpServices.get(
         "${ApiConstants.baseUrl}${ApiConstants.story}${private ? '/feed' : ''}?page=$page&refresh=$refresh",
       );
@@ -40,8 +37,6 @@ class StoryRemoteDataSource {
   Future<StoryResponse?> getStoryByUser(
       {int page = 1, int refresh = 0, required String id}) async {
     try {
-      String? token = await SimpleStorage.getStringData("token");
-      _httpServices.options.headers["authorization"] = "Bearer $token";
       Response res = await _httpServices.get(
         "${ApiConstants.baseUrl}${ApiConstants.story}/user/$id?page=$page&refresh=$refresh",
       );
@@ -54,8 +49,6 @@ class StoryRemoteDataSource {
 
   Future<bool> storyWatched({required String id}) async {
     try {
-      String? token = await SimpleStorage.getStringData("token");
-      _httpServices.options.headers["authorization"] = "Bearer $token";
       Response res = await _httpServices
           .post("${ApiConstants.baseUrl}${ApiConstants.story}/$id");
       return res.statusCode == 200;
@@ -68,8 +61,7 @@ class StoryRemoteDataSource {
   Future<bool> createStory({required Story story, XFile? file}) async {
     try {
       MultipartFile? media;
-      String? token = await SimpleStorage.getStringData("token");
-      _httpServices.options.headers["authorization"] = "Bearer $token";
+
       if (file != null) {
         media = await FileConverter.toMultipartFile(file: file);
       }

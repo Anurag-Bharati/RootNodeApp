@@ -2,20 +2,24 @@ import 'package:dio/dio.dart';
 import 'package:rootnode/app/constant/api.dart';
 
 class HttpServices {
-  static final HttpServices _instance = HttpServices._internal();
-  factory HttpServices() => _instance;
-  HttpServices._internal();
+  static Dio? _dio;
+  static const int _timeout = 60 * 1000;
 
-  Dio? _dio;
-  final int _timeout = 60 * 1000;
-
-  Map<String, String> headers = {
+  static Map<String, String> headers = {
     'content-type': 'application/json',
     'accept': 'application/json',
     'language': 'en',
   };
 
-  Dio getDioInstance() {
+  static addHeader({required String key, required String value}) {
+    getDioInstance().options.headers.putIfAbsent(key, () => value);
+  }
+
+  static removeHeader({required String key}) {
+    getDioInstance().options.headers.remove(key);
+  }
+
+  static Dio getDioInstance() {
     _dio ??= Dio(
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,

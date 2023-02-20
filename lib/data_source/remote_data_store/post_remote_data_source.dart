@@ -10,7 +10,7 @@ import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/post.dart';
 
 class PostRemoteDataSource {
-  final Dio _httpServices = HttpServices().getDioInstance();
+  final Dio _httpServices = HttpServices.getDioInstance();
 
   Future<PostResponse?> getPostFeed(
       {int page = 1, int refresh = 0, bool private = false}) async {
@@ -40,8 +40,6 @@ class PostRemoteDataSource {
 
   Future<bool> togglePostLike({required String id}) async {
     try {
-      String? token = await SimpleStorage.getStringData("token");
-      _httpServices.options.headers["authorization"] = "Bearer $token";
       Response res = await _httpServices.post(
         "${ApiConstants.baseUrl}${ApiConstants.post}/$id/like-unlike",
       );
