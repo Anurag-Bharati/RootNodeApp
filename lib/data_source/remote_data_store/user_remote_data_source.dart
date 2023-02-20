@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/helper/http_service.dart';
 import 'package:rootnode/helper/simple_storage.dart';
+import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user.dart';
 
 class UserRemoteDataSource {
@@ -64,6 +66,36 @@ class UserRemoteDataSource {
     } catch (_) {
       debugPrint(_.toString());
       return null;
+    }
+  }
+
+  Future<User?> updateUser({
+    required User user,
+    XFile? avatar,
+  }) async {
+    try {
+      var data = user.toJson();
+      if (avatar != null) {
+        MultipartFile? file = await FileConverter.toMultipartFile(file: avatar);
+        data['profile'] = file;
+      }
+      final formData = FormData.fromMap(data);
+      Response res = await _httpServices
+          .put('${ApiConstants.baseUrl}${ApiConstants.user}', data: formData);
+      return User.fromJson(res.data["user"]);
+    } catch (_) {
+      debugPrint(_.toString());
+      return null;
+    }
+  }
+
+  Future<bool> checkIfUsernameAvailable({required String username}) async {
+    try {
+      Response res = await _httpServices.get(
+          "${ApiConstants.baseUrl}${ApiConstants.isUsernameUnique}?username=$username");
+      return res.statusCode == 200;
+    } catch (_) {
+      return false;
     }
   }
 }

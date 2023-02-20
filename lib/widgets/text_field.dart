@@ -8,9 +8,14 @@ class RootNodeTextField extends StatefulWidget {
     required this.controller,
     required this.type,
     required this.hintText,
+
     this.compact = false,
+    this.validator,
+    this.autovalidateMode,
   }) : super(key: key);
 
+  final Future<String?> Function(String?)? validator;
+  final AutovalidateMode? autovalidateMode;
   final TextEditingController controller;
   final TextFieldTypes type;
   final String hintText;
@@ -25,7 +30,7 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
   late bool _compact;
   late double _iconSize;
   late double _fontSize;
-
+  String? asyncStringValidatorData;
   @override
   void initState() {
     _compact = widget.compact;
@@ -43,10 +48,17 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: TextFormField(
+          autovalidateMode: widget.autovalidateMode,
           scrollPadding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom + 20 * 8),
           controller: widget.controller,
+
           style: TextStyle(color: Colors.white70, fontSize: _fontSize),
+
+          onChanged: (value) {
+            if (widget.validator != null) _handleAsync(value);
+          },
+
           keyboardType: widget.type == TextFieldTypes.email
               ? TextInputType.emailAddress
               : TextInputType.visiblePassword,
@@ -56,7 +68,7 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
             if (value == null || value.isEmpty) {
               return 'This field is required';
             }
-            return null;
+            return asyncStringValidatorData;
           },
           textInputAction: widget.type == TextFieldTypes.email
               ? TextInputAction.next
@@ -97,5 +109,10 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
                     )
                   : null),
         ));
+  }
+
+  _handleAsync(String value) async {
+    asyncStringValidatorData = await widget.validator!(value);
+    setState(() {});
   }
 }
