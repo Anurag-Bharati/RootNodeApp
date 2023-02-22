@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/data_source/remote_data_store/cmnt_remote_data_source.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_cmnt.dart';
 import 'package:rootnode/model/comment/comment.dart';
@@ -18,10 +19,18 @@ abstract class CommentRepo {
   Future<Comment?> createComment({required String id, required String comment});
 }
 
+final commentRepoProvider = Provider((ref) {
+  final cmntRemoteDataSource = ref.watch(cmntRemoteDSProvider);
+  return CommentRepoImpl(remoteDataSource: cmntRemoteDataSource);
+});
+
 class CommentRepoImpl extends CommentRepo {
+  final CmntRemoteDataSource remoteDataSource;
+
+  CommentRepoImpl({required this.remoteDataSource});
   @override
   Future<bool> deleteCommentById({required String id}) {
-    return CmntRemoteDataSource().deleteCommentById(id: id);
+    return remoteDataSource.deleteCommentById(id: id);
   }
 
   @override
@@ -38,12 +47,12 @@ class CommentRepoImpl extends CommentRepo {
 
   @override
   Future<CommentResponse?> getPostComments({required String id, int page = 1}) {
-    return CmntRemoteDataSource().getPostComments(id: id, page: page);
+    return remoteDataSource.getPostComments(id: id, page: page);
   }
 
   @override
   Future<bool> toggleCommentLike({required String id}) {
-    return CmntRemoteDataSource().toggleCommentLike(id: id);
+    return remoteDataSource.toggleCommentLike(id: id);
   }
 
   @override
@@ -55,6 +64,6 @@ class CommentRepoImpl extends CommentRepo {
   @override
   Future<Comment?> createComment(
       {required String id, required String comment}) {
-    return CmntRemoteDataSource().createComment(id: id, comment: comment);
+    return remoteDataSource.createComment(id: id, comment: comment);
   }
 }

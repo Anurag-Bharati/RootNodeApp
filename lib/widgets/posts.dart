@@ -162,7 +162,8 @@ class _PostHeader extends ConsumerWidget {
                         Boxicons.bx_dots_vertical_rounded,
                         size: LayoutConstants.postIcon,
                       ),
-                      onSelected: (value) => _handleThreeDots(context, value),
+                      onSelected: (value) =>
+                          _handleThreeDots(context, value, ref),
                       itemBuilder: (BuildContext context) =>
                           <PopupMenuItem<int>>[
                         isOwn
@@ -184,9 +185,10 @@ class _PostHeader extends ConsumerWidget {
     );
   }
 
-  _handleThreeDots(BuildContext context, int value) {
+  _handleThreeDots(BuildContext context, int value, WidgetRef ref) {
     if (value == -1) {
-      PostRepoImpl().deletePost(id: post.id!).then((value) => value
+      final _postRepo = ref.read(postRepoProvider);
+      _postRepo.deletePost(id: post.id!).then((value) => value
           ? showSnackbar(context, "Deletion successful!", Colors.green[400]!)
           : showSnackbar(context, "Something went wrong!", Colors.red[400]!));
       return;
@@ -240,55 +242,54 @@ class _PostBody extends StatelessWidget {
                     margin: EdgeInsets.all(
                         compact ? 10 : LayoutConstants.postInnerMargin),
                     child: AnimatedSize(
-                        curve: Curves.easeInQuad,
-                        duration: const Duration(milliseconds: 500),
-                        child: post.mediaFiles.length == 1 &&
-                                post.mediaFiles[0].type == "image"
-                            ? Hero(
-                                tag: post.id.toString(),
-                                child: AspectRatio(
-                                  aspectRatio: 4 / 3,
-                                  child:
-                                      PostImage(url: post.mediaFiles[0].url!),
-                                ),
-                              )
-                            : Stack(
-                                children: [
-                                  CarouselSlider(
-                                    options: CarouselOptions(
-                                      enableInfiniteScroll: false,
-                                      disableCenter: true,
-                                      enlargeCenterPage: true,
-                                      enlargeStrategy:
-                                          CenterPageEnlargeStrategy.scale,
-                                      viewportFraction: 1,
-                                    ),
-                                    items: post.mediaFiles.map((e) {
-                                      return Builder(
-                                        key: PageStorageKey(key),
-                                        builder: (BuildContext context) {
-                                          return e.type! == 'image'
-                                              ? Hero(
-                                                  tag: tagPrefix != null
-                                                      ? '$tagPrefix-${post.id!}'
-                                                      : post.id!,
-                                                  child: PostImage(url: e.url!))
-                                              : Container(color: Colors.cyan);
-                                        },
-                                      );
-                                    }).toList(),
-                                  ),
-                                  const Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: Icon(Boxicons.bx_images,
-                                            size: 20, color: Colors.white54),
-                                      ))
-                                ],
+                      curve: Curves.easeInQuad,
+                      duration: const Duration(milliseconds: 500),
+                      child: post.mediaFiles.length == 1 &&
+                              post.mediaFiles[0].type == "image"
+                          ? Hero(
+                              tag: post.id.toString(),
+                              child: AspectRatio(
+                                aspectRatio: 4 / 3,
+                                child: PostImage(url: post.mediaFiles[0].url!),
                               ),
+                            )
+                          : Stack(
+                              children: [
+                                CarouselSlider(
+                                  options: CarouselOptions(
+                                    enableInfiniteScroll: false,
+                                    disableCenter: true,
+                                    enlargeCenterPage: true,
+                                    enlargeStrategy:
+                                        CenterPageEnlargeStrategy.scale,
+                                    viewportFraction: 1,
+                                  ),
+                                  items: post.mediaFiles.map((e) {
+                                    return Builder(
+                                      key: PageStorageKey(key),
+                                      builder: (BuildContext context) {
+                                        return e.type! == 'image'
+                                            ? Hero(
+                                                tag: tagPrefix != null
+                                                    ? '$tagPrefix-${post.id!}'
+                                                    : post.id!,
+                                                child: PostImage(url: e.url!))
+                                            : Container(color: Colors.cyan);
+                                      },
+                                    );
+                                  }).toList(),
+                                ),
+                                const Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Icon(Boxicons.bx_images,
+                                          size: 20, color: Colors.white54),
+                                    ))
+                              ],
                             ),
+                    ),
                   ),
                 )
               : SizedBox(height: post.caption != null ? 10 : 0),
@@ -315,18 +316,18 @@ class PostImage extends StatelessWidget {
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
       constraints: const BoxConstraints(maxHeight: 300, minHeight: 0),
       child: CachedNetworkImage(
-          maxWidthDiskCache: 500,
-          imageUrl: "${ApiConstants.baseUrl}/$url",
-          fit: BoxFit.cover,
-          errorWidget: (context, url, error) => const MediaError(
-                icon: Icons.broken_image,
-              ),
-          progressIndicatorBuilder: (context, url, progress) => MediaLoading(
-                label: "Loading Image",
-                icon: Boxicons.bx_image,
-                progress: progress,
-              ),
-            ),
+        maxWidthDiskCache: 500,
+        imageUrl: "${ApiConstants.baseUrl}/$url",
+        fit: BoxFit.cover,
+        errorWidget: (context, url, error) => const MediaError(
+          icon: Icons.broken_image,
+        ),
+        progressIndicatorBuilder: (context, url, progress) => MediaLoading(
+          label: "Loading Image",
+          icon: Boxicons.bx_image,
+          progress: progress,
+        ),
+      ),
     );
   }
 }

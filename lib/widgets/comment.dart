@@ -3,6 +3,7 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:like_button/like_button.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
@@ -58,146 +59,149 @@ class CommentContainer extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.8),
-                    margin: const EdgeInsets.only(left: 0, right: 10),
-                    padding: LayoutConstants.postPaddingTLR,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: const Color(0xFF333333),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              comment.user!.fullname,
-                              style: RootNodeFontStyle.title,
-                            ),
-                            Wrap(
-                              spacing: 5,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(
-                                  Utils.getTimeAgo(comment.createdAt!),
-                                  textAlign: TextAlign.center,
-                                  style: RootNodeFontStyle.label,
-                                ),
-                                SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: PopupMenuButton<int>(
-                                    shadowColor: Colors.white,
-                                    splashRadius: 24,
-                                    offset: const Offset(0, 32),
-                                    padding: EdgeInsets.zero,
-                                    color: Colors.white70,
-                                    surfaceTintColor: Colors.transparent,
-                                    enableFeedback: true,
-                                    elevation: 2,
-                                    icon: const Icon(
-                                      Boxicons.bx_dots_vertical_rounded,
-                                      size: LayoutConstants.postIcon,
-                                    ),
-                                    onSelected: (value) =>
-                                        _handleThreeDots(context, value),
-                                    itemBuilder: (BuildContext context) =>
-                                        <PopupMenuItem<int>>[
-                                      isOwn
-                                          ? const PopupMenuItem<int>(
-                                              height: 24,
-                                              value: -1,
-                                              child: Text('Remove'))
-                                          : const PopupMenuItem<int>(
-                                              height: 24,
-                                              value: 1,
-                                              child: Text('Report')),
-                                    ],
+              Consumer(builder: (context, ref, child) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.8),
+                      margin: const EdgeInsets.only(left: 0, right: 10),
+                      padding: LayoutConstants.postPaddingTLR,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: const Color(0xFF333333),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                comment.user!.fullname,
+                                style: RootNodeFontStyle.title,
+                              ),
+                              Wrap(
+                                spacing: 5,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Text(
+                                    Utils.getTimeAgo(comment.createdAt!),
+                                    textAlign: TextAlign.center,
+                                    style: RootNodeFontStyle.label,
                                   ),
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: PopupMenuButton<int>(
+                                      shadowColor: Colors.white,
+                                      splashRadius: 24,
+                                      offset: const Offset(0, 32),
+                                      padding: EdgeInsets.zero,
+                                      color: Colors.white70,
+                                      surfaceTintColor: Colors.transparent,
+                                      enableFeedback: true,
+                                      elevation: 2,
+                                      icon: const Icon(
+                                        Boxicons.bx_dots_vertical_rounded,
+                                        size: LayoutConstants.postIcon,
+                                      ),
+                                      onSelected: (value) =>
+                                          _handleThreeDots(context, value, ref),
+                                      itemBuilder: (BuildContext context) =>
+                                          <PopupMenuItem<int>>[
+                                        isOwn
+                                            ? const PopupMenuItem<int>(
+                                                height: 24,
+                                                value: -1,
+                                                child: Text('Remove'))
+                                            : const PopupMenuItem<int>(
+                                                height: 24,
+                                                value: 1,
+                                                child: Text('Report')),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(
+                                left: 5, top: 5, bottom: 10, right: 5),
+                            child: Text(
+                              comment.comment!,
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                              style:
+                                  RootNodeFontStyle.body.copyWith(height: 1.2),
                             ),
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(
-                              left: 5, top: 5, bottom: 10, right: 5),
-                          child: Text(
-                            comment.comment!,
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
-                            style: RootNodeFontStyle.body.copyWith(height: 1.2),
+                          ),
+                          const SizedBox(height: 5)
+                        ],
+                      ),
+                    ),
+                    Wrap(
+                      spacing: 5,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, left: 10),
+                          child: LikeButton(
+                            onTap: (isLiked) => _toggleCommentLike(ref),
+                            isLiked: isLiked,
+                            size: LayoutConstants.postIcon,
+                            likeCount: comment.likesCount,
+                            padding: const EdgeInsets.only(right: 10),
+                            likeBuilder: (isLiked) {
+                              return isLiked
+                                  ? const Icon(
+                                      Boxicons.bxs_like,
+                                      color: Colors.white70,
+                                      size: 18,
+                                    )
+                                  : const Icon(
+                                      Boxicons.bx_like,
+                                      color: Colors.white70,
+                                      size: 18,
+                                    );
+                            },
+                            likeCountPadding:
+                                const EdgeInsets.only(top: 2, left: 8.0),
                           ),
                         ),
-                        const SizedBox(height: 5)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: LikeButton(
+                            // onTap: (isLiked) => _toggleCommentLike(),
+                            isLiked: false,
+                            size: LayoutConstants.postIcon,
+                            likeCount: 0,
+                            padding: const EdgeInsets.only(right: 10),
+                            likeBuilder: (isLiked) {
+                              return isLiked
+                                  ? const Icon(
+                                      Boxicons.bxs_share,
+                                      color: Colors.white70,
+                                      size: 20,
+                                    )
+                                  : const Icon(
+                                      Boxicons.bx_share,
+                                      color: Colors.white70,
+                                      size: 20,
+                                    );
+                            },
+                            likeCountPadding:
+                                const EdgeInsets.only(top: 2, left: 8.0),
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                  Wrap(
-                    spacing: 5,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 10),
-                        child: LikeButton(
-                          onTap: (isLiked) => _toggleCommentLike(),
-                          isLiked: isLiked,
-                          size: LayoutConstants.postIcon,
-                          likeCount: comment.likesCount,
-                          padding: const EdgeInsets.only(right: 10),
-                          likeBuilder: (isLiked) {
-                            return isLiked
-                                ? const Icon(
-                                    Boxicons.bxs_like,
-                                    color: Colors.white70,
-                                    size: 18,
-                                  )
-                                : const Icon(
-                                    Boxicons.bx_like,
-                                    color: Colors.white70,
-                                    size: 18,
-                                  );
-                          },
-                          likeCountPadding:
-                              const EdgeInsets.only(top: 2, left: 8.0),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: LikeButton(
-                          // onTap: (isLiked) => _toggleCommentLike(),
-                          isLiked: false,
-                          size: LayoutConstants.postIcon,
-                          likeCount: 0,
-                          padding: const EdgeInsets.only(right: 10),
-                          likeBuilder: (isLiked) {
-                            return isLiked
-                                ? const Icon(
-                                    Boxicons.bxs_share,
-                                    color: Colors.white70,
-                                    size: 20,
-                                  )
-                                : const Icon(
-                                    Boxicons.bx_share,
-                                    color: Colors.white70,
-                                    size: 20,
-                                  );
-                          },
-                          likeCountPadding:
-                              const EdgeInsets.only(top: 2, left: 8.0),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                  ],
+                );
+              }),
             ],
           ),
         ],
@@ -205,13 +209,15 @@ class CommentContainer extends StatelessWidget {
     );
   }
 
-  Future<bool?> _toggleCommentLike() async {
-    return await CommentRepoImpl().toggleCommentLike(id: comment.id!);
+  Future<bool?> _toggleCommentLike(WidgetRef ref) async {
+    final commentRepo = ref.read(commentRepoProvider);
+    return await commentRepo.toggleCommentLike(id: comment.id!);
   }
 
-  _handleThreeDots(BuildContext context, int value) async {
+  _handleThreeDots(BuildContext context, int value, WidgetRef ref) async {
     if (value == -1) {
-      bool res = await CommentRepoImpl().deleteCommentById(id: comment.id!);
+      final commentRepo = ref.read(commentRepoProvider);
+      bool res = await commentRepo.deleteCommentById(id: comment.id!);
       res
           ? onDelete()
           : showSnackbar(context, "Something went wrong", Colors.red[400]!);

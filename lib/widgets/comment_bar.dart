@@ -19,7 +19,6 @@ class BottomCommentBar extends ConsumerStatefulWidget {
 
 class _BottomChatFieldState extends ConsumerState<BottomCommentBar> {
   final _controller = TextEditingController();
-
   FocusNode focusNode = FocusNode();
 
   @override
@@ -86,13 +85,14 @@ class _BottomChatFieldState extends ConsumerState<BottomCommentBar> {
   }
 
   _postComment() async {
+    final commentRepo = ref.read(commentRepoProvider);
     String comment = _controller.text;
     if (comment.trim() == "") {
       showSnackbar(context, "Invalid comment", Colors.red[400]!);
       return;
     }
     final res =
-        await CommentRepoImpl().createComment(id: widget.id, comment: comment);
+        await commentRepo.createComment(id: widget.id, comment: comment);
     if (res != null) {
       hideKeyboard();
       _controller.clear();

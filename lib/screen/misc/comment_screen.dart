@@ -27,6 +27,8 @@ class CommentScreen extends ConsumerStatefulWidget {
 }
 
 class _CommentScreenState extends ConsumerState<CommentScreen> {
+  late final CommentRepo _cmntRepo;
+  late final PostRepo _postRepo;
   late final ScrollController _controller;
   late User rootnode;
   Post? post;
@@ -38,10 +40,10 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
   int totalPages = 1;
 
   Future<void> _fetchPost() async =>
-      post = await PostRepoImpl().getPostById(id: widget.id);
+      post = await _postRepo.getPostById(id: widget.id);
 
   Future<void> _fetchComments() async =>
-      commentResponse = await CommentRepoImpl().getPostComments(id: widget.id);
+      commentResponse = await _cmntRepo.getPostComments(id: widget.id);
 
   Future<void> _refresh() async => {
         _fetchPost()
@@ -69,8 +71,8 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
   Future<void> _fetchMoreComments() async {
     if (currentPage < totalPages) {
       currentPage++;
-      final res = await CommentRepoImpl()
-          .getPostComments(id: widget.id, page: currentPage);
+      final res =
+          await _cmntRepo.getPostComments(id: widget.id, page: currentPage);
       if (res == null) return;
       setState(() {
         addUpdates(res);
@@ -82,6 +84,8 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
 
   @override
   void initState() {
+    _cmntRepo = ref.read(commentRepoProvider);
+    _postRepo = ref.read(postRepoProvider);
     _controller = ScrollController()
       ..addListener(() {
         if (_controller.position.maxScrollExtent == _controller.offset) {

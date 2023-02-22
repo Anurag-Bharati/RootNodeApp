@@ -77,7 +77,7 @@ class PostRemoteDataSource {
 
   Future<Post?> getPostById({required String id}) async {
     try {
-      Response res = await _httpServices
+      Response res = await httpService
           .get("${ApiConstants.baseUrl}${ApiConstants.post}/$id");
       return res.statusCode == 200 ? Post.fromJson(res.data['data']) : null;
     } catch (_) {
@@ -88,7 +88,7 @@ class PostRemoteDataSource {
 
   Future<bool> deletePost({required String id}) async {
     try {
-      Response res = await _httpServices.delete(
+      Response res = await httpService.delete(
         "${ApiConstants.baseUrl}${ApiConstants.post}/$id",
       );
       return res.statusCode == 200;

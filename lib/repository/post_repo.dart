@@ -49,11 +49,11 @@ class PostRepoImpl extends PostRepo {
 
   @override
   Future<Post?> getPostById({required String id}) {
-    return PostRemoteDataSource().getPostById(id: id);
+    return remoteDataSource.getPostById(id: id);
   }
 
   @override
   Future<bool> deletePost({required String id}) {
-    return PostRemoteDataSource().deletePost(id: id);
+    return remoteDataSource.deletePost(id: id);
   }
 }

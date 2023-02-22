@@ -76,7 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             channelKey: 'test_channel'),
       ),
     );
-    
+
     User? user = await userRepo.getUserFromToken();
     if (user == null) return false;
     ref.read(sessionProvider.notifier).updateUser(user: user);
@@ -131,23 +131,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 horizontal: 40, vertical: 10),
                             child: Consumer(builder: (context, ref, child) {
                               return TextButton(
-                              key: const ValueKey("loginBtn"),
-                              style: const ButtonStyle(
-                                  alignment: Alignment.center),
-                              onPressed: () async {
-                                if (!_globalkey.currentState!.validate()) {
-                                  showSnackbar(context, "Invalid fields",
-                                      Colors.red[400]!);
-                                  return;
-                                }
-                                showSnackbar(
-                                    context, "Logging in..", Colors.green[400]!,
-                                    dismissable: false);
-                                bool res = await _loginUser();
-                                if (res) {
-                                  // ignore: use_build_context_synchronously
-                                  ScaffoldMessenger.of(context)
-                                      .removeCurrentSnackBar();
+                                key: const ValueKey("loginBtn"),
+                                style: const ButtonStyle(
+                                    alignment: Alignment.center),
+                                onPressed: () async {
+                                  if (!_globalkey.currentState!.validate()) {
+                                    showSnackbar(context, "Invalid fields",
+                                        Colors.red[400]!);
+                                    return;
+                                  }
+                                  showSnackbar(context, "Logging in..",
+                                      Colors.green[400]!,
+                                      dismissable: false);
+                                  bool res = await _loginUser(ref);
+                                  if (res) {
+                                    // ignore: use_build_context_synchronously
+                                    ScaffoldMessenger.of(context)
+                                        .removeCurrentSnackBar();
                                     // ignore: use_build_context_synchronously
                                     return switchRouteByPushReplace(
                                         context, const DashboardScreen());
@@ -169,7 +169,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       color: Colors.white70,
                                       fontWeight: FontWeight.bold,
                                     ),
-
                                   ),
                                 ),
                               );
