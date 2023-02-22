@@ -89,26 +89,31 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                         ),
                         RootNodeTextField(
+                          key: const ValueKey("fnameField"),
                           controller: _fnameFieldController,
                           hintText: "First name",
                           type: TextFieldTypes.email,
                         ),
                         RootNodeTextField(
+                          key: const ValueKey("lnameField"),
                           controller: _lnameFieldController,
                           hintText: "Last name",
                           type: TextFieldTypes.email,
                         ),
                         RootNodeTextField(
+                          key: const ValueKey("emailField"),
                           controller: _emailFieldController,
                           hintText: "Email",
                           type: TextFieldTypes.email,
                         ),
                         RootNodeTextField(
+                          key: const ValueKey("pwdField"),
                           controller: _passwordFieldController,
                           hintText: "Password",
                           type: TextFieldTypes.password,
                         ),
                         RootNodeTextField(
+                          key: const ValueKey("cpwdField"),
                           controller: _confirmFieldController,
                           hintText: "Confirm password",
                           type: TextFieldTypes.password,
@@ -121,6 +126,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           margin: const EdgeInsets.only(
                               left: 40, right: 40, top: 10, bottom: 40),
                           child: TextButton(
+                            key: const ValueKey("regBtn"),
                             style:
                                 const ButtonStyle(alignment: Alignment.center),
                             onPressed: () {
@@ -176,6 +182,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     String msg;
     msg = status > 0 ? "Registered Successfully!" : "Something went wrong!";
     Color color = status > 0 ? Colors.green : Colors.red;
+
     showSnackbar(context, msg, color);
     if (status > 0) {
       _backToLogin(context, _emailFieldController.text);

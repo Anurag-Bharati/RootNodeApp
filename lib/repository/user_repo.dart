@@ -68,4 +68,14 @@ class UserRepoImpl extends UserRepo {
   Future<bool> checkIfUsernameAvailable({required String username}) {
     return remoteDataSource.checkIfUsernameAvailable(username: username);
   }
+
+  @override
+  Future<User?> updateUser({XFile? avatar, required User user}) {
+    return UserRemoteDataSource().updateUser(user: user, avatar: avatar);
+  }
+
+  @override
+  Future<bool> checkIfUsernameAvailable({required String username}) {
+    return UserRemoteDataSource().checkIfUsernameAvailable(username: username);
+  }
 }

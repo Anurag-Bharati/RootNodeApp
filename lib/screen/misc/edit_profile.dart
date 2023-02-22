@@ -128,7 +128,6 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                     if (p0.length < 3) {
                       return "Must be at least three char long";
                     }
-
                     return null;
                   },
                   hintText: 'First Name',

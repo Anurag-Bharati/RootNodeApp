@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rootnode/helper/notification_helper.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/provider/session_provider.dart';
@@ -58,6 +62,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       showSnackbar(context, "Invalid email or password", Colors.red[400]!);
       return false;
     }
+    String localTimeZone =
+        await AwesomeNotifications().getLocalTimeZoneIdentifier();
+    LocalNotificationHelper.checkNotificationEnabled().then(
+      (_) => _.createNotification(
+        schedule: NotificationInterval(
+            interval: 5, timeZone: localTimeZone, repeats: false),
+        content: NotificationContent(
+            id: 1,
+            title: "New login detected",
+            body: "A new login into your account was detected."
+                " Device: ${Platform.operatingSystem}",
+            channelKey: 'test_channel'),
+      ),
+    );
+    
     User? user = await userRepo.getUserFromToken();
     if (user == null) return false;
     ref.read(sessionProvider.notifier).updateUser(user: user);
@@ -92,11 +111,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: const RootNodeTextLogo(),
                           ),
                           RootNodeTextField(
+                            key: const ValueKey("emailField"),
                             controller: _emailFieldController,
                             hintText: "Email",
                             type: TextFieldTypes.email,
                           ),
                           RootNodeTextField(
+                            key: const ValueKey("pwdField"),
                             controller: _passwordFieldController,
                             hintText: "Password",
                             type: TextFieldTypes.password,
@@ -110,28 +131,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 horizontal: 40, vertical: 10),
                             child: Consumer(builder: (context, ref, child) {
                               return TextButton(
-                                style: const ButtonStyle(
-                                    alignment: Alignment.center),
-                                onPressed: () async {
-                                  if (!_globalkey.currentState!.validate()) {
-                                    showSnackbar(context, "Invalid fields",
-                                        Colors.red[400]!);
-                                    return;
-                                  }
-                                  showSnackbar(context, "Logging in..",
-                                      Colors.green[400]!,
-                                      dismissable: false);
-                                  bool success = await _loginUser(ref);
-                                  if (success) {
-                                    // ignore: use_build_context_synchronously
-                                    ScaffoldMessenger.of(context)
-                                        .removeCurrentSnackBar();
-
+                              key: const ValueKey("loginBtn"),
+                              style: const ButtonStyle(
+                                  alignment: Alignment.center),
+                              onPressed: () async {
+                                if (!_globalkey.currentState!.validate()) {
+                                  showSnackbar(context, "Invalid fields",
+                                      Colors.red[400]!);
+                                  return;
+                                }
+                                showSnackbar(
+                                    context, "Logging in..", Colors.green[400]!,
+                                    dismissable: false);
+                                bool res = await _loginUser();
+                                if (res) {
+                                  // ignore: use_build_context_synchronously
+                                  ScaffoldMessenger.of(context)
+                                      .removeCurrentSnackBar();
                                     // ignore: use_build_context_synchronously
                                     return switchRouteByPushReplace(
                                         context, const DashboardScreen());
                                   }
                                   // ignore: use_build_context_synchronously
+
                                   showSnackbar(
                                     context,
                                     "Sorry! Something went wrong",
@@ -147,6 +169,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       color: Colors.white70,
                                       fontWeight: FontWeight.bold,
                                     ),
+
                                   ),
                                 ),
                               );
@@ -165,8 +188,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       color: Colors.white70, fontSize: 16),
                                 ),
                                 TextButton(
+                                    key: const ValueKey('gotoRegBtn'),
                                     onPressed: (() {
-                                      Navigator.pushReplacement(
+                                      Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                               builder: (BuildContext context) =>

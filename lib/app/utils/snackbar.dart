@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 void showSnackbar(BuildContext context, String message, Color color,
     {dismissable = true}) {
+  ScaffoldMessenger.of(context).removeCurrentSnackBar();
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       elevation: 0,
