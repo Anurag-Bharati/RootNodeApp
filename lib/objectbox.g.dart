@@ -14,130 +14,15 @@ import 'package:objectbox/internal.dart'; // generated code can access "internal
 import 'package:objectbox/objectbox.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'model/comment/comment.dart';
 import 'model/conn.dart';
 import 'model/post.dart';
 import 'model/story.dart';
-import 'model/user.dart';
+import 'model/user/user.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
 final _entities = <ModelEntity>[
-  ModelEntity(
-      id: const IdUid(1, 6138479246504221594),
-      name: 'User',
-      lastPropertyId: const IdUid(21, 8948287723840119040),
-      flags: 0,
-      properties: <ModelProperty>[
-        ModelProperty(
-            id: const IdUid(1, 5115801486177743412),
-            name: 'uid',
-            type: 6,
-            flags: 129),
-        ModelProperty(
-            id: const IdUid(2, 8093898177353580005),
-            name: 'fname',
-            type: 9,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(3, 8776623099835251897),
-            name: 'lname',
-            type: 9,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(4, 4232165894689590937),
-            name: 'email',
-            type: 9,
-            flags: 2080,
-            indexId: const IdUid(2, 7657929131341665203)),
-        ModelProperty(
-            id: const IdUid(5, 5113996005119566160),
-            name: 'username',
-            type: 9,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(6, 1586253395544762102),
-            name: 'password',
-            type: 9,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(7, 8069922519351292753),
-            name: 'id',
-            type: 9,
-            flags: 2080,
-            indexId: const IdUid(1, 2783890494657467140)),
-        ModelProperty(
-            id: const IdUid(8, 419775958847083397),
-            name: 'avatar',
-            type: 9,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(9, 1782414650770189387),
-            name: 'emailVerified',
-            type: 1,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(10, 7759540973278672008),
-            name: 'postsCount',
-            type: 6,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(11, 2788229061688583000),
-            name: 'storiesCount',
-            type: 6,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(12, 2033463862497646420),
-            name: 'nodesCount',
-            type: 6,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(13, 5370286352775302310),
-            name: 'role',
-            type: 9,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(14, 2287307098108665787),
-            name: 'status',
-            type: 9,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(15, 5259066186921182738),
-            name: 'isVerified',
-            type: 1,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(16, 8257013226826044270),
-            name: 'showOnlineStatus',
-            type: 1,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(17, 39071100786601352),
-            name: 'lastSeen',
-            type: 10,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(18, 3750907936504814030),
-            name: 'createdAt',
-            type: 10,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(19, 6293594934558927518),
-            name: 'updatedAt',
-            type: 10,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(20, 9041089780929871417),
-            name: 'usernameChangedAt',
-            type: 10,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(21, 8948287723840119040),
-            name: 'connsCount',
-            type: 6,
-            flags: 0)
-      ],
-      relations: <ModelRelation>[],
-      backlinks: <ModelBacklink>[]),
   ModelEntity(
       id: const IdUid(3, 3439376138474405713),
       name: 'Post',
@@ -357,6 +242,173 @@ final _entities = <ModelEntity>[
             flags: 0)
       ],
       relations: <ModelRelation>[],
+      backlinks: <ModelBacklink>[]),
+  ModelEntity(
+      id: const IdUid(9, 8275925279760383233),
+      name: 'User',
+      lastPropertyId: const IdUid(21, 2007629041041205793),
+      flags: 0,
+      properties: <ModelProperty>[
+        ModelProperty(
+            id: const IdUid(1, 5772465103710400360),
+            name: 'uid',
+            type: 6,
+            flags: 129),
+        ModelProperty(
+            id: const IdUid(2, 5393314683543423338),
+            name: 'id',
+            type: 9,
+            flags: 2080,
+            indexId: const IdUid(12, 6132827397214467187)),
+        ModelProperty(
+            id: const IdUid(3, 4374328355945842870),
+            name: 'fname',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(4, 2287532527621483247),
+            name: 'lname',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(5, 8536612385223143857),
+            name: 'email',
+            type: 9,
+            flags: 2080,
+            indexId: const IdUid(13, 8154792555828599654)),
+        ModelProperty(
+            id: const IdUid(6, 5246092410050327376),
+            name: 'password',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(7, 7048208032075976673),
+            name: 'avatar',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(8, 7051459349830004719),
+            name: 'emailVerified',
+            type: 1,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(9, 7981548101812868101),
+            name: 'postsCount',
+            type: 6,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(10, 1199627552362986252),
+            name: 'storiesCount',
+            type: 6,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(11, 4371193259116081084),
+            name: 'nodesCount',
+            type: 6,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(12, 3484393529760724151),
+            name: 'connsCount',
+            type: 6,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(13, 3943243507904632026),
+            name: 'role',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(14, 5013140490880141484),
+            name: 'status',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(15, 4587091867749912196),
+            name: 'isVerified',
+            type: 1,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(16, 3086453081967533249),
+            name: 'showOnlineStatus',
+            type: 1,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(17, 3637350933540677739),
+            name: 'lastSeen',
+            type: 10,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(18, 3062967772156768618),
+            name: 'username',
+            type: 9,
+            flags: 2080,
+            indexId: const IdUid(15, 8677575070794955431)),
+        ModelProperty(
+            id: const IdUid(19, 433008862834630105),
+            name: 'createdAt',
+            type: 10,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(20, 1829805655390463955),
+            name: 'updatedAt',
+            type: 10,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(21, 2007629041041205793),
+            name: 'usernameChangedAt',
+            type: 10,
+            flags: 0)
+      ],
+      relations: <ModelRelation>[],
+      backlinks: <ModelBacklink>[]),
+  ModelEntity(
+      id: const IdUid(10, 2667989420531770701),
+      name: 'Comment',
+      lastPropertyId: const IdUid(8, 898622646642411009),
+      flags: 0,
+      properties: <ModelProperty>[
+        ModelProperty(
+            id: const IdUid(1, 5697139504284332177),
+            name: 'cid',
+            type: 6,
+            flags: 129),
+        ModelProperty(
+            id: const IdUid(2, 3761508425932665042),
+            name: 'id',
+            type: 9,
+            flags: 2080,
+            indexId: const IdUid(14, 3922288636409474377)),
+        ModelProperty(
+            id: const IdUid(3, 8215554676776451781),
+            name: 'comment',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(4, 8252573767795983553),
+            name: 'type',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(5, 6132312336048418290),
+            name: 'likesCount',
+            type: 6,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(6, 1668686964222377843),
+            name: 'status',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(7, 2400268014759141517),
+            name: 'createdAt',
+            type: 10,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(8, 898622646642411009),
+            name: 'updatedAt',
+            type: 10,
+            flags: 0)
+      ],
+      relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[])
 ];
 
@@ -380,11 +432,16 @@ Future<Store> openStore(
 ModelDefinition getObjectBoxModel() {
   final model = ModelInfo(
       entities: _entities,
-      lastEntityId: const IdUid(6, 6696166484992312307),
-      lastIndexId: const IdUid(7, 5092965173393285103),
+      lastEntityId: const IdUid(10, 2667989420531770701),
+      lastIndexId: const IdUid(15, 8677575070794955431),
       lastRelationId: const IdUid(1, 403350268397340821),
       lastSequenceId: const IdUid(0, 0),
-      retiredEntityUids: const [2699268489578170829],
+      retiredEntityUids: const [
+        2699268489578170829,
+        6138479246504221594,
+        3326717837390706245,
+        6289497147077741130
+      ],
       retiredIndexUids: const [2433313747825919311],
       retiredPropertyUids: const [
         2030185796248820130,
@@ -405,7 +462,70 @@ ModelDefinition getObjectBoxModel() {
         8506438372257683967,
         2603067226680828925,
         7029449042520276148,
-        71323444867613403
+        71323444867613403,
+        5115801486177743412,
+        8093898177353580005,
+        8776623099835251897,
+        4232165894689590937,
+        5113996005119566160,
+        1586253395544762102,
+        8069922519351292753,
+        419775958847083397,
+        1782414650770189387,
+        7759540973278672008,
+        2788229061688583000,
+        2033463862497646420,
+        5370286352775302310,
+        2287307098108665787,
+        5259066186921182738,
+        8257013226826044270,
+        39071100786601352,
+        3750907936504814030,
+        6293594934558927518,
+        9041089780929871417,
+        8948287723840119040,
+        6344612874808216171,
+        1411920881450717137,
+        367874528287423229,
+        2748762319398155485,
+        729333855110184677,
+        8919869237585038032,
+        7979469357601599126,
+        2635194065891506936,
+        6338911634165264774,
+        2811907069534259895,
+        6362881210888123403,
+        2132575563130018067,
+        1127729724644576286,
+        1366060696786567428,
+        2363191379614771364,
+        9101920675183299526,
+        917902277571213244,
+        2938846446720354971,
+        2039366882702187285,
+        1206942848991204012,
+        1024891598626382373,
+        7266997052754304030,
+        7657338957795200539,
+        3227897041484541498,
+        1129367898710753111,
+        1990074028713025057,
+        2231143418539581077,
+        4118722878784240911,
+        8885011370663378009,
+        8313662356233353121,
+        3603909469921376552,
+        3760821797400078681,
+        9134955579771215990,
+        4613546825304453825,
+        7984477343198039918,
+        8026587840440955834,
+        1741433785101848098,
+        3084305166243128091,
+        7018038141094637101,
+        391773177564767566,
+        2747108334332290773,
+        6243383187698410067
       ],
       retiredRelationUids: const [403350268397340821],
       modelVersion: 5,
@@ -413,106 +533,8 @@ ModelDefinition getObjectBoxModel() {
       version: 1);
 
   final bindings = <Type, EntityDefinition>{
-    User: EntityDefinition<User>(
-        model: _entities[0],
-        toOneRelations: (User object) => [],
-        toManyRelations: (User object) => {},
-        getId: (User object) => object.uid,
-        setId: (User object, int id) {
-          object.uid = id;
-        },
-        objectToFB: (User object, fb.Builder fbb) {
-          final fnameOffset =
-              object.fname == null ? null : fbb.writeString(object.fname!);
-          final lnameOffset =
-              object.lname == null ? null : fbb.writeString(object.lname!);
-          final emailOffset =
-              object.email == null ? null : fbb.writeString(object.email!);
-          final usernameOffset = object.username == null
-              ? null
-              : fbb.writeString(object.username!);
-          final passwordOffset = object.password == null
-              ? null
-              : fbb.writeString(object.password!);
-          final idOffset =
-              object.id == null ? null : fbb.writeString(object.id!);
-          final avatarOffset =
-              object.avatar == null ? null : fbb.writeString(object.avatar!);
-          final roleOffset =
-              object.role == null ? null : fbb.writeString(object.role!);
-          final statusOffset =
-              object.status == null ? null : fbb.writeString(object.status!);
-          fbb.startTable(22);
-          fbb.addInt64(0, object.uid);
-          fbb.addOffset(1, fnameOffset);
-          fbb.addOffset(2, lnameOffset);
-          fbb.addOffset(3, emailOffset);
-          fbb.addOffset(4, usernameOffset);
-          fbb.addOffset(5, passwordOffset);
-          fbb.addOffset(6, idOffset);
-          fbb.addOffset(7, avatarOffset);
-          fbb.addBool(8, object.emailVerified);
-          fbb.addInt64(9, object.postsCount);
-          fbb.addInt64(10, object.storiesCount);
-          fbb.addInt64(11, object.nodesCount);
-          fbb.addOffset(12, roleOffset);
-          fbb.addOffset(13, statusOffset);
-          fbb.addBool(14, object.isVerified);
-          fbb.addBool(15, object.showOnlineStatus);
-          fbb.addInt64(16, object.lastSeen?.millisecondsSinceEpoch);
-          fbb.addInt64(17, object.createdAt?.millisecondsSinceEpoch);
-          fbb.addInt64(18, object.updatedAt?.millisecondsSinceEpoch);
-          fbb.addInt64(19, object.usernameChangedAt?.millisecondsSinceEpoch);
-          fbb.addInt64(20, object.connsCount);
-          fbb.finish(fbb.endTable());
-          return object.uid;
-        },
-        objectFromFB: (Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-          final lastSeenValue =
-              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 36);
-          final createdAtValue =
-              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 38);
-          final updatedAtValue =
-              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 40);
-          final usernameChangedAtValue =
-              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 42);
-          final object = User(
-              avatar: const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 18),
-              id: const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 16),
-              fname: const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 6),
-              lname: const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 8),
-              email: const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 10),
-              password: const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 14),
-              emailVerified: const fb.BoolReader()
-                  .vTableGetNullable(buffer, rootOffset, 20),
-              postsCount:
-                  const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 22),
-              storiesCount: const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 24),
-              nodesCount: const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 26),
-              connsCount: const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 44),
-              role: const fb.StringReader(asciiOptimization: true).vTableGetNullable(buffer, rootOffset, 28),
-              status: const fb.StringReader(asciiOptimization: true).vTableGetNullable(buffer, rootOffset, 30),
-              isVerified: const fb.BoolReader().vTableGetNullable(buffer, rootOffset, 32),
-              showOnlineStatus: const fb.BoolReader().vTableGetNullable(buffer, rootOffset, 34),
-              lastSeen: lastSeenValue == null ? null : DateTime.fromMillisecondsSinceEpoch(lastSeenValue),
-              username: const fb.StringReader(asciiOptimization: true).vTableGetNullable(buffer, rootOffset, 12),
-              createdAt: createdAtValue == null ? null : DateTime.fromMillisecondsSinceEpoch(createdAtValue),
-              updatedAt: updatedAtValue == null ? null : DateTime.fromMillisecondsSinceEpoch(updatedAtValue),
-              usernameChangedAt: usernameChangedAtValue == null ? null : DateTime.fromMillisecondsSinceEpoch(usernameChangedAtValue),
-              uid: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
-
-          return object;
-        }),
     Post: EntityDefinition<Post>(
-        model: _entities[1],
+        model: _entities[0],
         toOneRelations: (Post object) => [],
         toManyRelations: (Post object) => {},
         getId: (Post object) => object.pid,
@@ -585,7 +607,7 @@ ModelDefinition getObjectBoxModel() {
           return object;
         }),
     MediaFile: EntityDefinition<MediaFile>(
-        model: _entities[2],
+        model: _entities[1],
         toOneRelations: (MediaFile object) => [],
         toManyRelations: (MediaFile object) => {},
         getId: (MediaFile object) => object.mediaId,
@@ -624,7 +646,7 @@ ModelDefinition getObjectBoxModel() {
           return object;
         }),
     Story: EntityDefinition<Story>(
-        model: _entities[3],
+        model: _entities[2],
         toOneRelations: (Story object) => [],
         toManyRelations: (Story object) => {},
         getId: (Story object) => object.storyId,
@@ -697,7 +719,7 @@ ModelDefinition getObjectBoxModel() {
           return object;
         }),
     Connection: EntityDefinition<Connection>(
-        model: _entities[4],
+        model: _entities[3],
         toOneRelations: (Connection object) => [],
         toManyRelations: (Connection object) => {},
         getId: (Connection object) => object.cid,
@@ -734,228 +756,429 @@ ModelDefinition getObjectBoxModel() {
               cid: const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0));
 
           return object;
+        }),
+    User: EntityDefinition<User>(
+        model: _entities[4],
+        toOneRelations: (User object) => [],
+        toManyRelations: (User object) => {},
+        getId: (User object) => object.uid,
+        setId: (User object, int id) {
+          if (object.uid != id) {
+            throw ArgumentError('Field User.uid is read-only '
+                '(final or getter-only) and it was declared to be self-assigned. '
+                'However, the currently inserted object (.uid=${object.uid}) '
+                "doesn't match the inserted ID (ID $id). "
+                'You must assign an ID before calling [box.put()].');
+          }
+        },
+        objectToFB: (User object, fb.Builder fbb) {
+          final idOffset =
+              object.id == null ? null : fbb.writeString(object.id!);
+          final fnameOffset =
+              object.fname == null ? null : fbb.writeString(object.fname!);
+          final lnameOffset =
+              object.lname == null ? null : fbb.writeString(object.lname!);
+          final emailOffset =
+              object.email == null ? null : fbb.writeString(object.email!);
+          final passwordOffset = object.password == null
+              ? null
+              : fbb.writeString(object.password!);
+          final avatarOffset =
+              object.avatar == null ? null : fbb.writeString(object.avatar!);
+          final roleOffset =
+              object.role == null ? null : fbb.writeString(object.role!);
+          final statusOffset =
+              object.status == null ? null : fbb.writeString(object.status!);
+          final usernameOffset = object.username == null
+              ? null
+              : fbb.writeString(object.username!);
+          fbb.startTable(22);
+          fbb.addInt64(0, object.uid ?? 0);
+          fbb.addOffset(1, idOffset);
+          fbb.addOffset(2, fnameOffset);
+          fbb.addOffset(3, lnameOffset);
+          fbb.addOffset(4, emailOffset);
+          fbb.addOffset(5, passwordOffset);
+          fbb.addOffset(6, avatarOffset);
+          fbb.addBool(7, object.emailVerified);
+          fbb.addInt64(8, object.postsCount);
+          fbb.addInt64(9, object.storiesCount);
+          fbb.addInt64(10, object.nodesCount);
+          fbb.addInt64(11, object.connsCount);
+          fbb.addOffset(12, roleOffset);
+          fbb.addOffset(13, statusOffset);
+          fbb.addBool(14, object.isVerified);
+          fbb.addBool(15, object.showOnlineStatus);
+          fbb.addInt64(16, object.lastSeen?.millisecondsSinceEpoch);
+          fbb.addOffset(17, usernameOffset);
+          fbb.addInt64(18, object.createdAt?.millisecondsSinceEpoch);
+          fbb.addInt64(19, object.updatedAt?.millisecondsSinceEpoch);
+          fbb.addInt64(20, object.usernameChangedAt?.millisecondsSinceEpoch);
+          fbb.finish(fbb.endTable());
+          return object.uid ?? 0;
+        },
+        objectFromFB: (Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final lastSeenValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 36);
+          final createdAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 40);
+          final updatedAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 42);
+          final usernameChangedAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 44);
+          final object = User(
+              uid: const fb.Int64Reader()
+                  .vTableGetNullable(buffer, rootOffset, 4),
+              id: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 6),
+              fname: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 8),
+              lname: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 10),
+              email: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 12),
+              password: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 14),
+              avatar: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 16),
+              emailVerified: const fb.BoolReader()
+                  .vTableGetNullable(buffer, rootOffset, 18),
+              postsCount: const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 20),
+              storiesCount: const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 22),
+              nodesCount: const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 24),
+              connsCount: const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 26),
+              role: const fb.StringReader(asciiOptimization: true).vTableGetNullable(buffer, rootOffset, 28),
+              status: const fb.StringReader(asciiOptimization: true).vTableGetNullable(buffer, rootOffset, 30),
+              isVerified: const fb.BoolReader().vTableGetNullable(buffer, rootOffset, 32),
+              showOnlineStatus: const fb.BoolReader().vTableGetNullable(buffer, rootOffset, 34),
+              lastSeen: lastSeenValue == null ? null : DateTime.fromMillisecondsSinceEpoch(lastSeenValue),
+              username: const fb.StringReader(asciiOptimization: true).vTableGetNullable(buffer, rootOffset, 38),
+              createdAt: createdAtValue == null ? null : DateTime.fromMillisecondsSinceEpoch(createdAtValue),
+              updatedAt: updatedAtValue == null ? null : DateTime.fromMillisecondsSinceEpoch(updatedAtValue),
+              usernameChangedAt: usernameChangedAtValue == null ? null : DateTime.fromMillisecondsSinceEpoch(usernameChangedAtValue));
+
+          return object;
+        }),
+    Comment: EntityDefinition<Comment>(
+        model: _entities[5],
+        toOneRelations: (Comment object) => [],
+        toManyRelations: (Comment object) => {},
+        getId: (Comment object) => object.cid,
+        setId: (Comment object, int id) {
+          if (object.cid != id) {
+            throw ArgumentError('Field Comment.cid is read-only '
+                '(final or getter-only) and it was declared to be self-assigned. '
+                'However, the currently inserted object (.cid=${object.cid}) '
+                "doesn't match the inserted ID (ID $id). "
+                'You must assign an ID before calling [box.put()].');
+          }
+        },
+        objectToFB: (Comment object, fb.Builder fbb) {
+          final idOffset =
+              object.id == null ? null : fbb.writeString(object.id!);
+          final commentOffset =
+              object.comment == null ? null : fbb.writeString(object.comment!);
+          final typeOffset =
+              object.type == null ? null : fbb.writeString(object.type!);
+          final statusOffset =
+              object.status == null ? null : fbb.writeString(object.status!);
+          fbb.startTable(9);
+          fbb.addInt64(0, object.cid ?? 0);
+          fbb.addOffset(1, idOffset);
+          fbb.addOffset(2, commentOffset);
+          fbb.addOffset(3, typeOffset);
+          fbb.addInt64(4, object.likesCount);
+          fbb.addOffset(5, statusOffset);
+          fbb.addInt64(6, object.createdAt?.millisecondsSinceEpoch);
+          fbb.addInt64(7, object.updatedAt?.millisecondsSinceEpoch);
+          fbb.finish(fbb.endTable());
+          return object.cid ?? 0;
+        },
+        objectFromFB: (Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final createdAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 16);
+          final updatedAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 18);
+          final object = Comment(
+              cid: const fb.Int64Reader()
+                  .vTableGetNullable(buffer, rootOffset, 4),
+              id: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 6),
+              comment: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 8),
+              type: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 10),
+              likesCount: const fb.Int64Reader()
+                  .vTableGetNullable(buffer, rootOffset, 12),
+              status: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 14),
+              createdAt: createdAtValue == null
+                  ? null
+                  : DateTime.fromMillisecondsSinceEpoch(createdAtValue),
+              updatedAt: updatedAtValue == null
+                  ? null
+                  : DateTime.fromMillisecondsSinceEpoch(updatedAtValue));
+
+          return object;
         })
   };
 
   return ModelDefinition(model, bindings);
 }
 
-/// [User] entity fields to define ObjectBox queries.
-class User_ {
-  /// see [User.uid]
-  static final uid = QueryIntegerProperty<User>(_entities[0].properties[0]);
-
-  /// see [User.fname]
-  static final fname = QueryStringProperty<User>(_entities[0].properties[1]);
-
-  /// see [User.lname]
-  static final lname = QueryStringProperty<User>(_entities[0].properties[2]);
-
-  /// see [User.email]
-  static final email = QueryStringProperty<User>(_entities[0].properties[3]);
-
-  /// see [User.username]
-  static final username = QueryStringProperty<User>(_entities[0].properties[4]);
-
-  /// see [User.password]
-  static final password = QueryStringProperty<User>(_entities[0].properties[5]);
-
-  /// see [User.id]
-  static final id = QueryStringProperty<User>(_entities[0].properties[6]);
-
-  /// see [User.avatar]
-  static final avatar = QueryStringProperty<User>(_entities[0].properties[7]);
-
-  /// see [User.emailVerified]
-  static final emailVerified =
-      QueryBooleanProperty<User>(_entities[0].properties[8]);
-
-  /// see [User.postsCount]
-  static final postsCount =
-      QueryIntegerProperty<User>(_entities[0].properties[9]);
-
-  /// see [User.storiesCount]
-  static final storiesCount =
-      QueryIntegerProperty<User>(_entities[0].properties[10]);
-
-  /// see [User.nodesCount]
-  static final nodesCount =
-      QueryIntegerProperty<User>(_entities[0].properties[11]);
-
-  /// see [User.role]
-  static final role = QueryStringProperty<User>(_entities[0].properties[12]);
-
-  /// see [User.status]
-  static final status = QueryStringProperty<User>(_entities[0].properties[13]);
-
-  /// see [User.isVerified]
-  static final isVerified =
-      QueryBooleanProperty<User>(_entities[0].properties[14]);
-
-  /// see [User.showOnlineStatus]
-  static final showOnlineStatus =
-      QueryBooleanProperty<User>(_entities[0].properties[15]);
-
-  /// see [User.lastSeen]
-  static final lastSeen =
-      QueryIntegerProperty<User>(_entities[0].properties[16]);
-
-  /// see [User.createdAt]
-  static final createdAt =
-      QueryIntegerProperty<User>(_entities[0].properties[17]);
-
-  /// see [User.updatedAt]
-  static final updatedAt =
-      QueryIntegerProperty<User>(_entities[0].properties[18]);
-
-  /// see [User.usernameChangedAt]
-  static final usernameChangedAt =
-      QueryIntegerProperty<User>(_entities[0].properties[19]);
-
-  /// see [User.connsCount]
-  static final connsCount =
-      QueryIntegerProperty<User>(_entities[0].properties[20]);
-}
-
 /// [Post] entity fields to define ObjectBox queries.
 class Post_ {
   /// see [Post.pid]
-  static final pid = QueryIntegerProperty<Post>(_entities[1].properties[0]);
+  static final pid = QueryIntegerProperty<Post>(_entities[0].properties[0]);
 
   /// see [Post.id]
-  static final id = QueryStringProperty<Post>(_entities[1].properties[1]);
+  static final id = QueryStringProperty<Post>(_entities[0].properties[1]);
 
   /// see [Post.type]
-  static final type = QueryStringProperty<Post>(_entities[1].properties[2]);
+  static final type = QueryStringProperty<Post>(_entities[0].properties[2]);
 
   /// see [Post.caption]
-  static final caption = QueryStringProperty<Post>(_entities[1].properties[3]);
+  static final caption = QueryStringProperty<Post>(_entities[0].properties[3]);
 
   /// see [Post.isMarkdown]
   static final isMarkdown =
-      QueryBooleanProperty<Post>(_entities[1].properties[4]);
+      QueryBooleanProperty<Post>(_entities[0].properties[4]);
 
   /// see [Post.likesCount]
   static final likesCount =
-      QueryIntegerProperty<Post>(_entities[1].properties[5]);
+      QueryIntegerProperty<Post>(_entities[0].properties[5]);
 
   /// see [Post.commentsCount]
   static final commentsCount =
-      QueryIntegerProperty<Post>(_entities[1].properties[6]);
+      QueryIntegerProperty<Post>(_entities[0].properties[6]);
 
   /// see [Post.sharesCount]
   static final sharesCount =
-      QueryIntegerProperty<Post>(_entities[1].properties[7]);
+      QueryIntegerProperty<Post>(_entities[0].properties[7]);
 
   /// see [Post.status]
-  static final status = QueryStringProperty<Post>(_entities[1].properties[8]);
+  static final status = QueryStringProperty<Post>(_entities[0].properties[8]);
 
   /// see [Post.visibility]
   static final visibility =
-      QueryStringProperty<Post>(_entities[1].properties[9]);
+      QueryStringProperty<Post>(_entities[0].properties[9]);
 
   /// see [Post.commentable]
   static final commentable =
-      QueryBooleanProperty<Post>(_entities[1].properties[10]);
+      QueryBooleanProperty<Post>(_entities[0].properties[10]);
 
   /// see [Post.likeable]
   static final likeable =
-      QueryBooleanProperty<Post>(_entities[1].properties[11]);
+      QueryBooleanProperty<Post>(_entities[0].properties[11]);
 
   /// see [Post.shareable]
   static final shareable =
-      QueryBooleanProperty<Post>(_entities[1].properties[12]);
+      QueryBooleanProperty<Post>(_entities[0].properties[12]);
 
   /// see [Post.createdAt]
   static final createdAt =
-      QueryIntegerProperty<Post>(_entities[1].properties[13]);
+      QueryIntegerProperty<Post>(_entities[0].properties[13]);
 
   /// see [Post.updatedAt]
   static final updatedAt =
-      QueryIntegerProperty<Post>(_entities[1].properties[14]);
+      QueryIntegerProperty<Post>(_entities[0].properties[14]);
 }
 
 /// [MediaFile] entity fields to define ObjectBox queries.
 class MediaFile_ {
   /// see [MediaFile.mediaId]
   static final mediaId =
-      QueryIntegerProperty<MediaFile>(_entities[2].properties[0]);
+      QueryIntegerProperty<MediaFile>(_entities[1].properties[0]);
 
   /// see [MediaFile.url]
-  static final url = QueryStringProperty<MediaFile>(_entities[2].properties[1]);
+  static final url = QueryStringProperty<MediaFile>(_entities[1].properties[1]);
 
   /// see [MediaFile.type]
   static final type =
-      QueryStringProperty<MediaFile>(_entities[2].properties[2]);
+      QueryStringProperty<MediaFile>(_entities[1].properties[2]);
 
   /// see [MediaFile.id]
-  static final id = QueryStringProperty<MediaFile>(_entities[2].properties[3]);
+  static final id = QueryStringProperty<MediaFile>(_entities[1].properties[3]);
 }
 
 /// [Story] entity fields to define ObjectBox queries.
 class Story_ {
   /// see [Story.storyId]
   static final storyId =
-      QueryIntegerProperty<Story>(_entities[3].properties[0]);
+      QueryIntegerProperty<Story>(_entities[2].properties[0]);
 
   /// see [Story.id]
-  static final id = QueryStringProperty<Story>(_entities[3].properties[1]);
+  static final id = QueryStringProperty<Story>(_entities[2].properties[1]);
 
   /// see [Story.type]
-  static final type = QueryStringProperty<Story>(_entities[3].properties[2]);
+  static final type = QueryStringProperty<Story>(_entities[2].properties[2]);
 
   /// see [Story.likesCount]
   static final likesCount =
-      QueryIntegerProperty<Story>(_entities[3].properties[3]);
+      QueryIntegerProperty<Story>(_entities[2].properties[3]);
 
   /// see [Story.watchCount]
   static final watchCount =
-      QueryIntegerProperty<Story>(_entities[3].properties[4]);
+      QueryIntegerProperty<Story>(_entities[2].properties[4]);
 
   /// see [Story.status]
-  static final status = QueryStringProperty<Story>(_entities[3].properties[5]);
+  static final status = QueryStringProperty<Story>(_entities[2].properties[5]);
 
   /// see [Story.visibility]
   static final visibility =
-      QueryStringProperty<Story>(_entities[3].properties[6]);
+      QueryStringProperty<Story>(_entities[2].properties[6]);
 
   /// see [Story.likeable]
   static final likeable =
-      QueryBooleanProperty<Story>(_entities[3].properties[7]);
+      QueryBooleanProperty<Story>(_entities[2].properties[7]);
 
   /// see [Story.seenBy]
   static final seenBy =
-      QueryStringVectorProperty<Story>(_entities[3].properties[8]);
+      QueryStringVectorProperty<Story>(_entities[2].properties[8]);
 
   /// see [Story.createdAt]
   static final createdAt =
-      QueryIntegerProperty<Story>(_entities[3].properties[9]);
+      QueryIntegerProperty<Story>(_entities[2].properties[9]);
 
   /// see [Story.updatedAt]
   static final updatedAt =
-      QueryIntegerProperty<Story>(_entities[3].properties[10]);
+      QueryIntegerProperty<Story>(_entities[2].properties[10]);
 
   /// see [Story.quote]
-  static final quote = QueryStringProperty<Story>(_entities[3].properties[11]);
+  static final quote = QueryStringProperty<Story>(_entities[2].properties[11]);
 
   /// see [Story.color]
-  static final color = QueryIntegerProperty<Story>(_entities[3].properties[12]);
+  static final color = QueryIntegerProperty<Story>(_entities[2].properties[12]);
 }
 
 /// [Connection] entity fields to define ObjectBox queries.
 class Connection_ {
   /// see [Connection.cid]
   static final cid =
-      QueryIntegerProperty<Connection>(_entities[4].properties[0]);
+      QueryIntegerProperty<Connection>(_entities[3].properties[0]);
 
   /// see [Connection.id]
-  static final id = QueryStringProperty<Connection>(_entities[4].properties[1]);
+  static final id = QueryStringProperty<Connection>(_entities[3].properties[1]);
 
   /// see [Connection.createdAt]
   static final createdAt =
-      QueryIntegerProperty<Connection>(_entities[4].properties[2]);
+      QueryIntegerProperty<Connection>(_entities[3].properties[2]);
 
   /// see [Connection.rootnode]
   static final rootnode =
-      QueryStringProperty<Connection>(_entities[4].properties[3]);
+      QueryStringProperty<Connection>(_entities[3].properties[3]);
+}
+
+/// [User] entity fields to define ObjectBox queries.
+class User_ {
+  /// see [User.uid]
+  static final uid = QueryIntegerProperty<User>(_entities[4].properties[0]);
+
+  /// see [User.id]
+  static final id = QueryStringProperty<User>(_entities[4].properties[1]);
+
+  /// see [User.fname]
+  static final fname = QueryStringProperty<User>(_entities[4].properties[2]);
+
+  /// see [User.lname]
+  static final lname = QueryStringProperty<User>(_entities[4].properties[3]);
+
+  /// see [User.email]
+  static final email = QueryStringProperty<User>(_entities[4].properties[4]);
+
+  /// see [User.password]
+  static final password = QueryStringProperty<User>(_entities[4].properties[5]);
+
+  /// see [User.avatar]
+  static final avatar = QueryStringProperty<User>(_entities[4].properties[6]);
+
+  /// see [User.emailVerified]
+  static final emailVerified =
+      QueryBooleanProperty<User>(_entities[4].properties[7]);
+
+  /// see [User.postsCount]
+  static final postsCount =
+      QueryIntegerProperty<User>(_entities[4].properties[8]);
+
+  /// see [User.storiesCount]
+  static final storiesCount =
+      QueryIntegerProperty<User>(_entities[4].properties[9]);
+
+  /// see [User.nodesCount]
+  static final nodesCount =
+      QueryIntegerProperty<User>(_entities[4].properties[10]);
+
+  /// see [User.connsCount]
+  static final connsCount =
+      QueryIntegerProperty<User>(_entities[4].properties[11]);
+
+  /// see [User.role]
+  static final role = QueryStringProperty<User>(_entities[4].properties[12]);
+
+  /// see [User.status]
+  static final status = QueryStringProperty<User>(_entities[4].properties[13]);
+
+  /// see [User.isVerified]
+  static final isVerified =
+      QueryBooleanProperty<User>(_entities[4].properties[14]);
+
+  /// see [User.showOnlineStatus]
+  static final showOnlineStatus =
+      QueryBooleanProperty<User>(_entities[4].properties[15]);
+
+  /// see [User.lastSeen]
+  static final lastSeen =
+      QueryIntegerProperty<User>(_entities[4].properties[16]);
+
+  /// see [User.username]
+  static final username =
+      QueryStringProperty<User>(_entities[4].properties[17]);
+
+  /// see [User.createdAt]
+  static final createdAt =
+      QueryIntegerProperty<User>(_entities[4].properties[18]);
+
+  /// see [User.updatedAt]
+  static final updatedAt =
+      QueryIntegerProperty<User>(_entities[4].properties[19]);
+
+  /// see [User.usernameChangedAt]
+  static final usernameChangedAt =
+      QueryIntegerProperty<User>(_entities[4].properties[20]);
+}
+
+/// [Comment] entity fields to define ObjectBox queries.
+class Comment_ {
+  /// see [Comment.cid]
+  static final cid = QueryIntegerProperty<Comment>(_entities[5].properties[0]);
+
+  /// see [Comment.id]
+  static final id = QueryStringProperty<Comment>(_entities[5].properties[1]);
+
+  /// see [Comment.comment]
+  static final comment =
+      QueryStringProperty<Comment>(_entities[5].properties[2]);
+
+  /// see [Comment.type]
+  static final type = QueryStringProperty<Comment>(_entities[5].properties[3]);
+
+  /// see [Comment.likesCount]
+  static final likesCount =
+      QueryIntegerProperty<Comment>(_entities[5].properties[4]);
+
+  /// see [Comment.status]
+  static final status =
+      QueryStringProperty<Comment>(_entities[5].properties[5]);
+
+  /// see [Comment.createdAt]
+  static final createdAt =
+      QueryIntegerProperty<Comment>(_entities[5].properties[6]);
+
+  /// see [Comment.updatedAt]
+  static final updatedAt =
+      QueryIntegerProperty<Comment>(_entities[5].properties[7]);
 }

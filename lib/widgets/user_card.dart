@@ -2,8 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
-import 'package:rootnode/model/user.dart';
-import 'package:string_extensions/string_extensions.dart';
+import 'package:rootnode/model/user/user.dart';
 
 class UserCard extends StatelessWidget {
   const UserCard({
@@ -28,7 +27,7 @@ class UserCard extends StatelessWidget {
             backgroundColor: Colors.white10,
             foregroundImage: CachedNetworkImageProvider(
               "${ApiConstants.baseUrl}/${user.avatar!}",
-              cacheKey: 'usercard-${user.id}',
+              cacheKey: user.avatar,
               maxHeight: 256,
               maxWidth: 256,
             ),
@@ -41,7 +40,7 @@ class UserCard extends StatelessWidget {
           spacing: -3,
           children: [
             Text(
-              "${user.fname} ${user.lname}".toTitleCase!,
+              user.fullname,
               style: RootNodeFontStyle.title,
             ),
             Text(

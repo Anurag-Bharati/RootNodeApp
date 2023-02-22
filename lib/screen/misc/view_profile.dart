@@ -1,5 +1,6 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_post.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
@@ -7,7 +8,9 @@ import 'package:rootnode/helper/responsive_helper.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/model/story.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/connection_provider.dart';
+import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/repository/story_repo.dart';
@@ -19,20 +22,21 @@ import 'package:rootnode/widgets/posts.dart';
 import 'package:rootnode/widgets/profile_card.dart';
 import 'package:rootnode/widgets/stories.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key, required this.id, required this.user});
+class ProfileScreen extends ConsumerStatefulWidget {
+  const ProfileScreen({super.key, required this.id, this.isOwn = false});
   final String id;
-  final User user;
+  final bool isOwn;
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  final _userRepo = UserRepoImpl();
-  final _storyRepo = StoryRepoImpl();
-  final _connRepo = ConnRepoImpl();
-  final _postRepo = PostRepoImpl();
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  late User rootnode;
+  late final UserRepo _userRepo;
+  late final StoryRepo _storyRepo;
+  late final ConnRepo _connRepo;
+  late final PostRepo _postRepo;
   late PostResponse? _postResponse;
   User? user;
   double maxContentWidth = 720;
@@ -121,6 +125,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
+    _connRepo = ref.read(connRepoProvider);
+    _postRepo = ref.read(postRepoProvider);
+    _storyRepo = ref.read(storyRepoProvider);
+    _userRepo = ref.read(userRepoProvider);
     _getInitialData();
     _postScrollController = ScrollController()
       ..addListener(() {
@@ -151,6 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    rootnode = ref.watch(sessionProvider.select((value) => value.user!));
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -224,12 +233,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   collapseMode: CollapseMode.parallax,
                   stretchModes: const [StretchMode.blurBackground],
-                  background: ProfileCard(
-                    actions: _actionButtons(),
-                    hasConn: hasConn,
-                    id: widget.id,
-                    user: user,
-                  ),
+                  background: Consumer(builder: (context, ref, child) {
+                    return ProfileCard(
+                      actions: _actionButtons(ref),
+                      hasConn: hasConn,
+                      user: widget.isOwn ? rootnode : user,
+                    );
+                  }),
                   centerTitle: true,
                 ),
                 leading: IconButton(
@@ -242,14 +252,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               _posts.isEmpty && !noPost
                   ? SliverToBoxAdapter(
-                      child: Container(
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height / 2,
-                        alignment: Alignment.center,
-                        child: const CircularProgressIndicator(
-                          color: Colors.white10,
-                        ),
-                      ),
+                      child: SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            children: const [
+                              PostShimmer(),
+                              PostShimmer(isMedia: true, isText: false),
+                              PostShimmer(isMedia: true),
+                            ],
+                          )),
                     )
                   : noPost
                       ? SliverToBoxAdapter(
@@ -273,6 +284,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ? ConstrainedSliverWidth(
                                       maxWidth: maxContentWidth,
                                       child: PostContainer(
+                                          isOwn: rootnode.id ==
+                                              _posts[index].owner!.id,
                                           post: _posts[index],
                                           likedMeta: _postsLiked[index]),
                                     )
@@ -291,8 +304,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  _toggleFollow() async {
+  _toggleFollow(WidgetRef ref) async {
     bool? res = await _connRepo.toggleConnection(id: widget.id);
+    ref.read(connOverviewProvider.notifier).fetchOverview();
     if (res != null) {
       setState(() {
         hasConn = res;
@@ -300,7 +314,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  List<RootNodeOutlinedButton> _actionButtons() {
+  List<RootNodeOutlinedButton> _actionButtons(WidgetRef ref) {
     return [
       RootNodeOutlinedButton(
         onPressed: () => debugPrint("Share Button Pressed!"),
@@ -313,16 +327,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       RootNodeOutlinedButton(
         onPressed: () async {
-          if (widget.id == widget.user.id!) {
+          if (widget.id == rootnode.id!) {
             debugPrint("Edit Button Pressed!");
-            switchRouteByPush(context, EditProfile(user: widget.user));
+            switchRouteByPush(context, EditProfile(user: rootnode));
           } else {
-            _toggleFollow();
+            _toggleFollow(ref);
             debugPrint("Follow Button Pressed!");
           }
         },
         child: hasConn != null
-            ? widget.id != widget.user.id
+            ? widget.id != rootnode.id
                 ? Text(hasConn! ? "Unfollow" : "Follow",
                     style: RootNodeFontStyle.body)
                 : Text("Edit", style: RootNodeFontStyle.body)

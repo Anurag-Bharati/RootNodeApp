@@ -1,5 +1,5 @@
 import 'package:rootnode/helper/objectbox.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/state/objectbox_state.dart';
 
 class UserDataSource {

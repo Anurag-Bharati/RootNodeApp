@@ -1,19 +1,20 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_story.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/story.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/story_repo.dart';
 import 'package:rootnode/screen/misc/create_story.dart';
 import 'package:rootnode/screen/misc/view_story.dart';
 import 'package:rootnode/widgets/selection_tile.dart';
-import 'package:string_extensions/string_extensions.dart';
 
-class StoriesWidget extends StatefulWidget {
+class StoriesWidget extends ConsumerStatefulWidget {
   final User currentUser;
   final bool compact;
   const StoriesWidget({
@@ -23,13 +24,13 @@ class StoriesWidget extends StatefulWidget {
   });
 
   @override
-  State<StoriesWidget> createState() => _StoriesWidgetState();
+  ConsumerState<StoriesWidget> createState() => _StoriesWidgetState();
 }
 
-class _StoriesWidgetState extends State<StoriesWidget> {
+class _StoriesWidgetState extends ConsumerState<StoriesWidget> {
   late final ScrollController _scrollController;
   // late final RandomColor _randomColor;
-  final _storyRepo = StoryRepoImpl();
+  late final StoryRepo _storyRepo;
   late StoryResponse? _storyResponse;
   final List<Story> _stories = [];
   late int storyTotal;
@@ -66,6 +67,7 @@ class _StoriesWidgetState extends State<StoriesWidget> {
 
   @override
   void initState() {
+    _storyRepo = ref.read(storyRepoProvider);
     _compact = widget.compact;
     _scrollController = ScrollController();
     _scrollController.addListener(() {
@@ -112,13 +114,15 @@ class _StoriesWidgetState extends State<StoriesWidget> {
             child: Hero(
               tag: _compact ? "story-$index" : "story-${index - 1}",
               child: StoryCard(
-                  compact: _compact,
-                  stories: _stories,
-                  index: index,
-                  color: Color(_compact
-                      ? _stories[index].color!
-                      : _stories[index - 1].color!),
-                  story: _compact ? _stories[index] : _stories[index - 1]),
+                isOwn: _stories[index - 1].owner!.id == widget.currentUser.id,
+                compact: _compact,
+                stories: _stories,
+                index: index,
+                color: Color(_compact
+                    ? _stories[index].color!
+                    : _stories[index - 1].color!),
+                story: _compact ? _stories[index] : _stories[index - 1],
+              ),
             ),
           );
         },
@@ -127,7 +131,7 @@ class _StoriesWidgetState extends State<StoriesWidget> {
   }
 }
 
-class StoryCard extends StatelessWidget {
+class StoryCard extends ConsumerWidget {
   final bool isAddStory;
   final Story? story;
   final List<Story> stories;
@@ -136,6 +140,7 @@ class StoryCard extends StatelessWidget {
   final bool hideName;
   final bool disableBorder;
   final bool compact;
+  final bool isOwn;
   const StoryCard({
     Key? key,
     this.isAddStory = false,
@@ -146,10 +151,12 @@ class StoryCard extends StatelessWidget {
     this.hideName = false,
     this.disableBorder = false,
     this.compact = false,
+    this.isOwn = false,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    User rootnode = ref.watch(sessionProvider.select((value) => value.user!));
     return Stack(
       children: [
         ClipRRect(
@@ -253,7 +260,9 @@ class StoryCard extends StatelessWidget {
                 child: Text(
                   isAddStory
                       ? 'Add story'
-                      : "${story!.owner!.fname!.toTitleCase!} ${story!.owner!.lname![0].capitalize!}.",
+                      : isOwn
+                          ? rootnode.fullnameMin
+                          : story!.owner!.fullnameMin,
                   style: RootNodeFontStyle.subtitle,
                   overflow: TextOverflow.fade,
                   textAlign: TextAlign.center,

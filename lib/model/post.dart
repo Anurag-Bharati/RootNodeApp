@@ -1,5 +1,5 @@
 import 'package:objectbox/objectbox.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'dart:convert';
 
 @Entity()
