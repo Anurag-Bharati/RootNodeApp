@@ -252,14 +252,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               _posts.isEmpty && !noPost
                   ? SliverToBoxAdapter(
-                      child: Container(
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height / 2,
-                        alignment: Alignment.center,
-                        child: const CircularProgressIndicator(
-                          color: Colors.white10,
-                        ),
-                      ),
+                      child: SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            children: const [
+                              PostShimmer(),
+                              PostShimmer(isMedia: true, isText: false),
+                              PostShimmer(isMedia: true),
+                            ],
+                          )),
                     )
                   : noPost
                       ? SliverToBoxAdapter(
