@@ -13,6 +13,15 @@ class SimpleStorage {
     }
   }
 
+  static removeStringData(String key) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove(key);
+    } catch (_) {
+      debugPrint(_.toString());
+    }
+  }
+
   static Future<String?> getStringData(String key) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();

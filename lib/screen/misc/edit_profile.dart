@@ -3,25 +3,27 @@ import 'dart:io';
 import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/helper/media_helper.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/widgets/text_field.dart';
 
-class EditProfile extends StatefulWidget {
+class EditProfile extends ConsumerStatefulWidget {
   const EditProfile({super.key, required this.user});
   final User user;
 
   @override
-  State<EditProfile> createState() => _EditProfileState();
+  ConsumerState<EditProfile> createState() => _EditProfileState();
 }
 
-class _EditProfileState extends State<EditProfile> {
-  final _userRepo = UserRepoImpl();
+class _EditProfileState extends ConsumerState<EditProfile> {
+  late final UserRepo _userRepo;
   XFile? avatar;
   bool hasSelectedAnImage = false;
   late final TextEditingController _fNameController;
@@ -31,6 +33,7 @@ class _EditProfileState extends State<EditProfile> {
   late final GlobalKey<FormState> _formKey;
   @override
   void initState() {
+    _userRepo = ref.read(userRepoProvider);
     _formKey = GlobalKey<FormState>();
     _fNameController = TextEditingController(text: widget.user.fname ?? "");
     _lNameController = TextEditingController(text: widget.user.lname ?? "");
@@ -118,7 +121,15 @@ class _EditProfileState extends State<EditProfile> {
                   child: Text("First Name", style: RootNodeFontStyle.body),
                 ),
                 RootNodeTextField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   controller: _fNameController,
+                  validator: (p0) async {
+                    if (p0 == null) return "This field is required";
+                    if (p0.length < 3) {
+                      return "Must be at least three char long";
+                    }
+                    return null;
+                  },
                   hintText: 'First Name',
                   type: TextFieldTypes.email,
                 ),
@@ -155,15 +166,17 @@ class _EditProfileState extends State<EditProfile> {
                   type: TextFieldTypes.email,
                 ),
                 const SizedBox(height: 10),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  width: double.infinity,
-                  height: 60,
-                  child: ElevatedButton(
-                    onPressed: _saveUser,
-                    child: Text("Save", style: RootNodeFontStyle.body),
-                  ),
-                )
+                Consumer(builder: (context, ref, child) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    width: double.infinity,
+                    height: 60,
+                    child: ElevatedButton(
+                      onPressed: () => _saveUser(ref),
+                      child: Text("Save", style: RootNodeFontStyle.body),
+                    ),
+                  );
+                })
               ],
             ),
           ),
@@ -227,6 +240,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   _pickFile(ImageSource source) async {
+    Navigator.of(context, rootNavigator: true).pop('dialog');
     MediaHelper helper = MediaHelper.instance;
     CroppedFile? crop = await helper
         .pickImage(source: source)
@@ -245,7 +259,7 @@ class _EditProfileState extends State<EditProfile> {
     setState(() {});
   }
 
-  _saveUser() {
+  void _saveUser(WidgetRef ref) async {
     if (!_formKey.currentState!.validate()) return;
     final User updatedUser = User(
       fname: _fNameController.text,
@@ -253,7 +267,10 @@ class _EditProfileState extends State<EditProfile> {
       username: _usernameController.text,
       email: _emailController.text,
     );
-    _userRepo.updateUser(user: updatedUser, avatar: avatar);
+    User? user = await _userRepo.updateUser(user: updatedUser, avatar: avatar);
+    if (user != null) {
+      ref.read(sessionProvider.notifier).updateUser(user: user);
+    }
     if (mounted) Navigator.of(context).pop();
   }
 }

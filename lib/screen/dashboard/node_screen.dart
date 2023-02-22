@@ -2,29 +2,31 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_conn.dart';
 import 'package:rootnode/helper/responsive_helper.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/connection_provider.dart';
+import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/screen/misc/browse_conn.dart';
 import 'package:rootnode/screen/misc/view_conn.dart';
 import 'package:rootnode/screen/misc/view_profile.dart';
 import 'package:rootnode/widgets/placeholder.dart';
-import 'package:string_extensions/string_extensions.dart';
 
-class NodeScreen extends StatefulWidget {
-  const NodeScreen({super.key, required this.user});
-  final User user;
+class NodeScreen extends ConsumerStatefulWidget {
+  const NodeScreen({super.key});
   @override
-  State<NodeScreen> createState() => _NodeScreenState();
+  ConsumerState<NodeScreen> createState() => _NodeScreenState();
 }
 
-class _NodeScreenState extends State<NodeScreen> {
-  final _connRepo = ConnRepoImpl();
+class _NodeScreenState extends ConsumerState<NodeScreen> {
+  late User rootnode;
+  late final ConnRepoImpl _connRepo;
   late final ScrollController _scrollController;
   late final ScrollController _recomScrollController;
   late final ScrollController _randomScrollController;
@@ -37,24 +39,7 @@ class _NodeScreenState extends State<NodeScreen> {
   int randomCurrentPage = 1;
   int randomTotalPage = 1;
 
-  List<Node>? recent;
-  List<Node>? old;
-  late int count;
-  late int limit;
-
-  void _getOverview() async {
-    ConnOverviewResponse? overview = await _connRepo.getOldRecentConns();
-    if (overview == null || overview.data == null) return;
-    recent = overview.data!.recent ?? [];
-    old = overview.data!.old ?? [];
-    count = overview.data!.count ?? 0;
-    limit = overview.data!.limit ?? 0;
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  void _initRandom() async {
+  Future<void> _initRandom() async {
     random.clear();
     randomCurrentPage = 1;
     final randomResponse =
@@ -66,7 +51,7 @@ class _NodeScreenState extends State<NodeScreen> {
     }
   }
 
-  void _initRecom() async {
+  Future<void> _initRecom() async {
     recom.clear();
     recomCurrentPage = 1;
     final recomResponse =
@@ -105,16 +90,14 @@ class _NodeScreenState extends State<NodeScreen> {
     }
   }
 
-  void _getRecomAndRandom() async {
-    _initRandom();
-    _initRecom();
-    if (random.isNotEmpty || recom.isNotEmpty) setState(() {});
+  Future<void> _getRecomAndRandom() async {
+    await _initRandom();
+    await _initRecom();
   }
 
   @override
   void didUpdateWidget(covariant NodeScreen oldWidget) {
     if (mounted) {
-      _getOverview();
       setState(() {});
     }
     super.didUpdateWidget(oldWidget);
@@ -122,8 +105,9 @@ class _NodeScreenState extends State<NodeScreen> {
 
   @override
   void initState() {
-    _getOverview();
-    _getRecomAndRandom();
+    _connRepo = ref.read(connRepoProvider);
+    ref.read(connOverviewProvider.notifier).fetchOverview();
+    _getRecomAndRandom().then((value) => setState(() {}));
     _scrollController = ScrollController();
     _randomScrollController = ScrollController()
       ..addListener(() {
@@ -139,6 +123,7 @@ class _NodeScreenState extends State<NodeScreen> {
           _fetchMoreRecom();
         }
       });
+
     super.initState();
   }
 
@@ -152,6 +137,7 @@ class _NodeScreenState extends State<NodeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    rootnode = ref.watch(sessionProvider.select((value) => value.user!));
     return CustomScrollView(
       controller: _scrollController,
       slivers: [
@@ -160,23 +146,7 @@ class _NodeScreenState extends State<NodeScreen> {
                 maxWidth: 720, child: DummySearchField())),
         SliverToBoxAdapter(
           child: ConstrainedSliverWidth(
-            maxWidth: 720,
-            child: old != null && recent != null
-                ? ConnOverview(
-                    user: widget.user,
-                    old: old!,
-                    count: count,
-                    recent: recent!,
-                    limit: limit)
-                : Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      height: 64,
-                      width: 64,
-                      child: const CircularProgressIndicator(),
-                    ),
-                  ),
-          ),
+              maxWidth: 720, child: ConnOverview(user: rootnode)),
         ),
         SliverToBoxAdapter(
           child: ConstrainedSliverWidth(
@@ -194,7 +164,7 @@ class _NodeScreenState extends State<NodeScreen> {
           child: ConstrainedSliverWidth(
             maxWidth: 720,
             child: NewConnectionList(
-              rootnode: widget.user,
+              rootnode: rootnode,
               users: recom,
               scrollController: _recomScrollController,
               type: NewConnectionListType.recommended,
@@ -206,7 +176,7 @@ class _NodeScreenState extends State<NodeScreen> {
           child: ConstrainedSliverWidth(
             maxWidth: 720,
             child: NewConnectionList(
-              rootnode: widget.user,
+              rootnode: rootnode,
               users: random,
               scrollController: _randomScrollController,
               type: NewConnectionListType.random,
@@ -337,38 +307,40 @@ class NewConnectionList extends StatelessWidget {
                 color: const Color(0xFF111111),
               ),
             ),
-            GestureDetector(
-                onTap: () {
-                  switchRouteByPush(
-                      context, ProfileScreen(id: user.id!, user: rootnode));
-                  debugPrint("Discover > User: ${user.fname}");
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  height: double.infinity,
-                  width: 110.0,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: const Color(0xFF111111),
-                        width: 1.0,
-                        strokeAlign: BorderSide.strokeAlignOutside),
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF111111),
-                        Colors.transparent,
-                      ],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
+            Consumer(builder: (context, ref, child) {
+              return GestureDetector(
+                  onTap: () {
+                    switchRouteByPush(context, ProfileScreen(id: user.id!));
+                    debugPrint("Discover > User: ${user.fname}");
+                  },
+                  onLongPress: () => _toggleFollow(ref, user.id!),
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: double.infinity,
+                    width: 110.0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: const Color(0xFF111111),
+                          width: 1.0,
+                          strokeAlign: BorderSide.strokeAlignOutside),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF111111),
+                          Colors.transparent,
+                        ],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                      ),
                     ),
-                  ),
-                )),
+                  ));
+            }),
             Positioned(
               bottom: 8.0,
               left: 8.0,
               right: 8.0,
               child: Text(
-                "${user.fname} ${user.lname!.first()}".toTitleCase!,
+                user.fullnameMin,
                 style: RootNodeFontStyle.subtitle,
                 overflow: TextOverflow.fade,
                 textAlign: TextAlign.center,
@@ -378,25 +350,20 @@ class NewConnectionList extends StatelessWidget {
           ],
         ),
       );
+
+  _toggleFollow(WidgetRef ref, String id) async {
+    final connRepo = ref.read(connRepoProvider);
+    await connRepo.toggleConnection(id: id);
+    ref.read(connOverviewProvider.notifier).fetchOverview();
+  }
 }
 
-class ConnOverview extends StatelessWidget {
-  const ConnOverview({
-    super.key,
-    required this.old,
-    required this.count,
-    required this.recent,
-    required this.limit,
-    required this.user,
-  });
+class ConnOverview extends ConsumerWidget {
+  const ConnOverview({super.key, required this.user});
   final User user;
-  final List<Node> recent;
-  final List<Node> old;
-  final int count;
-  final int limit;
 
   List<Widget> _generateNodeAvatar(
-      {required List<Node> nodes, bool isOld = true}) {
+      {required List<Node> nodes, bool isOld = true, int limit = 3}) {
     List<NodeAvatar>? dummys, generated;
     int length = nodes.length;
     int dummyCount = limit - length;
@@ -404,25 +371,20 @@ class ConnOverview extends StatelessWidget {
       dummys = _generateDummyAvatar(count: dummyCount, isOld: isOld);
     }
     if (isOld) {
-      generated = old
-          .map((e) => NodeAvatar(
-              rootnode: user, date: Utils.getTimeAgo(e.date!), user: e.user))
+      generated = nodes
+          .map((e) => NodeAvatar(date: Utils.getTimeAgo(e.date!), user: e.user))
           .toList();
       generated.addAll(dummys ?? []);
-      generated.insert(0,
-          NodeAvatar(rootnode: user, user: user, date: "this", isAction: true));
+      generated.insert(
+          0, NodeAvatar(isOwn: true, user: user, date: "this", isAction: true));
       generated.last.settings['hideDate'] = true;
     } else {
-      generated = recent
+      generated = nodes
           .map((e) => NodeAvatar(
-              rootnode: user,
-              date: Utils.getTimeAgo(e.date!),
-              user: e.user,
-              invert: true))
+              date: Utils.getTimeAgo(e.date!), user: e.user, invert: true))
           .toList();
       generated.insertAll(0, dummys ?? []);
-      generated.add(NodeAvatar(
-          date: "this.add", invert: true, isAction: true, rootnode: user));
+      generated.add(NodeAvatar(date: "this.add", invert: true, isAction: true));
       generated.first.settings['hideDate'] = true;
     }
     return generated;
@@ -440,7 +402,8 @@ class ConnOverview extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(connOverviewProvider);
     return AnimatedContainer(
       width: double.infinity,
       duration: const Duration(milliseconds: 300),
@@ -481,7 +444,8 @@ class ConnOverview extends StatelessWidget {
                       ),
                       Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: _generateNodeAvatar(nodes: old)),
+                          children: _generateNodeAvatar(
+                              nodes: state.old, limit: state.limit)),
                     ],
                   ),
                 ),
@@ -497,7 +461,7 @@ class ConnOverview extends StatelessWidget {
                       child: CircleAvatar(
                         backgroundColor: const Color(0xFFCCCCCC),
                         maxRadius: 25,
-                        child: Text("+$count",
+                        child: Text("+${state.count}",
                             style: RootNodeFontStyle.caption.copyWith(
                               color: const Color(0xFF111111),
                               fontWeight: FontWeight.bold,
@@ -521,8 +485,11 @@ class ConnOverview extends StatelessWidget {
                       ),
                       Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children:
-                              _generateNodeAvatar(nodes: recent, isOld: false)),
+                          children: _generateNodeAvatar(
+                            nodes: state.recent,
+                            isOld: false,
+                            limit: state.limit,
+                          )),
                     ],
                   ),
                 ),
@@ -543,14 +510,14 @@ class NodeAvatar extends StatelessWidget {
     this.invert = false,
     this.isDummy = false,
     this.isAction = false,
-    this.rootnode,
+    this.isOwn = false,
   });
-  final User? rootnode;
   final User? user;
   final String date;
   final bool invert;
   final bool isDummy;
   final bool isAction;
+  final bool isOwn;
   final Map<String, bool> settings = {"hideDate": false};
 
   @override
@@ -567,12 +534,11 @@ class NodeAvatar extends StatelessWidget {
                 debugPrint(
                     "User: ${isDummy ? 'Dummy Node' : user != null ? user!.fname : 'No user'} | Action: $isAction");
                 if (isAction && user == null) {
-                  print(rootnode);
-                  switchRouteByPush(context, BrowseConnScreen(user: rootnode!));
+                  switchRouteByPush(context, const BrowseConnScreen());
                 }
                 if (user != null) {
                   switchRouteByPush(
-                      context, ProfileScreen(id: user!.id!, user: rootnode!));
+                      context, ProfileScreen(isOwn: isOwn, id: user!.id!));
                 }
               },
               child: Container(
@@ -592,7 +558,7 @@ class NodeAvatar extends StatelessWidget {
                           "${ApiConstants.baseUrl}/${user!.avatar}",
                           maxHeight: 256,
                           maxWidth: 256,
-                          cacheKey: user!.id,
+                          cacheKey: isOwn ? null : user!.id,
                         )
                       : null,
                   child: date == "this.add"

@@ -2,21 +2,22 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
+
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/helper/notification_helper.dart';
-import 'package:rootnode/model/user.dart';
 import 'package:rootnode/screen/auth/login_screen.dart';
 import 'package:rootnode/widgets/radio_button.dart';
 import 'package:rootnode/widgets/switch_button.dart';
 
 class SettingScreen extends StatefulWidget {
-  const SettingScreen({super.key, required this.user});
-  final User user;
+  const SettingScreen({super.key});
 
   @override
   State<SettingScreen> createState() => _SettingScreenState();
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+  late User rootnode;
   @override
   void initState() {
     LocalNotificationHelper.checkNotificationEnabled();

@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_post.dart';
 import 'package:rootnode/helper/responsive_helper.dart';
 import 'package:rootnode/model/post.dart';
+import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/widgets/placeholder.dart';
 import 'package:rootnode/widgets/posts.dart';
 import 'package:rootnode/widgets/stories.dart';
 
-import '../../model/user.dart';
-
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   static const String route = "home";
-  final User user;
   const HomeScreen({
     super.key,
-    required this.user,
   });
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  final _postRepo = PostRepoImpl();
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with TickerProviderStateMixin {
+  late User rootnode;
+  late final PostRepo _postRepo;
   late final ScrollController _scrollController;
   late final TabController _tabController;
   bool privateFeed = false;
@@ -101,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    _postRepo = ref.read(postRepoProvider);
     _scrollController = ScrollController();
     _tabController = TabController(length: 2, vsync: this);
     _getInitialData();
@@ -135,6 +137,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    rootnode = ref.watch(sessionProvider.select((value) => value.user!));
     return RefreshIndicator(
       color: Colors.cyan,
       backgroundColor: Colors.transparent,
@@ -156,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               maxWidth: maxContentWidth,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: StoriesWidget(currentUser: widget.user),
+                child: StoriesWidget(currentUser: rootnode),
               ),
             ),
           ),
@@ -209,6 +212,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           ? ConstrainedSliverWidth(
                               maxWidth: maxContentWidth,
                               child: PostContainer(
+                                  isOwn: rootnode.id == _posts[index].owner!.id,
                                   post: _posts[index],
                                   likedMeta: _postsLiked[index]),
                             )

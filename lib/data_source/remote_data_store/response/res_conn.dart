@@ -1,5 +1,5 @@
 import 'package:rootnode/model/conn.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 
 class ConnResponse {
   ConnResponse({

@@ -2,6 +2,7 @@ import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:like_button/like_button.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
@@ -9,6 +10,8 @@ import 'package:rootnode/app/constant/layout.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/post.dart';
+import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/screen/misc/view_post_media.dart';
 import 'package:rootnode/widgets/placeholder.dart';
@@ -22,12 +25,14 @@ class PostContainer extends StatelessWidget {
     required this.likedMeta,
     this.tagPrefix,
     this.compact = false,
+    this.isOwn = false,
   }) : super(key: key);
 
   final Post post;
   final bool likedMeta;
   final String? tagPrefix;
   final bool compact;
+  final bool isOwn;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +44,7 @@ class PostContainer extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _PostHeader(
+          isOwn: isOwn,
           post: post,
           compact: compact,
         ),
@@ -62,18 +68,24 @@ class PostContainer extends StatelessWidget {
   }
 }
 
-class _PostHeader extends StatelessWidget {
+class _PostHeader extends ConsumerWidget {
   const _PostHeader({
     Key? key,
     required this.post,
     required this.compact,
+    this.isOwn = false,
   }) : super(key: key);
 
   final Post post;
+  final bool isOwn;
   final bool compact;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    User? rootnode;
+    if (isOwn) {
+      rootnode = ref.watch(sessionProvider.select((value) => value.user!));
+    }
     return Padding(
       padding: LayoutConstants.postPaddingTLR,
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -90,7 +102,7 @@ class _PostHeader extends StatelessWidget {
             imageCacheHeight: 128,
             fit: BoxFit.cover,
             image: post.owner!.avatar != null
-                ? "${ApiConstants.baseUrl}\\${post.owner!.avatar}"
+                ? "${ApiConstants.baseUrl}\\${isOwn ? rootnode!.avatar : post.owner!.avatar}"
                 : "https://icon-library.com/images/anonymous-user-icon/anonymous-user-icon-2.jpg",
             placeholder: 'assets/images/image_grey.png',
             imageErrorBuilder: (context, error, stackTrace) =>
@@ -103,8 +115,7 @@ class _PostHeader extends StatelessWidget {
             compact
                 ? Text(post.owner!.fname!.toTitleCase!,
                     style: RootNodeFontStyle.title)
-                : Text(
-                    "${post.owner!.fname!} ${post.owner!.lname!}".toTitleCase!,
+                : Text(isOwn ? rootnode!.fullname : post.owner!.fullname,
                     style: RootNodeFontStyle.title),
             compact
                 ? Text(
@@ -113,7 +124,7 @@ class _PostHeader extends StatelessWidget {
                     style: RootNodeFontStyle.label,
                   )
                 : Text(
-                    "@${post.owner!.username!}",
+                    "@${isOwn ? rootnode!.username : post.owner!.username!}",
                     style: RootNodeFontStyle.subtitle,
                   ),
           ]),
@@ -275,7 +286,7 @@ class PostImage extends StatelessWidget {
   }
 }
 
-class _PostFooter extends StatefulWidget {
+class _PostFooter extends ConsumerStatefulWidget {
   const _PostFooter({
     Key? key,
     required this.post,
@@ -288,18 +299,24 @@ class _PostFooter extends StatefulWidget {
   final bool compact;
 
   @override
-  State<_PostFooter> createState() => _PostFooterState();
+  ConsumerState<_PostFooter> createState() => _PostFooterState();
 }
 
-class _PostFooterState extends State<_PostFooter> {
-  final postRepo = PostRepoImpl();
+class _PostFooterState extends ConsumerState<_PostFooter> {
+  late final PostRepo _postRepo;
   bool liking = false;
   Future<bool> togglePostLike() async {
     if (liking) return !widget.likedMeta;
     liking = true;
-    bool res = await postRepo.togglePostLike(id: widget.post.id!);
+    bool res = await _postRepo.togglePostLike(id: widget.post.id!);
     liking = false;
     return res;
+  }
+
+  @override
+  void initState() {
+    _postRepo = ref.read(postRepoProvider);
+    super.initState();
   }
 
   @override

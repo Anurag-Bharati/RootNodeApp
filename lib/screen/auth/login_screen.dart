@@ -2,28 +2,30 @@ import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/helper/notification_helper.dart';
 import 'package:rootnode/helper/switch_route.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
+import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/auth/register_screen.dart';
 import 'package:rootnode/screen/dashboard/dashboard.dart';
 import 'package:rootnode/widgets/text_field.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   static const route = "login";
   final String? email;
   const LoginScreen({super.key, this.email});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final String emailregEx =
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
-  final userRepo = UserRepoImpl();
+  late final UserRepo userRepo;
   final _emailFieldController = TextEditingController(text: "anuragbharati");
   final _scrollController = ScrollController();
   final _passwordFieldController = TextEditingController(text: "anurag");
@@ -31,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
+    userRepo = ref.read(userRepoProvider);
     if (widget.email != null) {
       _emailFieldController.text = widget.email!;
     }
@@ -45,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _scrollController.dispose();
   }
 
-  Future<User?> _loginUser() async {
+  Future<bool> _loginUser(WidgetRef ref) async {
     final bool isEmail =
         RegExp(emailregEx).hasMatch(_emailFieldController.text);
     FocusScope.of(context).unfocus();
@@ -57,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!res) {
       // ignore: use_build_context_synchronously
       showSnackbar(context, "Invalid email or password", Colors.red[400]!);
-      return null;
+      return false;
     }
     String localTimeZone =
         await AwesomeNotifications().getLocalTimeZoneIdentifier();
@@ -73,10 +76,11 @@ class _LoginScreenState extends State<LoginScreen> {
             channelKey: 'test_channel'),
       ),
     );
-
+    
     User? user = await userRepo.getUserFromToken();
-
-    return user;
+    if (user == null) return false;
+    ref.read(sessionProvider.notifier).updateUser(user: user);
+    return true;
   }
 
   @override
@@ -125,7 +129,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             margin: const EdgeInsets.symmetric(
                                 horizontal: 40, vertical: 10),
-                            child: TextButton(
+                            child: Consumer(builder: (context, ref, child) {
+                              return TextButton(
                               key: const ValueKey("loginBtn"),
                               style: const ButtonStyle(
                                   alignment: Alignment.center),
@@ -138,30 +143,37 @@ class _LoginScreenState extends State<LoginScreen> {
                                 showSnackbar(
                                     context, "Logging in..", Colors.green[400]!,
                                     dismissable: false);
-                                User? user = await _loginUser();
-                                if (user != null) {
+                                bool res = await _loginUser();
+                                if (res) {
                                   // ignore: use_build_context_synchronously
                                   ScaffoldMessenger.of(context)
                                       .removeCurrentSnackBar();
-
+                                    // ignore: use_build_context_synchronously
+                                    return switchRouteByPushReplace(
+                                        context, const DashboardScreen());
+                                  }
                                   // ignore: use_build_context_synchronously
-                                  return switchRouteByPushReplace(
-                                      context, DashboardScreen(user: user));
-                                }
-                                // ignore: use_build_context_synchronously
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text(
-                                  'Login',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.bold,
+
+                                  showSnackbar(
+                                    context,
+                                    "Sorry! Something went wrong",
+                                    Colors.red[400]!,
+                                  );
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(
+                                    'Login',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+
                                   ),
                                 ),
-                              ),
-                            ),
+                              );
+                            }),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(

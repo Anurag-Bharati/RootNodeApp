@@ -1,5 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/api.dart';
+
+final httpServiceProvider = Provider((ref) => HttpServices.getDioInstance());
 
 class HttpServices {
   static Dio? _dio;
@@ -12,11 +15,11 @@ class HttpServices {
   };
 
   static addHeader({required String key, required String value}) {
-    getDioInstance().options.headers.putIfAbsent(key, () => value);
+    getDioInstance().options.headers[key] = value;
   }
 
   static removeHeader({required String key}) {
-    getDioInstance().options.headers.remove(key);
+    getDioInstance().options.headers[key] = null;
   }
 
   static Dio getDioInstance() {

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_post.dart';
 import 'package:rootnode/helper/responsive_helper.dart';
 import 'package:rootnode/model/post.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/screen/dashboard/dashboard.dart';
 import 'package:rootnode/widgets/posts.dart';
 import 'package:rootnode/widgets/stories.dart';
 import 'package:wear/wear.dart';
 
-import '../../model/user.dart';
-
-class WearOsHomeScreen extends StatefulWidget {
+class WearOsHomeScreen extends ConsumerStatefulWidget {
   static const String route = "home";
   final User user;
   const WearOsHomeScreen({
@@ -20,12 +20,12 @@ class WearOsHomeScreen extends StatefulWidget {
   });
 
   @override
-  State<WearOsHomeScreen> createState() => _WearOsHomeScreenState();
+  ConsumerState<WearOsHomeScreen> createState() => _WearOsHomeScreenState();
 }
 
-class _WearOsHomeScreenState extends State<WearOsHomeScreen>
+class _WearOsHomeScreenState extends ConsumerState<WearOsHomeScreen>
     with TickerProviderStateMixin {
-  final _postRepo = PostRepoImpl();
+  late final PostRepo _postRepo;
   late final ScrollController _scrollController;
   late final TabController _tabController;
   bool privateFeed = false;
@@ -103,6 +103,7 @@ class _WearOsHomeScreenState extends State<WearOsHomeScreen>
 
   @override
   void initState() {
+    _postRepo = ref.read(postRepoProvider);
     _scrollController = ScrollController();
     _tabController = TabController(length: 2, vsync: this);
     _getInitialData();

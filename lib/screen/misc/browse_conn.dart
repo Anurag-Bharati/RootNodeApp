@@ -1,24 +1,25 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/helper/switch_route.dart';
-import 'package:rootnode/model/user.dart';
+import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/screen/misc/view_profile.dart';
 import 'package:rootnode/widgets/placeholder.dart';
 import 'package:rootnode/widgets/user_card.dart';
 
-class BrowseConnScreen extends StatefulWidget {
-  const BrowseConnScreen({super.key, required this.user});
-  final User user;
+class BrowseConnScreen extends ConsumerStatefulWidget {
+  const BrowseConnScreen({super.key});
 
   @override
-  State<BrowseConnScreen> createState() => _BrowseConnScreenState();
+  ConsumerState<BrowseConnScreen> createState() => _BrowseConnScreenState();
 }
 
-class _BrowseConnScreenState extends State<BrowseConnScreen> {
-  final _connRepo = ConnRepoImpl();
+class _BrowseConnScreenState extends ConsumerState<BrowseConnScreen> {
+  late User rootnode;
+  late final ConnRepo _connRepo;
   late final ScrollController _scrollController;
   final List<User> random = [];
   int randomCurrentPage = 1;
@@ -57,6 +58,7 @@ class _BrowseConnScreenState extends State<BrowseConnScreen> {
 
   @override
   void initState() {
+    _connRepo = ref.read(connRepoProvider);
     _scrollController = ScrollController()
       ..addListener(() {
         if (_scrollController.position.maxScrollExtent ==
@@ -116,11 +118,8 @@ class _BrowseConnScreenState extends State<BrowseConnScreen> {
                 delegate: random.isNotEmpty
                     ? SliverChildBuilderDelegate(
                         (context, index) => GestureDetector(
-                              onTap: () => switchRouteByPush(
-                                  context,
-                                  ProfileScreen(
-                                      id: random[index].id!,
-                                      user: widget.user)),
+                              onTap: () => switchRouteByPush(context,
+                                  ProfileScreen(id: random[index].id!)),
                               child: Container(
                                 height: 80,
                                 color: Colors.white10,

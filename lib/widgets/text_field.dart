@@ -8,7 +8,8 @@ class RootNodeTextField extends StatefulWidget {
     required this.controller,
     required this.type,
     required this.hintText,
-
+    this.validator,
+    this.autovalidateMode,
     this.compact = false,
     this.validator,
     this.autovalidateMode,
@@ -27,6 +28,7 @@ class RootNodeTextField extends StatefulWidget {
 
 class _RootNodeTextFieldState extends State<RootNodeTextField> {
   bool _passVisible = false;
+  String? asyncStringValidatorData;
   late bool _compact;
   late double _iconSize;
   late double _fontSize;
@@ -52,13 +54,14 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
           scrollPadding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom + 20 * 8),
           controller: widget.controller,
-
+          onChanged: (value) {
+            if (widget.validator != null) _handleAsync(value);
+          },
           style: TextStyle(color: Colors.white70, fontSize: _fontSize),
 
           onChanged: (value) {
             if (widget.validator != null) _handleAsync(value);
           },
-
           keyboardType: widget.type == TextFieldTypes.email
               ? TextInputType.emailAddress
               : TextInputType.visiblePassword,
@@ -108,7 +111,8 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
                       },
                     )
                   : null),
-        ));
+        ),
+      );
   }
 
   _handleAsync(String value) async {
