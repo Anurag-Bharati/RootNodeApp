@@ -5,11 +5,9 @@ class LocalNotificationHelper {
   static AwesomeNotifications get awesomeNotification =>
       _instance ??= AwesomeNotifications();
 
-  static void checkNotificationEnabled() {
-    awesomeNotification.isNotificationAllowed().then((value) {
-      if (value) {
-        awesomeNotification.requestPermissionToSendNotifications();
-      }
-    });
+  static Future<AwesomeNotifications> checkNotificationEnabled() async {
+    bool val = await awesomeNotification.isNotificationAllowed();
+    if (!val) await awesomeNotification.requestPermissionToSendNotifications();
+    return awesomeNotification;
   }
 }

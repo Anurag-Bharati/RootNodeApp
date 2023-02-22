@@ -11,6 +11,8 @@ class RootNodeTextField extends StatefulWidget {
     this.validator,
     this.autovalidateMode,
     this.compact = false,
+    this.validator,
+    this.autovalidateMode,
   }) : super(key: key);
 
   final Future<String?> Function(String?)? validator;
@@ -30,7 +32,7 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
   late bool _compact;
   late double _iconSize;
   late double _fontSize;
-
+  String? asyncStringValidatorData;
   @override
   void initState() {
     _compact = widget.compact;
@@ -56,6 +58,10 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
             if (widget.validator != null) _handleAsync(value);
           },
           style: TextStyle(color: Colors.white70, fontSize: _fontSize),
+
+          onChanged: (value) {
+            if (widget.validator != null) _handleAsync(value);
+          },
           keyboardType: widget.type == TextFieldTypes.email
               ? TextInputType.emailAddress
               : TextInputType.visiblePassword,
@@ -105,7 +111,8 @@ class _RootNodeTextFieldState extends State<RootNodeTextField> {
                       },
                     )
                   : null),
-        ));
+        ),
+      );
   }
 
   _handleAsync(String value) async {

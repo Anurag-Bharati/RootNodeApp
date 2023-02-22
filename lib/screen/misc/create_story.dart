@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
@@ -14,19 +15,25 @@ import 'package:rootnode/widgets/radio_button.dart';
 import 'package:rootnode/widgets/selection_tile.dart';
 import 'package:rootnode/widgets/switch_button.dart';
 
-class CreateStoryScreen extends StatefulWidget {
+class CreateStoryScreen extends ConsumerStatefulWidget {
   const CreateStoryScreen({super.key, required this.type});
   final RNContentType type;
 
   @override
-  State<CreateStoryScreen> createState() => _CreateStoryScreenState();
+  ConsumerState<CreateStoryScreen> createState() => _CreateStoryScreenState();
 }
 
-class _CreateStoryScreenState extends State<CreateStoryScreen> {
-  final _storyRepo = StoryRepoImpl();
+class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
+  late final StoryRepo _storyRepo;
   XFile? file;
 
   bool appBar = true;
+
+  @override
+  void initState() {
+    _storyRepo = ref.read(storyRepoProvider);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

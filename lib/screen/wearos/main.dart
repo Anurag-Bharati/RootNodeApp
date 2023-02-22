@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/theme.dart';
 import 'package:rootnode/helper/objectbox.dart';
 import 'package:rootnode/screen/wearos/wearos_splash_screen.dart';
@@ -18,7 +19,7 @@ void main(List<String> args) async {
       title: 'RootNode',
       debugShowCheckedModeBanner: false,
       theme: getApplicationThemeData(),
-      home: const WearOsSplashScreen(),
+      home: const ProviderScope(child: WearOsSplashScreen()),
     )),
   );
 }

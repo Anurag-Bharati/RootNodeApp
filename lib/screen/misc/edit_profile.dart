@@ -14,16 +14,16 @@ import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/widgets/text_field.dart';
 
-class EditProfile extends StatefulWidget {
+class EditProfile extends ConsumerStatefulWidget {
   const EditProfile({super.key, required this.user});
   final User user;
 
   @override
-  State<EditProfile> createState() => _EditProfileState();
+  ConsumerState<EditProfile> createState() => _EditProfileState();
 }
 
-class _EditProfileState extends State<EditProfile> {
-  final _userRepo = UserRepoImpl();
+class _EditProfileState extends ConsumerState<EditProfile> {
+  late final UserRepo _userRepo;
   XFile? avatar;
   bool hasSelectedAnImage = false;
   late final TextEditingController _fNameController;
@@ -33,6 +33,7 @@ class _EditProfileState extends State<EditProfile> {
   late final GlobalKey<FormState> _formKey;
   @override
   void initState() {
+    _userRepo = ref.read(userRepoProvider);
     _formKey = GlobalKey<FormState>();
     _fNameController = TextEditingController(text: widget.user.fname ?? "");
     _lNameController = TextEditingController(text: widget.user.lname ?? "");
@@ -127,7 +128,6 @@ class _EditProfileState extends State<EditProfile> {
                     if (p0.length < 3) {
                       return "Must be at least three char long";
                     }
-
                     return null;
                   },
                   hintText: 'First Name',

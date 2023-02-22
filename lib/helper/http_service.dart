@@ -1,5 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/api.dart';
+
+final httpServiceProvider = Provider((ref) => HttpServices.getDioInstance());
 
 class HttpServices {
   static Dio? _dio;

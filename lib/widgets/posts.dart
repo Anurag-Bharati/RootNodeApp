@@ -17,6 +17,7 @@ import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/screen/misc/comment_screen.dart';
 import 'package:rootnode/screen/misc/view_post_media.dart';
 import 'package:rootnode/widgets/placeholder.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'package:string_extensions/string_extensions.dart';
 
@@ -286,7 +287,8 @@ class _PostBody extends StatelessWidget {
                                             size: 20, color: Colors.white54),
                                       ))
                                 ],
-                              )),
+                              ),
+                            ),
                   ),
                 )
               : SizedBox(height: post.caption != null ? 10 : 0),
@@ -323,12 +325,13 @@ class PostImage extends StatelessWidget {
                 label: "Loading Image",
                 icon: Boxicons.bx_image,
                 progress: progress,
-              )),
+              ),
+            ),
     );
   }
 }
 
-class _PostFooter extends StatefulWidget {
+class _PostFooter extends ConsumerStatefulWidget {
   const _PostFooter({
     Key? key,
     required this.post,
@@ -343,18 +346,24 @@ class _PostFooter extends StatefulWidget {
   final bool disableComment;
 
   @override
-  State<_PostFooter> createState() => _PostFooterState();
+  ConsumerState<_PostFooter> createState() => _PostFooterState();
 }
 
-class _PostFooterState extends State<_PostFooter> {
-  final postRepo = PostRepoImpl();
+class _PostFooterState extends ConsumerState<_PostFooter> {
+  late final PostRepo _postRepo;
   bool liking = false;
   Future<bool> togglePostLike() async {
     if (liking) return !widget.likedMeta;
     liking = true;
-    bool res = await postRepo.togglePostLike(id: widget.post.id!);
+    bool res = await _postRepo.togglePostLike(id: widget.post.id!);
     liking = false;
     return res;
+  }
+
+  @override
+  void initState() {
+    _postRepo = ref.read(postRepoProvider);
+    super.initState();
   }
 
   @override
@@ -453,5 +462,170 @@ class PostLoader extends StatelessWidget {
               ),
       ),
     ]);
+  }
+}
+
+class PostShimmer extends StatelessWidget {
+  const PostShimmer({super.key, this.isText = true, this.isMedia = false});
+  final bool isText;
+  final bool isMedia;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: LayoutConstants.postMarginTLR,
+      padding: const EdgeInsets.only(top: 5),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade900,
+        borderRadius: LayoutConstants.postCardBorderRadius,
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        RootNodeShimmer(
+          child: Padding(
+            padding: LayoutConstants.postPaddingTLR,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  height: 40,
+                  width: 40,
+                  decoration: const BoxDecoration(
+                    color: Colors.white10,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Wrap(direction: Axis.vertical, spacing: 6, children: [
+                    Container(
+                      height: 18,
+                      constraints: const BoxConstraints(maxWidth: 200),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: Colors.white10,
+                      ),
+                    ),
+                    Container(
+                      height: 12,
+                      constraints: const BoxConstraints(maxWidth: 150),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(3),
+                        color: Colors.white10,
+                      ),
+                    ),
+                  ]),
+                ),
+              ],
+            ),
+          ),
+        ),
+        RootNodeShimmer(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            isText
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: LayoutConstants.postPadding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(top: 14),
+                          height: 14,
+                          constraints: const BoxConstraints(maxWidth: 300),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(3),
+                            color: Colors.white10,
+                          ),
+                        ),
+                        Container(
+                          height: 14,
+                          margin: const EdgeInsets.only(top: 5),
+                          constraints: const BoxConstraints(maxWidth: 200),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(3),
+                            color: Colors.white10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            isMedia
+                ? Center(
+                    child: Container(
+                      width: double.maxFinite,
+                      clipBehavior: Clip.antiAlias,
+                      decoration: const BoxDecoration(
+                          borderRadius:
+                              LayoutConstants.postContentBorderRadius),
+                      margin:
+                          const EdgeInsets.all(LayoutConstants.postInnerMargin),
+                      child: AspectRatio(
+                        aspectRatio: 4 / 3,
+                        child: Container(
+                          color: Colors.white10,
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ]),
+        ),
+        SizedBox(height: isMedia ? 0 : 10),
+        const Divider(thickness: 3, color: Color(0xFF111111)),
+        Padding(
+          padding: LayoutConstants.postActionPadding,
+          child: RootNodeShimmer(
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Wrap(spacing: 20, children: [
+                    Container(
+                      height: 24,
+                      width: 32,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(3),
+                        color: Colors.white10,
+                      ),
+                    ),
+                    Container(
+                      height: 24,
+                      width: 32,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(3),
+                        color: Colors.white10,
+                      ),
+                    ),
+                  ]),
+                  Container(
+                    height: 24,
+                    width: 32,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      color: Colors.white10,
+                    ),
+                  ),
+                ]),
+          ),
+        )
+      ]),
+    );
+  }
+}
+
+class RootNodeShimmer extends StatelessWidget {
+  const RootNodeShimmer({super.key, required this.child, this.darkmode = true});
+  final Widget child;
+  final bool darkmode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: darkmode ? Colors.white24 : Colors.grey.shade900,
+      highlightColor: Colors.white54,
+      child: child,
+    );
   }
 }

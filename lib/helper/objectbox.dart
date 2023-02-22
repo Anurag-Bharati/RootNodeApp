@@ -41,4 +41,9 @@ class ObjectBoxInstance {
     Query<User> query = _userBox.query(User_.id.equals(id)).build();
     return query.findUnique();
   }
+
+  static Future<void> deleteDatabase() async {
+    var dir = await getApplicationDocumentsDirectory();
+    Directory('${dir.path}/user_data').deleteSync(recursive: true);
+  }
 }

@@ -33,10 +33,10 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   late User rootnode;
-  final _userRepo = UserRepoImpl();
-  final _storyRepo = StoryRepoImpl();
-  final _connRepo = ConnRepoImpl();
-  final _postRepo = PostRepoImpl();
+  late final UserRepo _userRepo;
+  late final StoryRepo _storyRepo;
+  late final ConnRepo _connRepo;
+  late final PostRepo _postRepo;
   late PostResponse? _postResponse;
   User? user;
   double maxContentWidth = 720;
@@ -125,6 +125,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   void initState() {
+    _connRepo = ref.read(connRepoProvider);
+    _postRepo = ref.read(postRepoProvider);
+    _storyRepo = ref.read(storyRepoProvider);
+    _userRepo = ref.read(userRepoProvider);
     _getInitialData();
     _postScrollController = ScrollController()
       ..addListener(() {
@@ -248,14 +252,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               _posts.isEmpty && !noPost
                   ? SliverToBoxAdapter(
-                      child: Container(
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height / 2,
-                        alignment: Alignment.center,
-                        child: const CircularProgressIndicator(
-                          color: Colors.white10,
-                        ),
-                      ),
+                      child: SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            children: const [
+                              PostShimmer(),
+                              PostShimmer(isMedia: true, isText: false),
+                              PostShimmer(isMedia: true),
+                            ],
+                          )),
                     )
                   : noPost
                       ? SliverToBoxAdapter(

@@ -24,7 +24,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with TickerProviderStateMixin {
   late User rootnode;
-  final _postRepo = PostRepoImpl();
+  late final PostRepo _postRepo;
   late final ScrollController _scrollController;
   late final TabController _tabController;
   bool privateFeed = false;
@@ -102,6 +102,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   void initState() {
+    _postRepo = ref.read(postRepoProvider);
     _scrollController = ScrollController();
     _tabController = TabController(length: 2, vsync: this);
     _getInitialData().then((value) => setState(() {}));
@@ -146,6 +147,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       },
       child: CustomScrollView(
         controller: _scrollController,
+        physics: _posts.isEmpty ? const NeverScrollableScrollPhysics() : null,
         slivers: [
           SliverToBoxAdapter(
             child: ConstrainedSliverWidth(
@@ -195,14 +197,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
           _posts.isEmpty
               ? SliverToBoxAdapter(
-                  child: Container(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height / 2,
-                    alignment: Alignment.center,
-                    child: const CircularProgressIndicator(
-                      color: Colors.white10,
-                    ),
-                  ),
+                  child: SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        children: const [
+                          PostShimmer(),
+                          PostShimmer(isMedia: true, isText: false),
+                          PostShimmer(isMedia: true),
+                        ],
+                      )),
                 )
               : SliverList(
                   delegate: SliverChildBuilderDelegate(

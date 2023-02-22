@@ -14,6 +14,18 @@ class Utils {
         locale: 'en_short');
   }
 
+  static String greetings() {
+    final hour = TimeOfDay.now().hour;
+    if (hour <= 12) {
+      return 'Good Morning,';
+    } else if (hour <= 16) {
+      return 'Good Afternoon,';
+    } else if (hour <= 20) {
+      return 'Good Evening,';
+    }
+    return 'Good Night,';
+  }
+
   static String humanizeNumber(int i) {
     if (i < 1000) return i.toString();
     return NumberFormat.compact(locale: "en_US").format(i);

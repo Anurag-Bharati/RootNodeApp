@@ -1,6 +1,7 @@
 import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/helper/utils.dart';
@@ -11,7 +12,7 @@ import 'package:rootnode/widgets/placeholder.dart';
 import 'package:string_extensions/string_extensions.dart';
 import 'package:video_player/video_player.dart';
 
-class ViewStoryScreen extends StatefulWidget {
+class ViewStoryScreen extends ConsumerStatefulWidget {
   const ViewStoryScreen({
     super.key,
     required this.stories,
@@ -23,15 +24,15 @@ class ViewStoryScreen extends StatefulWidget {
   final bool compact;
 
   @override
-  State<ViewStoryScreen> createState() => _ViewStoryScreenState();
+  ConsumerState<ViewStoryScreen> createState() => _ViewStoryScreenState();
 }
 
-class _ViewStoryScreenState extends State<ViewStoryScreen>
+class _ViewStoryScreenState extends ConsumerState<ViewStoryScreen>
     with TickerProviderStateMixin {
   late final PageController _pageController;
   late final AnimationController _animationController;
   VideoPlayerController? _videoController;
-  final _stroyRepo = StoryRepoImpl();
+  late final StoryRepo _stroyRepo;
   late int currentIndex;
   late bool _compact;
   bool paused = false;
@@ -41,6 +42,7 @@ class _ViewStoryScreenState extends State<ViewStoryScreen>
 
   @override
   void initState() {
+    _stroyRepo = ref.read(storyRepoProvider);
     _compact = widget.compact;
     currentIndex = widget.initial;
     _pageController = PageController();

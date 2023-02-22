@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/data_source/remote_data_store/response/res_post.dart';
@@ -8,13 +9,19 @@ import 'package:rootnode/helper/http_service.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/post.dart';
 
+final postRemoteDSProvider = Provider((ref) {
+  final httpService = ref.watch(httpServiceProvider);
+  return PostRemoteDataSource(httpService: httpService);
+});
+
 class PostRemoteDataSource {
-  final Dio _httpServices = HttpServices.getDioInstance();
+  final Dio httpService;
+  PostRemoteDataSource({required this.httpService});
 
   Future<PostResponse?> getPostFeed(
       {int page = 1, int refresh = 0, bool private = false}) async {
     try {
-      Response res = await _httpServices.get(
+      Response res = await httpService.get(
         "${ApiConstants.baseUrl}${ApiConstants.post}${private ? '/feed' : ''}?page=$page&refresh=$refresh",
       );
       return res.statusCode == 200 ? PostResponse.fromJson(res.data) : null;
@@ -27,7 +34,7 @@ class PostRemoteDataSource {
   Future<PostResponse?> getPostByUser(
       {int page = 1, int refresh = 0, required String id}) async {
     try {
-      Response res = await _httpServices.get(
+      Response res = await httpService.get(
         "${ApiConstants.baseUrl}${ApiConstants.post}/user/$id?page=$page&refresh=$refresh",
       );
       return res.statusCode == 200 ? PostResponse.fromJson(res.data) : null;
@@ -39,7 +46,7 @@ class PostRemoteDataSource {
 
   Future<bool> togglePostLike({required String id}) async {
     try {
-      Response res = await _httpServices.post(
+      Response res = await httpService.post(
         "${ApiConstants.baseUrl}${ApiConstants.post}/$id/like-unlike",
       );
       return res.data['data']['liked'];
@@ -58,7 +65,7 @@ class PostRemoteDataSource {
       Map<String, dynamic> postMap = post.toJson();
       postMap['mediaFiles'] = mediaFiles;
       FormData formData = FormData.fromMap(postMap);
-      Response res = await _httpServices
+      Response res = await httpService
           .post("${ApiConstants.baseUrl}${ApiConstants.post}", data: formData);
 
       return res.statusCode == 201;

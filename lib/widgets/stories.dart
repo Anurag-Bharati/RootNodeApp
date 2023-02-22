@@ -14,7 +14,7 @@ import 'package:rootnode/screen/misc/create_story.dart';
 import 'package:rootnode/screen/misc/view_story.dart';
 import 'package:rootnode/widgets/selection_tile.dart';
 
-class StoriesWidget extends StatefulWidget {
+class StoriesWidget extends ConsumerStatefulWidget {
   final User currentUser;
   final bool compact;
   const StoriesWidget({
@@ -24,13 +24,13 @@ class StoriesWidget extends StatefulWidget {
   });
 
   @override
-  State<StoriesWidget> createState() => _StoriesWidgetState();
+  ConsumerState<StoriesWidget> createState() => _StoriesWidgetState();
 }
 
-class _StoriesWidgetState extends State<StoriesWidget> {
+class _StoriesWidgetState extends ConsumerState<StoriesWidget> {
   late final ScrollController _scrollController;
   // late final RandomColor _randomColor;
-  final _storyRepo = StoryRepoImpl();
+  late final StoryRepo _storyRepo;
   late StoryResponse? _storyResponse;
   final List<Story> _stories = [];
   late int storyTotal;
@@ -67,6 +67,7 @@ class _StoriesWidgetState extends State<StoriesWidget> {
 
   @override
   void initState() {
+    _storyRepo = ref.read(storyRepoProvider);
     _compact = widget.compact;
     _scrollController = ScrollController();
     _scrollController.addListener(() {
