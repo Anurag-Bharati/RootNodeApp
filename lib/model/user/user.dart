@@ -27,7 +27,7 @@ class User with _$User {
     @Default(false) final bool? isVerified,
     @Default(false) final bool? showOnlineStatus,
     @Property(type: PropertyType.date) final DateTime? lastSeen,
-    final String? username,
+    @Unique() final String? username,
     @Property(type: PropertyType.date) final DateTime? createdAt,
     @Property(type: PropertyType.date) final DateTime? updatedAt,
     @Property(type: PropertyType.date) final DateTime? usernameChangedAt,

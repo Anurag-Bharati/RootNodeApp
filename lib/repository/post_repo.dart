@@ -7,10 +7,12 @@ import 'package:rootnode/model/post.dart';
 abstract class PostRepo {
   Future<PostResponse?> getPostFeed(
       {int page = 1, int refresh = 0, bool private = false});
+  Future<Post?> getPostById({required String id});
   Future<PostResponse?> getPostByUser(
       {int page = 1, int refresh = 0, required String id});
   Future<bool> togglePostLike({required String id});
   Future<bool> createPost({required Post post, required List<XFile>? files});
+  Future<bool> deletePost({required String id});
 }
 
 final postRepoProvider = Provider((ref) {
@@ -43,5 +45,15 @@ class PostRepoImpl extends PostRepo {
   @override
   Future<bool> createPost({required Post post, required List<XFile>? files}) {
     return remoteDataSource.createPost(post, files);
+  }
+
+  @override
+  Future<Post?> getPostById({required String id}) {
+    return PostRemoteDataSource().getPostById(id: id);
+  }
+
+  @override
+  Future<bool> deletePost({required String id}) {
+    return PostRemoteDataSource().deletePost(id: id);
   }
 }

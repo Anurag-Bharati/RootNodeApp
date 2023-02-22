@@ -22,6 +22,11 @@ class ObjectBoxInstance {
     return ObjectBoxInstance(store);
   }
 
+  static Future<void> deleteDatabase() async {
+    var dir = await getApplicationDocumentsDirectory();
+    Directory('${dir.path}/user_data').deleteSync(recursive: true);
+  }
+
   int saveUser(User user) => _userBox.put(user);
   bool loginUser(String email, String password) {
     Query<User> query = _userBox

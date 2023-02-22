@@ -43,6 +43,7 @@ mixin _$User {
   bool? get showOnlineStatus => throw _privateConstructorUsedError;
   @Property(type: PropertyType.date)
   DateTime? get lastSeen => throw _privateConstructorUsedError;
+  @Unique()
   String? get username => throw _privateConstructorUsedError;
   @Property(type: PropertyType.date)
   DateTime? get createdAt => throw _privateConstructorUsedError;
@@ -79,7 +80,7 @@ abstract class $UserCopyWith<$Res> {
       bool? isVerified,
       bool? showOnlineStatus,
       @Property(type: PropertyType.date) DateTime? lastSeen,
-      String? username,
+      @Unique() String? username,
       @Property(type: PropertyType.date) DateTime? createdAt,
       @Property(type: PropertyType.date) DateTime? updatedAt,
       @Property(type: PropertyType.date) DateTime? usernameChangedAt});
@@ -233,7 +234,7 @@ abstract class _$$_UserCopyWith<$Res> implements $UserCopyWith<$Res> {
       bool? isVerified,
       bool? showOnlineStatus,
       @Property(type: PropertyType.date) DateTime? lastSeen,
-      String? username,
+      @Unique() String? username,
       @Property(type: PropertyType.date) DateTime? createdAt,
       @Property(type: PropertyType.date) DateTime? updatedAt,
       @Property(type: PropertyType.date) DateTime? usernameChangedAt});
@@ -381,7 +382,7 @@ class _$_User extends _User {
       this.isVerified = false,
       this.showOnlineStatus = false,
       @Property(type: PropertyType.date) this.lastSeen,
-      this.username,
+      @Unique() this.username,
       @Property(type: PropertyType.date) this.createdAt,
       @Property(type: PropertyType.date) this.updatedAt,
       @Property(type: PropertyType.date) this.usernameChangedAt})
@@ -432,6 +433,7 @@ class _$_User extends _User {
   @Property(type: PropertyType.date)
   final DateTime? lastSeen;
   @override
+  @Unique()
   final String? username;
   @override
   @Property(type: PropertyType.date)
@@ -555,7 +557,8 @@ abstract class _User extends User {
       final bool? showOnlineStatus,
       @Property(type: PropertyType.date)
           final DateTime? lastSeen,
-      final String? username,
+      @Unique()
+          final String? username,
       @Property(type: PropertyType.date)
           final DateTime? createdAt,
       @Property(type: PropertyType.date)
@@ -607,6 +610,7 @@ abstract class _User extends User {
   @Property(type: PropertyType.date)
   DateTime? get lastSeen;
   @override
+  @Unique()
   String? get username;
   @override
   @Property(type: PropertyType.date)

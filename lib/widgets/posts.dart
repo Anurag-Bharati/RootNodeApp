@@ -7,12 +7,14 @@ import 'package:like_button/like_button.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
+import 'package:rootnode/app/utils/snackbar.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/post.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/provider/session_provider.dart';
 import 'package:rootnode/repository/post_repo.dart';
+import 'package:rootnode/screen/misc/comment_screen.dart';
 import 'package:rootnode/screen/misc/view_post_media.dart';
 import 'package:rootnode/widgets/placeholder.dart';
 import 'package:shimmer/shimmer.dart';
@@ -27,6 +29,7 @@ class PostContainer extends StatelessWidget {
     this.tagPrefix,
     this.compact = false,
     this.isOwn = false,
+    this.disableComment = false,
   }) : super(key: key);
 
   final Post post;
@@ -34,6 +37,7 @@ class PostContainer extends StatelessWidget {
   final String? tagPrefix;
   final bool compact;
   final bool isOwn;
+  final bool disableComment;
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +64,7 @@ class PostContainer extends StatelessWidget {
         ),
         const Divider(thickness: 3, color: Color(0xFF111111)),
         _PostFooter(
+          disableComment: disableComment,
           compact: compact,
           post: post,
           likedMeta: likedMeta,
@@ -141,15 +146,52 @@ class _PostHeader extends ConsumerWidget {
                     textAlign: TextAlign.center,
                     style: RootNodeFontStyle.label,
                   ),
-                  const Icon(
-                    Boxicons.bx_dots_vertical_rounded,
-                    color: Colors.white70,
-                    size: LayoutConstants.postIcon,
+                  SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: PopupMenuButton<int>(
+                      shadowColor: Colors.white,
+                      splashRadius: 24,
+                      offset: const Offset(0, 32),
+                      padding: EdgeInsets.zero,
+                      color: Colors.white70,
+                      surfaceTintColor: Colors.transparent,
+                      enableFeedback: true,
+                      elevation: 2,
+                      icon: const Icon(
+                        Boxicons.bx_dots_vertical_rounded,
+                        size: LayoutConstants.postIcon,
+                      ),
+                      onSelected: (value) => _handleThreeDots(context, value),
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuItem<int>>[
+                        isOwn
+                            ? const PopupMenuItem<int>(
+                                height: 42, value: 0, child: Text('Edit'))
+                            : const PopupMenuItem<int>(
+                                height: 42, value: 1, child: Text('Report')),
+                        isOwn
+                            ? const PopupMenuItem<int>(
+                                height: 42, value: -1, child: Text('Remove'))
+                            : const PopupMenuItem<int>(
+                                height: 42, value: -2, child: Text('Hide')),
+                      ],
+                    ),
                   ),
                 ],
               )
       ]),
     );
+  }
+
+  _handleThreeDots(BuildContext context, int value) {
+    if (value == -1) {
+      PostRepoImpl().deletePost(id: post.id!).then((value) => value
+          ? showSnackbar(context, "Deletion successful!", Colors.green[400]!)
+          : showSnackbar(context, "Something went wrong!", Colors.red[400]!));
+      return;
+    }
+    showSnackbar(context, "Coming soon!", const Color(0xFF555555));
   }
 }
 
@@ -245,7 +287,8 @@ class _PostBody extends StatelessWidget {
                                             size: 20, color: Colors.white54),
                                       ))
                                 ],
-                              )),
+                              ),
+                            ),
                   ),
                 )
               : SizedBox(height: post.caption != null ? 10 : 0),
@@ -282,7 +325,8 @@ class PostImage extends StatelessWidget {
                 label: "Loading Image",
                 icon: Boxicons.bx_image,
                 progress: progress,
-              )),
+              ),
+            ),
     );
   }
 }
@@ -293,11 +337,13 @@ class _PostFooter extends ConsumerStatefulWidget {
     required this.post,
     required this.likedMeta,
     required this.compact,
+    required this.disableComment,
   }) : super(key: key);
 
   final Post post;
   final bool likedMeta;
   final bool compact;
+  final bool disableComment;
 
   @override
   ConsumerState<_PostFooter> createState() => _PostFooterState();
@@ -346,23 +392,29 @@ class _PostFooterState extends ConsumerState<_PostFooter> {
             },
             likeCountPadding: const EdgeInsets.only(top: 2, left: 8.0),
           ),
-          LikeButton(
-            size: LayoutConstants.postIcon,
-            likeCount: widget.post.commentsCount,
-            likeBuilder: (isLiked) {
-              return isLiked
-                  ? const Icon(
-                      Boxicons.bxs_message_square_detail,
-                      color: Colors.white70,
-                      size: 22,
-                    )
-                  : const Icon(
-                      Boxicons.bx_message_square_detail,
-                      color: Colors.white70,
-                      size: 22,
-                    );
+          GestureDetector(
+            onTap: () {
+              if (widget.disableComment) return;
+              switchRouteByPush(
+                  context,
+                  CommentScreen(
+                    liked: widget.likedMeta,
+                    id: widget.post.id!,
+                  ));
             },
-            likeCountPadding: const EdgeInsets.only(top: 2, left: 8.0),
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              children: [
+                const Icon(
+                  Boxicons.bx_message_square_detail,
+                  color: Colors.white70,
+                  size: 22,
+                ),
+                Text("${widget.post.commentsCount}",
+                    style: RootNodeFontStyle.label)
+              ],
+            ),
           ),
         ]),
         widget.compact
