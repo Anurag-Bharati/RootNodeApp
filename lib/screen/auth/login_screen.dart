@@ -153,7 +153,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         context, const DashboardScreen());
                                   }
                                   // ignore: use_build_context_synchronously
-
                                   showSnackbar(
                                     context,
                                     "Sorry! Something went wrong",
