@@ -50,7 +50,6 @@ dependencies:
     carousel_slider: ^4.2.1
     video_player: ^2.5.1
     visibility_detector: ^0.3.3
-    # chewie: ^1.4.0
     dotted_border: ^2.0.0+3
     open_file: ^3.2.1
     cached_network_image: ^3.2.3
@@ -70,6 +69,8 @@ dependencies:
     socket_io_client: ^2.0.1
     flutter_slidable: ^2.0.0
     flutter_markdown: ^0.6.14
+    shake: ^2.2.0
+    sensors_plus: ^1.4.1
 
 dev_dependencies:
     flutter_test:

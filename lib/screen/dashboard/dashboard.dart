@@ -5,10 +5,12 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:rootnode/app/constant/api.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:rootnode/app/constant/layout.dart';
+import 'package:rootnode/helper/socket_service.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/helper/utils.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/provider/session_provider.dart';
+import 'package:rootnode/screen/auth/login_screen.dart';
 import 'package:rootnode/screen/dashboard/event_screen.dart';
 import 'package:rootnode/screen/dashboard/home_screen.dart';
 import 'package:rootnode/screen/dashboard/messenger_screen.dart';
@@ -16,6 +18,7 @@ import 'package:rootnode/screen/dashboard/node_screen.dart';
 import 'package:rootnode/screen/misc/create_post.dart';
 import 'package:rootnode/screen/misc/setting.dart';
 import 'package:rootnode/widgets/selection_tile.dart';
+import 'package:shake/shake.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -28,7 +31,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   late User rootnode;
-
+  late final ShakeDetector shakeDetector;
   Future<void> _navigateToCreatePost(
       BuildContext context, RNContentType type) async {
     final result = await Navigator.push(
@@ -62,12 +65,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   @override
   void initState() {
+    shakeDetector = ShakeDetector.autoStart(onPhoneShake: () => _showLogout());
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    shakeDetector.stopListening();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     rootnode = ref.watch(sessionProvider.select((value) => value.user!));
+
     return Scaffold(
       extendBody: _getWidth(context) > 480,
       appBar: AppBar(
@@ -204,6 +215,35 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         widthFraction: 0.7,
         column: 2,
         bottomLabel: "Select a type of post you want to create",
+      ),
+    );
+  }
+
+  _showLogout() {
+    return showDialog(
+      barrierColor: const Color(0xEE000000),
+      context: context,
+      builder: (context) => SelectionTile(
+        title: "Do you want to logout?",
+        tileButton: [
+          TileButton(
+              type: RNContentType.text,
+              icon: Boxicons.bx_check,
+              label: "Yes",
+              onPressed: (RNContentType type) {
+                ref.read(socketServiceProvider).disconnect();
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    LoginScreen.route, (route) => false);
+              }),
+          TileButton(
+              type: RNContentType.markdown,
+              icon: Boxicons.bx_x,
+              label: "No",
+              onPressed: (RNContentType type) => Navigator.pop(context, false)),
+        ],
+        widthFraction: 0.7,
+        column: 2,
+        bottomLabel: "A shake has been detected",
       ),
     );
   }
