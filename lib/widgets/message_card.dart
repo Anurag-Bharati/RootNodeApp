@@ -21,7 +21,8 @@ class MessageCard extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Container(
-            constraints: const BoxConstraints(maxWidth: 300),
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.7),
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),

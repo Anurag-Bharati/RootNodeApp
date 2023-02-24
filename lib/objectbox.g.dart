@@ -412,39 +412,39 @@ final _entities = <ModelEntity>[
       relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[]),
   ModelEntity(
-      id: const IdUid(11, 9207858836982385325),
+      id: const IdUid(12, 3080264456348421225),
       name: 'Message',
-      lastPropertyId: const IdUid(6, 3931524772921781053),
+      lastPropertyId: const IdUid(6, 7998462352554530462),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
-            id: const IdUid(1, 1748165099843081263),
+            id: const IdUid(1, 4433510117586323590),
             name: 'mid',
             type: 6,
             flags: 129),
         ModelProperty(
-            id: const IdUid(2, 8722230122389221858),
+            id: const IdUid(2, 105864540673807990),
             name: 'id',
             type: 9,
             flags: 2080,
-            indexId: const IdUid(16, 7052030665778554805)),
+            indexId: const IdUid(17, 3488631986190077712)),
         ModelProperty(
-            id: const IdUid(3, 408481172411800900),
+            id: const IdUid(3, 1314785057747739184),
             name: 'text',
             type: 9,
             flags: 0),
         ModelProperty(
-            id: const IdUid(4, 8497259532286296652),
+            id: const IdUid(4, 8792419507488771527),
             name: 'senderId',
             type: 9,
             flags: 0),
         ModelProperty(
-            id: const IdUid(5, 6665885871461353957),
+            id: const IdUid(5, 5298742466338899628),
             name: 'receiverId',
             type: 9,
             flags: 0),
         ModelProperty(
-            id: const IdUid(6, 3931524772921781053),
+            id: const IdUid(6, 7998462352554530462),
             name: 'createdAt',
             type: 10,
             flags: 0)
@@ -473,15 +473,16 @@ Future<Store> openStore(
 ModelDefinition getObjectBoxModel() {
   final model = ModelInfo(
       entities: _entities,
-      lastEntityId: const IdUid(11, 9207858836982385325),
-      lastIndexId: const IdUid(16, 7052030665778554805),
+      lastEntityId: const IdUid(12, 3080264456348421225),
+      lastIndexId: const IdUid(17, 3488631986190077712),
       lastRelationId: const IdUid(1, 403350268397340821),
       lastSequenceId: const IdUid(0, 0),
       retiredEntityUids: const [
         2699268489578170829,
         6138479246504221594,
         3326717837390706245,
-        6289497147077741130
+        6289497147077741130,
+        9207858836982385325
       ],
       retiredIndexUids: const [2433313747825919311],
       retiredPropertyUids: const [
@@ -566,7 +567,13 @@ ModelDefinition getObjectBoxModel() {
         7018038141094637101,
         391773177564767566,
         2747108334332290773,
-        6243383187698410067
+        6243383187698410067,
+        1748165099843081263,
+        8722230122389221858,
+        408481172411800900,
+        8497259532286296652,
+        6665885871461353957,
+        3931524772921781053
       ],
       retiredRelationUids: const [403350268397340821],
       modelVersion: 5,
@@ -983,36 +990,43 @@ ModelDefinition getObjectBoxModel() {
         objectToFB: (Message object, fb.Builder fbb) {
           final idOffset =
               object.id == null ? null : fbb.writeString(object.id!);
-          final textOffset = fbb.writeString(object.text);
-          final senderIdOffset = fbb.writeString(object.senderId);
-          final receiverIdOffset = fbb.writeString(object.receiverId);
+          final textOffset =
+              object.text == null ? null : fbb.writeString(object.text!);
+          final senderIdOffset = object.senderId == null
+              ? null
+              : fbb.writeString(object.senderId!);
+          final receiverIdOffset = object.receiverId == null
+              ? null
+              : fbb.writeString(object.receiverId!);
           fbb.startTable(7);
           fbb.addInt64(0, object.mid ?? 0);
           fbb.addOffset(1, idOffset);
           fbb.addOffset(2, textOffset);
           fbb.addOffset(3, senderIdOffset);
           fbb.addOffset(4, receiverIdOffset);
-          fbb.addInt64(5, object.createdAt.millisecondsSinceEpoch);
+          fbb.addInt64(5, object.createdAt?.millisecondsSinceEpoch);
           fbb.finish(fbb.endTable());
           return object.mid ?? 0;
         },
         objectFromFB: (Store store, ByteData fbData) {
           final buffer = fb.BufferContext(fbData);
           final rootOffset = buffer.derefObject(0);
-
+          final createdAtValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 14);
           final object = Message(
               mid: const fb.Int64Reader()
                   .vTableGetNullable(buffer, rootOffset, 4),
               id: const fb.StringReader(asciiOptimization: true)
                   .vTableGetNullable(buffer, rootOffset, 6),
               text: const fb.StringReader(asciiOptimization: true)
-                  .vTableGet(buffer, rootOffset, 8, ''),
+                  .vTableGetNullable(buffer, rootOffset, 8),
               senderId: const fb.StringReader(asciiOptimization: true)
-                  .vTableGet(buffer, rootOffset, 10, ''),
+                  .vTableGetNullable(buffer, rootOffset, 10),
               receiverId: const fb.StringReader(asciiOptimization: true)
-                  .vTableGet(buffer, rootOffset, 12, ''),
-              createdAt: DateTime.fromMillisecondsSinceEpoch(
-                  const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0)));
+                  .vTableGetNullable(buffer, rootOffset, 12),
+              createdAt: createdAtValue == null
+                  ? null
+                  : DateTime.fromMillisecondsSinceEpoch(createdAtValue));
 
           return object;
         })

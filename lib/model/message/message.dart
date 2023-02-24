@@ -10,10 +10,10 @@ class Message with _$Message {
   factory Message({
     @JsonKey(ignore: true) @Id(assignable: true) final int? mid,
     @Unique() @JsonKey(name: '_id') final String? id,
-    required String text,
-    required String senderId,
-    required String receiverId,
-    @Property(type: PropertyType.date) required DateTime createdAt,
+    final String? text,
+    final String? senderId,
+    final String? receiverId,
+    @Property(type: PropertyType.date) final DateTime? createdAt,
   }) = _Message;
 
   factory Message.fromJson(Map<String, dynamic> json) =>

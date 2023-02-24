@@ -3,6 +3,7 @@ class ApiConstants {
   static const String baseUrl = 'http://192.168.1.71:3000';
   // static const String baseUrl = 'http://localhost:3000';
   static const String apiUrl = "/api/v0";
+  static const String socket = "http://192.168.1.71:3000";
   static const String staticUrl = "/public/media/uploads/all/";
 
   /* AUTH  */

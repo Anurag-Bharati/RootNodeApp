@@ -8,10 +8,12 @@ part of 'message.dart';
 
 _$_Message _$$_MessageFromJson(Map<String, dynamic> json) => _$_Message(
       id: json['_id'] as String?,
-      text: json['text'] as String,
-      senderId: json['senderId'] as String,
-      receiverId: json['receiverId'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      text: json['text'] as String?,
+      senderId: json['senderId'] as String?,
+      receiverId: json['receiverId'] as String?,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
     );
 
 Map<String, dynamic> _$$_MessageToJson(_$_Message instance) =>
@@ -20,5 +22,5 @@ Map<String, dynamic> _$$_MessageToJson(_$_Message instance) =>
       'text': instance.text,
       'senderId': instance.senderId,
       'receiverId': instance.receiverId,
-      'createdAt': instance.createdAt.toIso8601String(),
+      'createdAt': instance.createdAt?.toIso8601String(),
     };

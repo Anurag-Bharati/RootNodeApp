@@ -1,9 +1,7 @@
-import 'dart:io';
+// ignore_for_file: use_build_context_synchronously
 
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rootnode/helper/notification_helper.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/provider/session_provider.dart';
@@ -58,24 +56,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       isEmail: isEmail,
     );
     if (!res) {
-      // ignore: use_build_context_synchronously
       showSnackbar(context, "Invalid email or password", Colors.red[400]!);
       return false;
     }
-    String localTimeZone =
-        await AwesomeNotifications().getLocalTimeZoneIdentifier();
-    LocalNotificationHelper.checkNotificationEnabled().then(
-      (_) => _.createNotification(
-        schedule: NotificationInterval(
-            interval: 5, timeZone: localTimeZone, repeats: false),
-        content: NotificationContent(
-            id: 1,
-            title: "New login detected",
-            body: "A new login into your account was detected."
-                " Device: ${Platform.operatingSystem}",
-            channelKey: 'test_channel'),
-      ),
-    );
+    // String localTimeZone =
+    //     await AwesomeNotifications().getLocalTimeZoneIdentifier();
+    // LocalNotificationHelper.checkNotificationEnabled().then(
+    //   (_) => _.createNotification(
+    //     schedule: NotificationInterval(
+    //         interval: 5, timeZone: localTimeZone, repeats: false),
+    //     content: NotificationContent(
+    //         id: 1,
+    //         title: "New login detected",
+    //         body: "A new login into your account was detected."
+    //             " Device: ${Platform.operatingSystem}",
+    //         channelKey: 'test_channel'),
+    //   ),
+    // );
 
     User? user = await userRepo.getUserFromToken();
     if (user == null) return false;
@@ -145,14 +142,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       dismissable: false);
                                   bool res = await _loginUser(ref);
                                   if (res) {
-                                    // ignore: use_build_context_synchronously
                                     ScaffoldMessenger.of(context)
                                         .removeCurrentSnackBar();
-                                    // ignore: use_build_context_synchronously
                                     return switchRouteByPushReplace(
                                         context, const DashboardScreen());
                                   }
-                                  // ignore: use_build_context_synchronously
                                   showSnackbar(
                                     context,
                                     "Sorry! Something went wrong",

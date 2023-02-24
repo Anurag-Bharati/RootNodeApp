@@ -26,11 +26,11 @@ mixin _$Message {
   @Unique()
   @JsonKey(name: '_id')
   String? get id => throw _privateConstructorUsedError;
-  String get text => throw _privateConstructorUsedError;
-  String get senderId => throw _privateConstructorUsedError;
-  String get receiverId => throw _privateConstructorUsedError;
+  String? get text => throw _privateConstructorUsedError;
+  String? get senderId => throw _privateConstructorUsedError;
+  String? get receiverId => throw _privateConstructorUsedError;
   @Property(type: PropertyType.date)
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -45,10 +45,10 @@ abstract class $MessageCopyWith<$Res> {
   $Res call(
       {@JsonKey(ignore: true) @Id(assignable: true) int? mid,
       @Unique() @JsonKey(name: '_id') String? id,
-      String text,
-      String senderId,
-      String receiverId,
-      @Property(type: PropertyType.date) DateTime createdAt});
+      String? text,
+      String? senderId,
+      String? receiverId,
+      @Property(type: PropertyType.date) DateTime? createdAt});
 }
 
 /// @nodoc
@@ -66,10 +66,10 @@ class _$MessageCopyWithImpl<$Res, $Val extends Message>
   $Res call({
     Object? mid = freezed,
     Object? id = freezed,
-    Object? text = null,
-    Object? senderId = null,
-    Object? receiverId = null,
-    Object? createdAt = null,
+    Object? text = freezed,
+    Object? senderId = freezed,
+    Object? receiverId = freezed,
+    Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
       mid: freezed == mid
@@ -80,22 +80,22 @@ class _$MessageCopyWithImpl<$Res, $Val extends Message>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String?,
-      text: null == text
+      text: freezed == text
           ? _value.text
           : text // ignore: cast_nullable_to_non_nullable
-              as String,
-      senderId: null == senderId
+              as String?,
+      senderId: freezed == senderId
           ? _value.senderId
           : senderId // ignore: cast_nullable_to_non_nullable
-              as String,
-      receiverId: null == receiverId
+              as String?,
+      receiverId: freezed == receiverId
           ? _value.receiverId
           : receiverId // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
+              as String?,
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -110,10 +110,10 @@ abstract class _$$_MessageCopyWith<$Res> implements $MessageCopyWith<$Res> {
   $Res call(
       {@JsonKey(ignore: true) @Id(assignable: true) int? mid,
       @Unique() @JsonKey(name: '_id') String? id,
-      String text,
-      String senderId,
-      String receiverId,
-      @Property(type: PropertyType.date) DateTime createdAt});
+      String? text,
+      String? senderId,
+      String? receiverId,
+      @Property(type: PropertyType.date) DateTime? createdAt});
 }
 
 /// @nodoc
@@ -128,10 +128,10 @@ class __$$_MessageCopyWithImpl<$Res>
   $Res call({
     Object? mid = freezed,
     Object? id = freezed,
-    Object? text = null,
-    Object? senderId = null,
-    Object? receiverId = null,
-    Object? createdAt = null,
+    Object? text = freezed,
+    Object? senderId = freezed,
+    Object? receiverId = freezed,
+    Object? createdAt = freezed,
   }) {
     return _then(_$_Message(
       mid: freezed == mid
@@ -142,22 +142,22 @@ class __$$_MessageCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String?,
-      text: null == text
+      text: freezed == text
           ? _value.text
           : text // ignore: cast_nullable_to_non_nullable
-              as String,
-      senderId: null == senderId
+              as String?,
+      senderId: freezed == senderId
           ? _value.senderId
           : senderId // ignore: cast_nullable_to_non_nullable
-              as String,
-      receiverId: null == receiverId
+              as String?,
+      receiverId: freezed == receiverId
           ? _value.receiverId
           : receiverId // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
+              as String?,
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
     ));
   }
 }
@@ -169,10 +169,10 @@ class _$_Message implements _Message {
   _$_Message(
       {@JsonKey(ignore: true) @Id(assignable: true) this.mid,
       @Unique() @JsonKey(name: '_id') this.id,
-      required this.text,
-      required this.senderId,
-      required this.receiverId,
-      @Property(type: PropertyType.date) required this.createdAt});
+      this.text,
+      this.senderId,
+      this.receiverId,
+      @Property(type: PropertyType.date) this.createdAt});
 
   factory _$_Message.fromJson(Map<String, dynamic> json) =>
       _$$_MessageFromJson(json);
@@ -186,14 +186,14 @@ class _$_Message implements _Message {
   @JsonKey(name: '_id')
   final String? id;
   @override
-  final String text;
+  final String? text;
   @override
-  final String senderId;
+  final String? senderId;
   @override
-  final String receiverId;
+  final String? receiverId;
   @override
   @Property(type: PropertyType.date)
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   @override
   String toString() {
@@ -237,17 +237,13 @@ class _$_Message implements _Message {
 
 abstract class _Message implements Message {
   factory _Message(
-      {@JsonKey(ignore: true)
-      @Id(assignable: true)
-          final int? mid,
-      @Unique()
-      @JsonKey(name: '_id')
-          final String? id,
-      required final String text,
-      required final String senderId,
-      required final String receiverId,
-      @Property(type: PropertyType.date)
-          required final DateTime createdAt}) = _$_Message;
+          {@JsonKey(ignore: true) @Id(assignable: true) final int? mid,
+          @Unique() @JsonKey(name: '_id') final String? id,
+          final String? text,
+          final String? senderId,
+          final String? receiverId,
+          @Property(type: PropertyType.date) final DateTime? createdAt}) =
+      _$_Message;
 
   factory _Message.fromJson(Map<String, dynamic> json) = _$_Message.fromJson;
 
@@ -260,14 +256,14 @@ abstract class _Message implements Message {
   @JsonKey(name: '_id')
   String? get id;
   @override
-  String get text;
+  String? get text;
   @override
-  String get senderId;
+  String? get senderId;
   @override
-  String get receiverId;
+  String? get receiverId;
   @override
   @Property(type: PropertyType.date)
-  DateTime get createdAt;
+  DateTime? get createdAt;
   @override
   @JsonKey(ignore: true)
   _$$_MessageCopyWith<_$_Message> get copyWith =>

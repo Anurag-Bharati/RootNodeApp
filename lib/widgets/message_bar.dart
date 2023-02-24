@@ -66,9 +66,7 @@ class _BottomChatFieldState extends ConsumerState<BottomMessageBar> {
                   onChanged: _toggleSend,
                   style: RootNodeFontStyle.caption.copyWith(height: 1.4),
                   textAlign: TextAlign.start,
-                  onTapOutside: (event) {
-                    hideKeyboard();
-                  },
+                  onEditingComplete: hideKeyboard,
                   cursorWidth: 6,
                   cursorRadius: const Radius.circular(2),
                   onFieldSubmitted: (value) =>
