@@ -16,6 +16,7 @@ import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'model/comment/comment.dart';
 import 'model/conn.dart';
+import 'model/message/message.dart';
 import 'model/post.dart';
 import 'model/story.dart';
 import 'model/user/user.dart';
@@ -409,6 +410,46 @@ final _entities = <ModelEntity>[
             flags: 0)
       ],
       relations: <ModelRelation>[],
+      backlinks: <ModelBacklink>[]),
+  ModelEntity(
+      id: const IdUid(11, 9207858836982385325),
+      name: 'Message',
+      lastPropertyId: const IdUid(6, 3931524772921781053),
+      flags: 0,
+      properties: <ModelProperty>[
+        ModelProperty(
+            id: const IdUid(1, 1748165099843081263),
+            name: 'mid',
+            type: 6,
+            flags: 129),
+        ModelProperty(
+            id: const IdUid(2, 8722230122389221858),
+            name: 'id',
+            type: 9,
+            flags: 2080,
+            indexId: const IdUid(16, 7052030665778554805)),
+        ModelProperty(
+            id: const IdUid(3, 408481172411800900),
+            name: 'text',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(4, 8497259532286296652),
+            name: 'senderId',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(5, 6665885871461353957),
+            name: 'receiverId',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(6, 3931524772921781053),
+            name: 'createdAt',
+            type: 10,
+            flags: 0)
+      ],
+      relations: <ModelRelation>[],
       backlinks: <ModelBacklink>[])
 ];
 
@@ -432,8 +473,8 @@ Future<Store> openStore(
 ModelDefinition getObjectBoxModel() {
   final model = ModelInfo(
       entities: _entities,
-      lastEntityId: const IdUid(10, 2667989420531770701),
-      lastIndexId: const IdUid(15, 8677575070794955431),
+      lastEntityId: const IdUid(11, 9207858836982385325),
+      lastIndexId: const IdUid(16, 7052030665778554805),
       lastRelationId: const IdUid(1, 403350268397340821),
       lastSequenceId: const IdUid(0, 0),
       retiredEntityUids: const [
@@ -924,6 +965,56 @@ ModelDefinition getObjectBoxModel() {
                   : DateTime.fromMillisecondsSinceEpoch(updatedAtValue));
 
           return object;
+        }),
+    Message: EntityDefinition<Message>(
+        model: _entities[6],
+        toOneRelations: (Message object) => [],
+        toManyRelations: (Message object) => {},
+        getId: (Message object) => object.mid,
+        setId: (Message object, int id) {
+          if (object.mid != id) {
+            throw ArgumentError('Field Message.mid is read-only '
+                '(final or getter-only) and it was declared to be self-assigned. '
+                'However, the currently inserted object (.mid=${object.mid}) '
+                "doesn't match the inserted ID (ID $id). "
+                'You must assign an ID before calling [box.put()].');
+          }
+        },
+        objectToFB: (Message object, fb.Builder fbb) {
+          final idOffset =
+              object.id == null ? null : fbb.writeString(object.id!);
+          final textOffset = fbb.writeString(object.text);
+          final senderIdOffset = fbb.writeString(object.senderId);
+          final receiverIdOffset = fbb.writeString(object.receiverId);
+          fbb.startTable(7);
+          fbb.addInt64(0, object.mid ?? 0);
+          fbb.addOffset(1, idOffset);
+          fbb.addOffset(2, textOffset);
+          fbb.addOffset(3, senderIdOffset);
+          fbb.addOffset(4, receiverIdOffset);
+          fbb.addInt64(5, object.createdAt.millisecondsSinceEpoch);
+          fbb.finish(fbb.endTable());
+          return object.mid ?? 0;
+        },
+        objectFromFB: (Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+
+          final object = Message(
+              mid: const fb.Int64Reader()
+                  .vTableGetNullable(buffer, rootOffset, 4),
+              id: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 6),
+              text: const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 8, ''),
+              senderId: const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 10, ''),
+              receiverId: const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 12, ''),
+              createdAt: DateTime.fromMillisecondsSinceEpoch(
+                  const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0)));
+
+          return object;
         })
   };
 
@@ -1181,4 +1272,28 @@ class Comment_ {
   /// see [Comment.updatedAt]
   static final updatedAt =
       QueryIntegerProperty<Comment>(_entities[5].properties[7]);
+}
+
+/// [Message] entity fields to define ObjectBox queries.
+class Message_ {
+  /// see [Message.mid]
+  static final mid = QueryIntegerProperty<Message>(_entities[6].properties[0]);
+
+  /// see [Message.id]
+  static final id = QueryStringProperty<Message>(_entities[6].properties[1]);
+
+  /// see [Message.text]
+  static final text = QueryStringProperty<Message>(_entities[6].properties[2]);
+
+  /// see [Message.senderId]
+  static final senderId =
+      QueryStringProperty<Message>(_entities[6].properties[3]);
+
+  /// see [Message.receiverId]
+  static final receiverId =
+      QueryStringProperty<Message>(_entities[6].properties[4]);
+
+  /// see [Message.createdAt]
+  static final createdAt =
+      QueryIntegerProperty<Message>(_entities[6].properties[5]);
 }
