@@ -160,7 +160,11 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
                   },
                 ),
               ),
-              BottomMessageBar(onSuccess: _scrollToBottom, id: widget.node.id!)
+              BottomMessageBar(
+                onSuccess: _scrollToBottom,
+                id: widget.node.id!,
+                messageService: _messageService!,
+              )
             ],
           ),
         ),

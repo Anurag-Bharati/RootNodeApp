@@ -10,10 +10,12 @@ class BottomMessageBar extends ConsumerStatefulWidget {
   const BottomMessageBar({
     required this.onSuccess,
     required this.id,
+    required this.messageService,
     Key? key,
   }) : super(key: key);
   final String id;
   final Function onSuccess;
+  final MessageService messageService;
 
   @override
   ConsumerState<BottomMessageBar> createState() => _BottomChatFieldState();
@@ -21,13 +23,11 @@ class BottomMessageBar extends ConsumerStatefulWidget {
 
 class _BottomChatFieldState extends ConsumerState<BottomMessageBar> {
   final _controller = TextEditingController();
-  late final MessageService _messageService;
   FocusNode focusNode = FocusNode();
   bool isDisabled = true;
 
   @override
   void initState() {
-    _messageService = ref.read(messageServiceProvider(widget.id));
     super.initState();
   }
 
@@ -36,7 +36,6 @@ class _BottomChatFieldState extends ConsumerState<BottomMessageBar> {
 
   @override
   void dispose() {
-    _messageService.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -127,7 +126,7 @@ class _BottomChatFieldState extends ConsumerState<BottomMessageBar> {
       showSnackbar(context, "Invalid comment", Colors.red[400]!);
       return;
     }
-    _messageService.sendMessage(Message(
+    widget.messageService.sendMessage(Message(
       from: rootnode.id!,
       to: widget.id,
       text: message,

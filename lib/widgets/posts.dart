@@ -214,33 +214,36 @@ class _PostBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => switchRouteByPush(
-          context,
-          ViewPost(
-            post: post,
-            likedMeta: isLiked,
-          )),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: compact ? 10 : LayoutConstants.postPadding),
-            child: post.type == "markdown"
-                ? MarkdownBody(
-                    data: post.caption!,
-                    styleSheet: MarkdownStyleSheet(
-                        h1: RootNodeFontStyle.body, p: RootNodeFontStyle.body),
-                  )
-                : Text(
-                    post.caption ?? "",
-                    softWrap: true,
-                    style: RootNodeFontStyle.caption,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: compact ? 10 : LayoutConstants.postPadding),
+          child: post.type == "markdown"
+              ? MarkdownBody(
+                  data: post.caption!,
+                  selectable: true,
+                  styleSheet: MarkdownStyleSheet(
+                    h1: RootNodeFontStyle.body,
+                    p: RootNodeFontStyle.subtitle,
                   ),
-          ),
-          post.mediaFiles.isNotEmpty
-              ? Center(
+                )
+              : Text(
+                  post.caption ?? "",
+                  softWrap: true,
+                  style: RootNodeFontStyle.caption,
+                ),
+        ),
+        post.mediaFiles.isNotEmpty
+            ? Center(
+                child: GestureDetector(
+                  onTap: () => switchRouteByPush(
+                      context,
+                      ViewPost(
+                        post: post,
+                        likedMeta: isLiked,
+                      )),
                   child: Container(
                     width: double.maxFinite,
                     clipBehavior: Clip.antiAlias,
@@ -287,21 +290,25 @@ class _PostBody extends StatelessWidget {
                                   }).toList(),
                                 ),
                                 const Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Icon(Boxicons.bx_images,
-                                          size: 20, color: Colors.white54),
-                                    ))
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Icon(
+                                      Boxicons.bx_images,
+                                      size: 20,
+                                      color: Colors.white54,
+                                    ),
+                                  ),
+                                )
                               ],
                             ),
                     ),
                   ),
-                )
-              : SizedBox(height: post.caption != null ? 10 : 0),
-        ],
-      ),
+                ),
+              )
+            : SizedBox(height: post.caption != null ? 10 : 0),
+      ],
     );
   }
 }
