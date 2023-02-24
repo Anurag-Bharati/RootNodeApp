@@ -27,8 +27,8 @@ mixin _$Message {
   @JsonKey(name: '_id')
   String? get id => throw _privateConstructorUsedError;
   String? get text => throw _privateConstructorUsedError;
-  String? get senderId => throw _privateConstructorUsedError;
-  String? get receiverId => throw _privateConstructorUsedError;
+  String? get to => throw _privateConstructorUsedError;
+  String? get from => throw _privateConstructorUsedError;
   @Property(type: PropertyType.date)
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
@@ -46,8 +46,8 @@ abstract class $MessageCopyWith<$Res> {
       {@JsonKey(ignore: true) @Id(assignable: true) int? mid,
       @Unique() @JsonKey(name: '_id') String? id,
       String? text,
-      String? senderId,
-      String? receiverId,
+      String? to,
+      String? from,
       @Property(type: PropertyType.date) DateTime? createdAt});
 }
 
@@ -67,8 +67,8 @@ class _$MessageCopyWithImpl<$Res, $Val extends Message>
     Object? mid = freezed,
     Object? id = freezed,
     Object? text = freezed,
-    Object? senderId = freezed,
-    Object? receiverId = freezed,
+    Object? to = freezed,
+    Object? from = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
@@ -84,13 +84,13 @@ class _$MessageCopyWithImpl<$Res, $Val extends Message>
           ? _value.text
           : text // ignore: cast_nullable_to_non_nullable
               as String?,
-      senderId: freezed == senderId
-          ? _value.senderId
-          : senderId // ignore: cast_nullable_to_non_nullable
+      to: freezed == to
+          ? _value.to
+          : to // ignore: cast_nullable_to_non_nullable
               as String?,
-      receiverId: freezed == receiverId
-          ? _value.receiverId
-          : receiverId // ignore: cast_nullable_to_non_nullable
+      from: freezed == from
+          ? _value.from
+          : from // ignore: cast_nullable_to_non_nullable
               as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
@@ -111,8 +111,8 @@ abstract class _$$_MessageCopyWith<$Res> implements $MessageCopyWith<$Res> {
       {@JsonKey(ignore: true) @Id(assignable: true) int? mid,
       @Unique() @JsonKey(name: '_id') String? id,
       String? text,
-      String? senderId,
-      String? receiverId,
+      String? to,
+      String? from,
       @Property(type: PropertyType.date) DateTime? createdAt});
 }
 
@@ -129,8 +129,8 @@ class __$$_MessageCopyWithImpl<$Res>
     Object? mid = freezed,
     Object? id = freezed,
     Object? text = freezed,
-    Object? senderId = freezed,
-    Object? receiverId = freezed,
+    Object? to = freezed,
+    Object? from = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(_$_Message(
@@ -146,13 +146,13 @@ class __$$_MessageCopyWithImpl<$Res>
           ? _value.text
           : text // ignore: cast_nullable_to_non_nullable
               as String?,
-      senderId: freezed == senderId
-          ? _value.senderId
-          : senderId // ignore: cast_nullable_to_non_nullable
+      to: freezed == to
+          ? _value.to
+          : to // ignore: cast_nullable_to_non_nullable
               as String?,
-      receiverId: freezed == receiverId
-          ? _value.receiverId
-          : receiverId // ignore: cast_nullable_to_non_nullable
+      from: freezed == from
+          ? _value.from
+          : from // ignore: cast_nullable_to_non_nullable
               as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
@@ -170,8 +170,8 @@ class _$_Message implements _Message {
       {@JsonKey(ignore: true) @Id(assignable: true) this.mid,
       @Unique() @JsonKey(name: '_id') this.id,
       this.text,
-      this.senderId,
-      this.receiverId,
+      this.to,
+      this.from,
       @Property(type: PropertyType.date) this.createdAt});
 
   factory _$_Message.fromJson(Map<String, dynamic> json) =>
@@ -188,16 +188,16 @@ class _$_Message implements _Message {
   @override
   final String? text;
   @override
-  final String? senderId;
+  final String? to;
   @override
-  final String? receiverId;
+  final String? from;
   @override
   @Property(type: PropertyType.date)
   final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'Message(mid: $mid, id: $id, text: $text, senderId: $senderId, receiverId: $receiverId, createdAt: $createdAt)';
+    return 'Message(mid: $mid, id: $id, text: $text, to: $to, from: $from, createdAt: $createdAt)';
   }
 
   @override
@@ -208,10 +208,8 @@ class _$_Message implements _Message {
             (identical(other.mid, mid) || other.mid == mid) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.text, text) || other.text == text) &&
-            (identical(other.senderId, senderId) ||
-                other.senderId == senderId) &&
-            (identical(other.receiverId, receiverId) ||
-                other.receiverId == receiverId) &&
+            (identical(other.to, to) || other.to == to) &&
+            (identical(other.from, from) || other.from == from) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -219,7 +217,7 @@ class _$_Message implements _Message {
   @JsonKey(ignore: true)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, mid, id, text, senderId, receiverId, createdAt);
+      Object.hash(runtimeType, mid, id, text, to, from, createdAt);
 
   @JsonKey(ignore: true)
   @override
@@ -240,8 +238,8 @@ abstract class _Message implements Message {
           {@JsonKey(ignore: true) @Id(assignable: true) final int? mid,
           @Unique() @JsonKey(name: '_id') final String? id,
           final String? text,
-          final String? senderId,
-          final String? receiverId,
+          final String? to,
+          final String? from,
           @Property(type: PropertyType.date) final DateTime? createdAt}) =
       _$_Message;
 
@@ -258,9 +256,9 @@ abstract class _Message implements Message {
   @override
   String? get text;
   @override
-  String? get senderId;
+  String? get to;
   @override
-  String? get receiverId;
+  String? get from;
   @override
   @Property(type: PropertyType.date)
   DateTime? get createdAt;

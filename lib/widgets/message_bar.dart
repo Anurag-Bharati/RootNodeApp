@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:rootnode/app/constant/font.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/utils/snackbar.dart';
+import 'package:rootnode/helper/message_service.dart';
+import 'package:rootnode/model/message/message.dart';
+import 'package:rootnode/provider/session_provider.dart';
 
 class BottomMessageBar extends ConsumerStatefulWidget {
   const BottomMessageBar({
@@ -18,12 +21,13 @@ class BottomMessageBar extends ConsumerStatefulWidget {
 
 class _BottomChatFieldState extends ConsumerState<BottomMessageBar> {
   final _controller = TextEditingController();
-
+  late final MessageService _messageService;
   FocusNode focusNode = FocusNode();
   bool isDisabled = true;
 
   @override
   void initState() {
+    _messageService = ref.read(messageServiceProvider(widget.id));
     super.initState();
   }
 
@@ -32,8 +36,9 @@ class _BottomChatFieldState extends ConsumerState<BottomMessageBar> {
 
   @override
   void dispose() {
-    super.dispose();
+    _messageService.dispose();
     _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -90,7 +95,6 @@ class _BottomChatFieldState extends ConsumerState<BottomMessageBar> {
               ),
             ),
             IconButton(
-              padding: const EdgeInsets.only(right: 10),
               disabledColor: Colors.white10,
               color: Colors.white70,
               visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -114,6 +118,7 @@ class _BottomChatFieldState extends ConsumerState<BottomMessageBar> {
   }
 
   _sendMessage() {
+    final rootnode = ref.read(sessionProvider.select((value) => value.user!));
     String message = _controller.text;
     _controller.clear();
     _toggleSend("");
@@ -122,5 +127,11 @@ class _BottomChatFieldState extends ConsumerState<BottomMessageBar> {
       showSnackbar(context, "Invalid comment", Colors.red[400]!);
       return;
     }
+    _messageService.sendMessage(Message(
+      from: rootnode.id!,
+      to: widget.id,
+      text: message,
+    ));
+    widget.onSuccess();
   }
 }

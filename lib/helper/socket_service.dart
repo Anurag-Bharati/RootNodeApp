@@ -25,8 +25,8 @@ class SocketService {
   SocketService({required this.socket});
 
   void connect() {
-    print("Socket:Connect->${socket.connected}");
-    print(hashCode);
+    print("SocketStatus: ${socket.connected ? 'Connected!' : 'Connecting...'}");
+    print("SocketHash: $hashCode");
     if (socket.connected) return;
     socket.connect();
     socket.onConnect((data) => print("SocketIO: connected"));

@@ -5,17 +5,23 @@ import 'package:rootnode/helper/socket_service.dart';
 import 'package:rootnode/model/message/message.dart';
 
 final messageServiceProvider = Provider.family((ref, String nodeId) {
-  return MessageService(
+  print("USER READY FOR MSG: $nodeId");
+  final x = MessageService(
       nodeId: nodeId, socketService: ref.watch(socketServiceProvider));
+  print("MsgProviderHash: ${x.hashCode}");
+  return x;
 });
 
 class MessageService {
   final String nodeId;
   final SocketService socketService;
   final _messages = <Message>[];
-  final _messagesController = StreamController<List<Message>>.broadcast();
+  final StreamController<List<Message>> _messagesController =
+      StreamController<List<Message>>.broadcast();
   bool _isTyping = false;
   Timer? _typingTimer;
+
+  get initials => _messages;
 
   void isConnected() => print(socketService.socket.connected);
 
@@ -24,6 +30,8 @@ class MessageService {
     socketService.attachEvent('message', _handleIncomingMessage);
     socketService.attachEvent('typing', _handleIncomingTyping);
   }
+
+  get recent => messages.last;
 
   void _handleIncomingTyping(data) {
     final userId = data['senderId'];
@@ -84,5 +92,9 @@ class MessageService {
     messages.drain();
     _messagesController.close();
     socketService.dispose();
+  }
+
+  void deactivate() {
+    // _messagesController.pause();
   }
 }

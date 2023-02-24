@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 void showSnackbar(BuildContext context, String message, Color color,
-    {dismissable = true}) {
+    {bool dismissable = true,
+    EdgeInsetsGeometry margin = const EdgeInsets.all(20)}) {
   ScaffoldMessenger.of(context).removeCurrentSnackBar();
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
@@ -10,7 +11,7 @@ void showSnackbar(BuildContext context, String message, Color color,
       backgroundColor: color,
       content: Text(message),
       duration: const Duration(milliseconds: 1500),
-      margin: const EdgeInsets.all(20),
+      margin: margin,
       action: dismissable
           ? SnackBarAction(
               label: "OK",

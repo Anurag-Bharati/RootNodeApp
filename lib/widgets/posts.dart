@@ -2,6 +2,7 @@ import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:like_button/like_button.dart';
 import 'package:rootnode/app/constant/api.dart';
@@ -187,8 +188,8 @@ class _PostHeader extends ConsumerWidget {
 
   _handleThreeDots(BuildContext context, int value, WidgetRef ref) {
     if (value == -1) {
-      final _postRepo = ref.read(postRepoProvider);
-      _postRepo.deletePost(id: post.id!).then((value) => value
+      final postRepo = ref.read(postRepoProvider);
+      postRepo.deletePost(id: post.id!).then((value) => value
           ? showSnackbar(context, "Deletion successful!", Colors.green[400]!)
           : showSnackbar(context, "Something went wrong!", Colors.red[400]!));
       return;
@@ -226,11 +227,17 @@ class _PostBody extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(
                 horizontal: compact ? 10 : LayoutConstants.postPadding),
-            child: Text(
-              post.caption ?? "",
-              softWrap: true,
-              style: RootNodeFontStyle.caption,
-            ),
+            child: post.type == "markdown"
+                ? MarkdownBody(
+                    data: post.caption!,
+                    styleSheet: MarkdownStyleSheet(
+                        h1: RootNodeFontStyle.body, p: RootNodeFontStyle.body),
+                  )
+                : Text(
+                    post.caption ?? "",
+                    softWrap: true,
+                    style: RootNodeFontStyle.caption,
+                  ),
           ),
           post.mediaFiles.isNotEmpty
               ? Center(

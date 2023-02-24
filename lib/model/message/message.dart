@@ -11,8 +11,8 @@ class Message with _$Message {
     @JsonKey(ignore: true) @Id(assignable: true) final int? mid,
     @Unique() @JsonKey(name: '_id') final String? id,
     final String? text,
-    final String? senderId,
-    final String? receiverId,
+    final String? to,
+    final String? from,
     @Property(type: PropertyType.date) final DateTime? createdAt,
   }) = _Message;
 

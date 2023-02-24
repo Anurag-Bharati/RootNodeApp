@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rootnode/helper/socket_service.dart';
 import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/provider/session_provider.dart';
@@ -77,6 +78,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     User? user = await userRepo.getUserFromToken();
     if (user == null) return false;
     ref.read(sessionProvider.notifier).updateUser(user: user);
+    ref.read(socketServiceProvider).connect();
     return true;
   }
 

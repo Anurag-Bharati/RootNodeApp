@@ -414,7 +414,7 @@ final _entities = <ModelEntity>[
   ModelEntity(
       id: const IdUid(12, 3080264456348421225),
       name: 'Message',
-      lastPropertyId: const IdUid(6, 7998462352554530462),
+      lastPropertyId: const IdUid(10, 482661637893167961),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
@@ -434,19 +434,19 @@ final _entities = <ModelEntity>[
             type: 9,
             flags: 0),
         ModelProperty(
-            id: const IdUid(4, 8792419507488771527),
-            name: 'senderId',
-            type: 9,
-            flags: 0),
-        ModelProperty(
-            id: const IdUid(5, 5298742466338899628),
-            name: 'receiverId',
-            type: 9,
-            flags: 0),
-        ModelProperty(
             id: const IdUid(6, 7998462352554530462),
             name: 'createdAt',
             type: 10,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(9, 4545059121923392934),
+            name: 'to',
+            type: 9,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(10, 482661637893167961),
+            name: 'from',
+            type: 9,
             flags: 0)
       ],
       relations: <ModelRelation>[],
@@ -573,7 +573,11 @@ ModelDefinition getObjectBoxModel() {
         408481172411800900,
         8497259532286296652,
         6665885871461353957,
-        3931524772921781053
+        3931524772921781053,
+        8792419507488771527,
+        5298742466338899628,
+        7859619053656089670,
+        4129377868401575680
       ],
       retiredRelationUids: const [403350268397340821],
       modelVersion: 5,
@@ -992,19 +996,17 @@ ModelDefinition getObjectBoxModel() {
               object.id == null ? null : fbb.writeString(object.id!);
           final textOffset =
               object.text == null ? null : fbb.writeString(object.text!);
-          final senderIdOffset = object.senderId == null
-              ? null
-              : fbb.writeString(object.senderId!);
-          final receiverIdOffset = object.receiverId == null
-              ? null
-              : fbb.writeString(object.receiverId!);
-          fbb.startTable(7);
+          final toOffset =
+              object.to == null ? null : fbb.writeString(object.to!);
+          final fromOffset =
+              object.from == null ? null : fbb.writeString(object.from!);
+          fbb.startTable(11);
           fbb.addInt64(0, object.mid ?? 0);
           fbb.addOffset(1, idOffset);
           fbb.addOffset(2, textOffset);
-          fbb.addOffset(3, senderIdOffset);
-          fbb.addOffset(4, receiverIdOffset);
           fbb.addInt64(5, object.createdAt?.millisecondsSinceEpoch);
+          fbb.addOffset(8, toOffset);
+          fbb.addOffset(9, fromOffset);
           fbb.finish(fbb.endTable());
           return object.mid ?? 0;
         },
@@ -1020,10 +1022,10 @@ ModelDefinition getObjectBoxModel() {
                   .vTableGetNullable(buffer, rootOffset, 6),
               text: const fb.StringReader(asciiOptimization: true)
                   .vTableGetNullable(buffer, rootOffset, 8),
-              senderId: const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 10),
-              receiverId: const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 12),
+              to: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 20),
+              from: const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 22),
               createdAt: createdAtValue == null
                   ? null
                   : DateTime.fromMillisecondsSinceEpoch(createdAtValue));
@@ -1299,15 +1301,13 @@ class Message_ {
   /// see [Message.text]
   static final text = QueryStringProperty<Message>(_entities[6].properties[2]);
 
-  /// see [Message.senderId]
-  static final senderId =
-      QueryStringProperty<Message>(_entities[6].properties[3]);
-
-  /// see [Message.receiverId]
-  static final receiverId =
-      QueryStringProperty<Message>(_entities[6].properties[4]);
-
   /// see [Message.createdAt]
   static final createdAt =
-      QueryIntegerProperty<Message>(_entities[6].properties[5]);
+      QueryIntegerProperty<Message>(_entities[6].properties[3]);
+
+  /// see [Message.to]
+  static final to = QueryStringProperty<Message>(_entities[6].properties[4]);
+
+  /// see [Message.from]
+  static final from = QueryStringProperty<Message>(_entities[6].properties[5]);
 }
