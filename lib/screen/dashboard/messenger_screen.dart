@@ -5,6 +5,7 @@ import 'package:rootnode/model/conn.dart';
 import 'package:rootnode/repository/conn_repo.dart';
 import 'package:rootnode/widgets/live_messenger_stats.dart';
 import 'package:rootnode/widgets/messenger_card.dart';
+import 'package:rootnode/widgets/such_empty.dart';
 
 class MessengerScreen extends ConsumerStatefulWidget {
   const MessengerScreen({super.key});
@@ -58,14 +59,16 @@ class _MessengerScreenState extends ConsumerState<MessengerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemBuilder: (context, index) => index == 0
-          ? const RNLiveMessage()
-          : MessengerCard(
-              node: conns[index].node!,
-            ),
-      itemCount: conns.length,
-    );
+    return conns.isEmpty
+        ? const SuchEmpty()
+        : ListView.builder(
+            itemBuilder: (context, index) => index == 0
+                ? const RNLiveMessage()
+                : MessengerCard(
+                    node: conns[index].node!,
+                  ),
+            itemCount: conns.length,
+          );
   }
 }
           // ,

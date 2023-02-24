@@ -65,7 +65,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   @override
   void initState() {
-    shakeDetector = ShakeDetector.autoStart(onPhoneShake: () => _showLogout());
+    shakeDetector =
+        ShakeDetector.waitForStart(onPhoneShake: () => _showLogout());
+    shakeDetector.startListening();
     super.initState();
   }
 
