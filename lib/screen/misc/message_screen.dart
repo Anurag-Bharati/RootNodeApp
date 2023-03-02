@@ -9,9 +9,11 @@ import 'package:rootnode/helper/switch_route.dart';
 import 'package:rootnode/model/message/message.dart';
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/provider/session_provider.dart';
+import 'package:rootnode/screen/misc/call_screen.dart';
 import 'package:rootnode/screen/misc/view_profile.dart';
 import 'package:rootnode/widgets/message_bar.dart';
 import 'package:rootnode/widgets/message_card.dart';
+import 'package:rootnode/widgets/such_empty.dart';
 
 class MessageScreen extends ConsumerStatefulWidget {
   const MessageScreen({super.key, required this.node});
@@ -122,6 +124,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final messages = snapshot.data!;
+                      if (messages.isEmpty) return const SuchEmpty();
                       return ListView.builder(
                         addAutomaticKeepAlives: false,
                         controller: _controller,
@@ -176,7 +179,8 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
         IconButton(
           visualDensity: VisualDensity.adaptivePlatformDensity,
           highlightColor: Colors.white10,
-          onPressed: () {},
+          onPressed: () =>
+              switchRouteByPush(context, CallScreen(node: widget.node)),
           icon: const Icon(
             Boxicons.bxs_phone,
             color: Colors.white70,
