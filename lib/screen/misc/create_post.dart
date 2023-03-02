@@ -94,33 +94,6 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                showHeading && !disableTextField
-                    ? Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
-                        child: TextFormField(
-                          onTapOutside: (event) =>
-                              FocusScope.of(context).unfocus(),
-                          onEditingComplete: () =>
-                              FocusScope.of(context).unfocus(),
-                          controller: _headingController,
-                          maxLines: 1,
-                          textAlign: TextAlign.center,
-                          cursorColor: Colors.cyan[400],
-                          cursorHeight: 5,
-                          cursorWidth: 15,
-                          style: RootNodeFontStyle.captionDefault,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white10,
-                            hintText: 'Try "Read this out!"',
-                            hintStyle: RootNodeFontStyle.body,
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 10),
-                          ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
                 disableTextField
                     ? const SizedBox.shrink()
                     : Container(
@@ -136,7 +109,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                           textAlign: TextAlign.center,
                           cursorColor: Colors.cyan[400],
                           cursorHeight: 5,
-                          cursorWidth: 15,
+                          cursorWidth: 3,
                           style: RootNodeFontStyle.captionDefault,
                           decoration: InputDecoration(
                             filled: true,

@@ -16,6 +16,7 @@ import 'package:rootnode/repository/post_repo.dart';
 import 'package:rootnode/repository/story_repo.dart';
 import 'package:rootnode/repository/user_repo.dart';
 import 'package:rootnode/screen/misc/edit_profile.dart';
+import 'package:rootnode/screen/misc/message_screen.dart';
 import 'package:rootnode/widgets/buttons.dart';
 import 'package:rootnode/widgets/placeholder.dart';
 import 'package:rootnode/widgets/posts.dart';
@@ -321,11 +322,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         child: Text("Share", style: RootNodeFontStyle.body),
       ),
       RootNodeOutlinedButton(
-        onPressed: () => debugPrint('Message Button Pressed!'),
-        child:
-            const Icon(Boxicons.bxs_message_square_dots, color: Colors.white54),
-      ),
-      RootNodeOutlinedButton(
         onPressed: () async {
           if (widget.id == rootnode.id!) {
             debugPrint("Edit Button Pressed!");
@@ -341,6 +337,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     style: RootNodeFontStyle.body)
                 : Text("Edit", style: RootNodeFontStyle.body)
             : const SizedBox.shrink(),
+      ),
+      RootNodeOutlinedButton(
+        onPressed: () =>
+            switchRouteByPushReplace(context, MessageScreen(node: user!)),
+        child:
+            const Icon(Boxicons.bxs_message_square_dots, color: Colors.white54),
       ),
     ];
   }

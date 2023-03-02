@@ -15,11 +15,13 @@ void main(List<String> args) async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then(
-    (value) => runApp(MaterialApp(
-      title: 'RootNode',
-      debugShowCheckedModeBanner: false,
-      theme: getApplicationThemeData(),
-      home: const ProviderScope(child: WearOsSplashScreen()),
+    (value) => runApp(ProviderScope(
+      child: MaterialApp(
+        title: 'RootNode',
+        debugShowCheckedModeBanner: false,
+        theme: getApplicationThemeData(),
+        home: const WearOsSplashScreen(),
+      ),
     )),
   );
 }

@@ -2,6 +2,7 @@ import 'package:boxicons/boxicons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:like_button/like_button.dart';
 import 'package:rootnode/app/constant/api.dart';
@@ -187,8 +188,8 @@ class _PostHeader extends ConsumerWidget {
 
   _handleThreeDots(BuildContext context, int value, WidgetRef ref) {
     if (value == -1) {
-      final _postRepo = ref.read(postRepoProvider);
-      _postRepo.deletePost(id: post.id!).then((value) => value
+      final postRepo = ref.read(postRepoProvider);
+      postRepo.deletePost(id: post.id!).then((value) => value
           ? showSnackbar(context, "Deletion successful!", Colors.green[400]!)
           : showSnackbar(context, "Something went wrong!", Colors.red[400]!));
       return;
@@ -213,27 +214,36 @@ class _PostBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => switchRouteByPush(
-          context,
-          ViewPost(
-            post: post,
-            likedMeta: isLiked,
-          )),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: compact ? 10 : LayoutConstants.postPadding),
-            child: Text(
-              post.caption ?? "",
-              softWrap: true,
-              style: RootNodeFontStyle.caption,
-            ),
-          ),
-          post.mediaFiles.isNotEmpty
-              ? Center(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: compact ? 10 : LayoutConstants.postPadding),
+          child: post.type == "markdown"
+              ? MarkdownBody(
+                  data: post.caption!,
+                  selectable: true,
+                  styleSheet: MarkdownStyleSheet(
+                    h1: RootNodeFontStyle.body,
+                    p: RootNodeFontStyle.subtitle,
+                  ),
+                )
+              : Text(
+                  post.caption ?? "",
+                  softWrap: true,
+                  style: RootNodeFontStyle.caption,
+                ),
+        ),
+        post.mediaFiles.isNotEmpty
+            ? Center(
+                child: GestureDetector(
+                  onTap: () => switchRouteByPush(
+                      context,
+                      ViewPost(
+                        post: post,
+                        likedMeta: isLiked,
+                      )),
                   child: Container(
                     width: double.maxFinite,
                     clipBehavior: Clip.antiAlias,
@@ -280,21 +290,25 @@ class _PostBody extends StatelessWidget {
                                   }).toList(),
                                 ),
                                 const Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Icon(Boxicons.bx_images,
-                                          size: 20, color: Colors.white54),
-                                    ))
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Icon(
+                                      Boxicons.bx_images,
+                                      size: 20,
+                                      color: Colors.white54,
+                                    ),
+                                  ),
+                                )
                               ],
                             ),
                     ),
                   ),
-                )
-              : SizedBox(height: post.caption != null ? 10 : 0),
-        ],
-      ),
+                ),
+              )
+            : SizedBox(height: post.caption != null ? 10 : 0),
+      ],
     );
   }
 }

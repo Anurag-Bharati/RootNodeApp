@@ -72,7 +72,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       extendBody: _getWidth(context) > 480,
       appBar: AppBar(
         elevation: 0,
-        toolbarHeight: mqSmallH(context) ? 80 : 60,
+        toolbarHeight: mqSmallH(context) ? 60 : 60, // 80 : 60
         backgroundColor: const Color(0xFF111111),
         title: RootNodeBar(user: rootnode),
         actions: [

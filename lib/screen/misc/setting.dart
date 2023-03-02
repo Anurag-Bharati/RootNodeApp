@@ -1,7 +1,9 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:boxicons/boxicons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rootnode/app/constant/font.dart';
+import 'package:rootnode/helper/socket_service.dart';
 
 import 'package:rootnode/model/user/user.dart';
 import 'package:rootnode/helper/notification_helper.dart';
@@ -125,28 +127,34 @@ class _SettingScreenState extends State<SettingScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: ElevatedButton(
-                      onPressed: () => Navigator.of(context)
-                          .pushNamedAndRemoveUntil(
-                              LoginScreen.route, (route) => false),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 20),
-                        child: Text(
-                          "Logout",
-                          style: RootNodeFontStyle.body,
-                        ),
-                      )),
-                ),
-              ),
+              Consumer(builder: (context, ref, child) {
+                return SizedBox(
+                  width: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: ElevatedButton(
+                        onPressed: () => _logout(ref),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 20),
+                          child: Text(
+                            "Logout",
+                            style: RootNodeFontStyle.body,
+                          ),
+                        )),
+                  ),
+                );
+              }),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _logout(WidgetRef ref) {
+    ref.read(socketServiceProvider).disconnect();
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(LoginScreen.route, (route) => false);
   }
 }
